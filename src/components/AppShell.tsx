@@ -22,19 +22,26 @@ import {
    Same routes, same components. Only the chrome changes.
 --------------------------------------------------------------------------- */
 
-type Item = { to: string; label: string; Icon: (p: { className?: string }) => JSX.Element }
+type Item = {
+  to: string
+  label: string
+  Icon: (p: { className?: string }) => JSX.Element
+  /** false keeps it out of the phone bottom bar, which only fits four. */
+  mobile?: boolean
+}
 
 const NAV: Record<string, Item[]> = {
   admin: [
     { to: '/admin', label: 'Today', Icon: IconToday },
     { to: '/admin/classes', label: 'Classes', Icon: IconClass },
+    { to: '/teacher', label: 'Register', Icon: IconRegister },
     { to: '/admin/flagged', label: 'Flagged', Icon: IconFlag },
-    { to: '/admin/notices', label: 'Notices', Icon: IconNotice },
+    { to: '/admin/teachers', label: 'Teachers', Icon: IconClass, mobile: false },
+    { to: '/admin/notices', label: 'Notices', Icon: IconNotice, mobile: false },
   ],
   teacher: [
     { to: '/teacher', label: 'Register', Icon: IconRegister },
     { to: '/teacher/lesson', label: 'Lesson', Icon: IconLesson },
-    { to: '/teacher/class', label: 'Class', Icon: IconClass },
   ],
   parent: [
     { to: '/parent', label: 'Today', Icon: IconToday },
@@ -139,7 +146,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* ---------- Phone bottom nav ---------- */}
       <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-surface border-t border-rule z-10">
         <div className="flex pb-[env(safe-area-inset-bottom)]">
-          {items.map(({ to, label, Icon }) => (
+          {items.filter((i) => i.mobile !== false).map(({ to, label, Icon }) => (
             <NavLink
               key={to}
               to={to}

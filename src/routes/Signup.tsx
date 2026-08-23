@@ -10,18 +10,26 @@ export default function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
 
   async function submit() {
     setError(null)
     setBusy(true)
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName } },
     })
     setBusy(false)
     if (error) return setError(error.message)
+
+    // Supabase confirms email by default, which returns a user but no session.
+    // Without this branch the screen looks like it did nothing.
+    if (!data.session) {
+      setSent(true)
+      return
+    }
     navigate('/')
   }
 
@@ -38,6 +46,20 @@ export default function Signup() {
     >
       <span className="eyebrow">Create account</span>
       <h2 className="text-[24px] mt-1.5 mb-6">Start with your name.</h2>
+
+      {sent && (
+        <div className="mb-5 border border-rule-strong bg-brass-wash rounded-md p-4">
+          <p className="text-[14px] text-ink font-semibold">Check your email.</p>
+          <p className="mt-1.5 text-[13px] text-ink-soft leading-relaxed">
+            Your account was created but needs confirming before you can sign in. Open the
+            link we sent to {email}.
+          </p>
+          <p className="mt-2.5 text-[12px] text-ink-faint leading-relaxed">
+            Building and want to skip this? In Supabase go to Authentication, Sign In /
+            Providers, Email, and turn off Confirm email.
+          </p>
+        </div>
+      )}
 
       <form
         className="space-y-3.5"

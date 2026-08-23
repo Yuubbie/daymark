@@ -1,23 +1,56 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { AuthProvider, useAuth } from './lib/auth'
-import { Spinner } from './components/ui'
+import { Button, Spinner } from './components/ui'
+import { Wordmark } from './components/Logo'
 import type { Role } from './lib/types'
 
 import Login from './routes/Login'
 import Signup from './routes/Signup'
 import Onboarding from './routes/Onboarding'
-import AdminHome from './routes/AdminHome'
-import TeacherHome from './routes/TeacherHome'
-import ParentHome from './routes/ParentHome'
+import AdminHome from './routes/admin/AdminHome'
+import Classes from './routes/admin/Classes'
+import ClassDetail from './routes/admin/ClassDetail'
+import Teachers from './routes/admin/Teachers'
+import Flagged from './routes/admin/Flagged'
+import Register from './routes/teacher/Register'
+import Lesson from './routes/teacher/Lesson'
+import ParentHome from './routes/parent/Home'
+import Homework from './routes/parent/Homework'
+import Notices from './routes/parent/Notices'
+import AdminNotices from './routes/admin/Notices'
 import Preview from './routes/Preview'
+import Diagnostics from './routes/Diagnostics'
 
-/** Sends a signed-in user to the right home, or to onboarding if unattached. */
+/** Shown when we have a session but cannot resolve a profile. Never spin forever. */
+function Blocked({ problem }: { problem: string }) {
+  const { signOut } = useAuth()
+  return (
+    <div className="min-h-dvh bg-paper flex items-center justify-center px-6">
+      <div className="w-full max-w-[440px]">
+        <Wordmark size="md" className="text-ink mb-7" />
+        <span className="eyebrow">Setup incomplete</span>
+        <h1 className="text-[26px] mt-1.5">This account cannot load.</h1>
+        <p className="mt-3 text-[14px] text-ink-soft leading-relaxed">{problem}</p>
+        <div className="mt-6 flex flex-wrap gap-2">
+          <Link to="/diagnostics">
+            <Button>Run diagnostics</Button>
+          </Link>
+          <Button variant="secondary" onClick={() => void signOut()}>
+            Sign out
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Landing() {
-  const { session, profile, loading } = useAuth()
+  const { session, profile, loading, problem } = useAuth()
 
   if (loading) return <Spinner />
   if (!session) return <Navigate to="/login" replace />
+  if (problem) return <Blocked problem={problem} />
   if (!profile) return <Spinner />
   if (!profile.school_id) return <Navigate to="/welcome" replace />
 
@@ -30,10 +63,11 @@ function Landing() {
 }
 
 function Protected({ roles, children }: { roles: Role[]; children: ReactNode }) {
-  const { session, profile, loading } = useAuth()
+  const { session, profile, loading, problem } = useAuth()
 
   if (loading) return <Spinner />
   if (!session) return <Navigate to="/login" replace />
+  if (problem) return <Blocked problem={problem} />
   if (!profile) return <Spinner />
   if (!profile.school_id) return <Navigate to="/welcome" replace />
   if (!roles.includes(profile.role)) return <Navigate to="/" replace />
@@ -41,10 +75,13 @@ function Protected({ roles, children }: { roles: Role[]; children: ReactNode }) 
   return <>{children}</>
 }
 
+/** Onboarding only. Anyone who already has a school gets sent to their home. */
 function RequireSession({ children }: { children: ReactNode }) {
-  const { session, loading } = useAuth()
+  const { session, profile, loading, problem } = useAuth()
   if (loading) return <Spinner />
   if (!session) return <Navigate to="/login" replace />
+  if (problem) return <Blocked problem={problem} />
+  if (profile?.school_id) return <Navigate to="/" replace />
   return <>{children}</>
 }
 
@@ -57,6 +94,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/preview" element={<Preview />} />
+          <Route path="/diagnostics" element={<Diagnostics />} />
 
           <Route
             path="/welcome"
@@ -76,10 +114,50 @@ export default function App() {
             }
           />
           <Route
+            path="/admin/classes"
+            element={
+              <Protected roles={['admin']}>
+                <Classes />
+              </Protected>
+            }
+          />
+          <Route
+            path="/admin/classes/:id"
+            element={
+              <Protected roles={['admin']}>
+                <ClassDetail />
+              </Protected>
+            }
+          />
+          <Route
+            path="/admin/flagged"
+            element={
+              <Protected roles={['admin']}>
+                <Flagged />
+              </Protected>
+            }
+          />
+          <Route
+            path="/admin/teachers"
+            element={
+              <Protected roles={['admin']}>
+                <Teachers />
+              </Protected>
+            }
+          />
+          <Route
             path="/teacher"
             element={
-              <Protected roles={['teacher']}>
-                <TeacherHome />
+              <Protected roles={['teacher', 'admin']}>
+                <Register />
+              </Protected>
+            }
+          />
+          <Route
+            path="/teacher/lesson"
+            element={
+              <Protected roles={['teacher', 'admin']}>
+                <Lesson />
               </Protected>
             }
           />
@@ -88,6 +166,30 @@ export default function App() {
             element={
               <Protected roles={['parent']}>
                 <ParentHome />
+              </Protected>
+            }
+          />
+          <Route
+            path="/parent/homework"
+            element={
+              <Protected roles={['parent']}>
+                <Homework />
+              </Protected>
+            }
+          />
+          <Route
+            path="/parent/notices"
+            element={
+              <Protected roles={['parent']}>
+                <Notices />
+              </Protected>
+            }
+          />
+          <Route
+            path="/admin/notices"
+            element={
+              <Protected roles={['admin']}>
+                <AdminNotices />
               </Protected>
             }
           />
