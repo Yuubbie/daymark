@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/* ===========================================================================
+   Daymark design tokens
+   Thesis: the app is the attendance register. Ruled surfaces, hairlines,
+   tabular figures, marks in a row. Brass is the only accent, spend it.
+   =========================================================================== */
+
+@theme {
+  /* Surfaces */
+  --color-paper:       #F7F8F6;
+  --color-surface:     #FFFFFF;
+  --color-surface-alt: #F1F3EF;
+
+  /* Ink */
+  --color-ink:       #143A2B;
+  --color-ink-soft:  #4A5F55;
+  --color-ink-faint: #7C8B83;
+  --color-ink-invert:#F7F8F6;
+
+  /* Accent, used once per screen, never twice */
+  --color-brass:      #C9922B;
+  --color-brass-dark: #A87A1F;
+  --color-brass-wash: #FAF3E4;
+
+  /* Rules */
+  --color-rule:        #DDE2DB;
+  --color-rule-strong: #C3CCC2;
+
+  /* Attendance semantics */
+  --color-present:  #2F7D5C;
+  --color-absent:   #C2413A;
+  --color-late:     #D99114;
+  --color-excused:  #6B7A80;
+  --color-unmarked: #DDE2DB;
+
+  /* Type */
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-sans:    "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Geometry: flat and squared. No pillowy cards. */
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  /* Every number in this app is a figure in a register. Align them. */
+  .tnum { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  /* The eyebrow: small mono caps. Structural, used to label a region. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brass);
+    outline-offset: 2px;
+  }
+
+  button { cursor: pointer; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
