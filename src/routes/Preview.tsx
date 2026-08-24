@@ -1,4 +1,4 @@
-import { AttendanceSummary, RegisterLegend, RegisterStrip } from '../components/RegisterStrip'
+import { AttendanceSummary, RegisterLegend } from '../components/RegisterStrip'
 import { Lockup, Mark, Wordmark } from '../components/Logo'
 import { Alert, Button, Empty, Field, Panel, StatusPill } from '../components/ui'
 import type { AttendanceMark, AttendanceStatus } from '../lib/types'
