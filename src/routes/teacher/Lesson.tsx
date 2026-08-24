@@ -3,7 +3,9 @@ import { AppShell } from '../../components/AppShell'
 import { Alert, Button, Empty, Field, Panel, Row, TextArea } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
 import {
+  defaultClass,
   listTeachableClasses,
+  rememberClass,
   loadLesson,
   recentLessons,
   saveLesson,
@@ -42,7 +44,7 @@ export default function Lesson() {
     void (async () => {
       const cs = await listTeachableClasses(profile.role, session.user.id)
       setClasses(cs)
-      setClassId((c) => c || cs[0]?.id || '')
+      setClassId((c) => c || defaultClass(session.user.id, cs))
     })()
   }, [profile, session])
 
@@ -134,7 +136,10 @@ export default function Lesson() {
                 <span className="eyebrow block mb-1.5">Class</span>
                 <select
                   value={classId}
-                  onChange={(e) => setClassId(e.target.value)}
+                  onChange={(e) => {
+                    setClassId(e.target.value)
+                    if (session) rememberClass(session.user.id, e.target.value)
+                  }}
                   className="w-full h-11 px-3 bg-surface border border-rule-strong rounded-md
                              text-[15px] text-ink focus:border-brass"
                 >

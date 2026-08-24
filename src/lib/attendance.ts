@@ -15,7 +15,57 @@ export type RegisterStudent = {
   status: AttendanceStatus | null
 }
 
-export type TeachableClass = { id: string; name: string; level: string | null }
+export type TeachableClass = {
+  id: string
+  name: string
+  level: string | null
+  student_count?: number
+}
+
+const LAST_CLASS = 'daymark.lastClass.'
+
+export function rememberClass(userId: string, classId: string) {
+  try {
+    localStorage.setItem(LAST_CLASS + userId, classId)
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Which class to open on. Last one used, if it is still valid. Otherwise the
+ * first class that actually has students in it, because landing a teacher on
+ * an empty class looks like the app is broken.
+ */
+export function defaultClass(userId: string, classes: TeachableClass[]): string {
+  if (classes.length === 0) return ''
+  let saved: string | null = null
+  try {
+    saved = localStorage.getItem(LAST_CLASS + userId)
+  } catch {
+    /* ignore */
+  }
+  if (saved && classes.some((c) => c.id === saved)) return saved
+  const populated = classes.find((c) => (c.student_count ?? 0) > 0)
+  return (populated ?? classes[0]).id
+}
+
+/** Attaches student counts so defaultClass can skip empty classes. */
+async function withCounts(classes: TeachableClass[]): Promise<TeachableClass[]> {
+  if (classes.length === 0) return classes
+  const { data } = await supabase
+    .from('students')
+    .select('class_id')
+    .eq('is_active', true)
+    .in('class_id', classes.map((c) => c.id))
+
+  const counts: Record<string, number> = {}
+  for (const r of data ?? []) {
+    const k = r.class_id as string
+    counts[k] = (counts[k] ?? 0) + 1
+  }
+  return classes.map((c) => ({ ...c, student_count: counts[c.id] ?? 0 }))
+}
 
 /** Teachers see the classes they are assigned to. Admins see all of them. */
 export async function listTeachableClasses(
@@ -23,7 +73,7 @@ export async function listTeachableClasses(
   userId: string,
 ): Promise<TeachableClass[]> {
   try {
-    const fresh = await fetchTeachableClasses(role, userId)
+    const fresh = await withCounts(await fetchTeachableClasses(role, userId))
     saveSnapshot(`classes.${userId}`, fresh)
     return fresh
   } catch (e) {

@@ -3,8 +3,10 @@ import { AppShell } from '../../components/AppShell'
 import { Button, Empty, Panel, Spinner } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
 import {
+  defaultClass,
   flushWrites,
   listTeachableClasses,
+  rememberClass,
   loadRegister,
   saveMarks,
   type RegisterStudent,
@@ -54,7 +56,7 @@ export default function Register() {
       try {
         const cs = await listTeachableClasses(profile.role, session.user.id)
         setClasses(cs)
-        setClassId((c) => c || cs[0]?.id || '')
+        setClassId((c) => c || defaultClass(session.user.id, cs))
         if (cs.length === 0) setLoading(false)
       } catch {
         setLoading(false)
@@ -164,7 +166,10 @@ export default function Register() {
           <div className="flex flex-wrap gap-2 mb-4">
             <select
               value={classId}
-              onChange={(e) => setClassId(e.target.value)}
+              onChange={(e) => {
+                setClassId(e.target.value)
+                if (session) rememberClass(session.user.id, e.target.value)
+              }}
               className="h-11 px-3 bg-surface border border-rule-strong rounded-md text-[15px]
                          text-ink focus:border-brass"
             >
