@@ -34,9 +34,10 @@ type Item = {
 const NAV: Record<string, Item[]> = {
   admin: [
     { to: '/admin', label: 'Today', Icon: IconToday },
-    { to: '/admin/classes', label: 'Classes', Icon: IconClass },
     { to: '/teacher', label: 'Register', Icon: IconRegister },
+    { to: '/teacher/lesson', label: 'Lesson', Icon: IconLesson },
     { to: '/admin/flagged', label: 'Flagged', Icon: IconFlag },
+    { to: '/admin/classes', label: 'Classes', Icon: IconClass, mobile: false },
     { to: '/admin/teachers', label: 'Teachers', Icon: IconClass, mobile: false },
     { to: '/admin/notices', label: 'Notices', Icon: IconNotice, mobile: false },
   ],
