@@ -86,7 +86,7 @@ export default function ParentHome() {
       ])
       setMarks(m)
       setToday(l)
-      setFeed(f.filter((x) => x.date !== todayISO()).slice(0, 8))
+      setFeed(f)
     } finally {
       setLoading(false)
     }
@@ -103,6 +103,25 @@ export default function ParentHome() {
     day: 'numeric',
     month: 'long',
   })
+
+  /**
+   * A parent checking at 7am, or on a Saturday, has no lessons for today yet.
+   * An empty panel is a dead end, so fall back to the most recent day that was
+   * posted. What was taught on Friday still matters on Sunday.
+   */
+  const notToday = feed.filter((l) => l.date !== todayISO())
+  const fallbackDate = today.length === 0 ? notToday[0]?.date : undefined
+  const fallbackLessons = fallbackDate
+    ? notToday.filter((l) => l.date === fallbackDate)
+    : []
+  const earlier = notToday.filter((l) => l.date !== fallbackDate).slice(0, 8)
+
+  function labelFor(iso: string) {
+    const d = new Date(iso + 'T00:00:00')
+    const days = Math.round((Date.now() - d.getTime()) / 86_400_000)
+    if (days === 1) return 'Yesterday'
+    return d.toLocaleDateString('en-NG', { weekday: 'long', day: 'numeric', month: 'long' })
+  }
 
   if (kids.length === 0 && !loading) {
     return (
@@ -149,22 +168,35 @@ export default function ParentHome() {
             )}
           </Panel>
 
-          <Panel title="Today at school">
-            {today.length === 0 ? (
-              <Empty line="Nothing posted yet today. Teachers usually post at the end of the lesson." />
-            ) : (
+          {today.length > 0 ? (
+            <Panel title="Today at school">
               <div className="divide-y divide-rule -my-3">
                 {today.map((l) => (
                   <LessonEntry key={l.id} lesson={l} />
                 ))}
               </div>
-            )}
-          </Panel>
+            </Panel>
+          ) : fallbackLessons.length > 0 ? (
+            <Panel title={`Last posted, ${labelFor(fallbackDate!)}`}>
+              <div className="divide-y divide-rule -my-3">
+                {fallbackLessons.map((l) => (
+                  <LessonEntry key={l.id} lesson={l} />
+                ))}
+              </div>
+              <p className="mt-4 pt-4 border-t border-rule text-[12px] text-ink-faint">
+                Nothing for today yet. Teachers usually post at the end of the lesson.
+              </p>
+            </Panel>
+          ) : (
+            <Panel title="Today at school">
+              <Empty line="Nothing posted yet. Lessons and homework will appear here as teachers add them." />
+            </Panel>
+          )}
 
-          {feed.length > 0 && (
+          {earlier.length > 0 && (
             <Panel title="Earlier this fortnight">
               <div className="divide-y divide-rule -my-3">
-                {feed.map((l) => (
+                {earlier.map((l) => (
                   <LessonEntry key={l.id} lesson={l} showDate />
                 ))}
               </div>
