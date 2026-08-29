@@ -103,7 +103,7 @@ export async function listStudents(classId: string): Promise<StudentRow[]> {
 export async function addStudents(
   schoolId: string,
   classId: string,
-  names: { first: string; last: string }[],
+  names: { first: string; last: string; admission_number?: string }[],
 ) {
   return supabase.from('students').insert(
     names.map((n) => ({
@@ -111,6 +111,7 @@ export async function addStudents(
       class_id: classId,
       first_name: n.first,
       last_name: n.last,
+      admission_number: n.admission_number || null,
     })),
   )
 }
@@ -121,6 +122,29 @@ export async function generateClaimCode(studentId: string) {
   })
   if (error) throw error
   return data as string
+}
+
+/**
+ * Runs generate_claim_code once per student, in sequence rather than in
+ * parallel — a burst of concurrent RPC calls under Supabase's connection
+ * pooling is more likely to trip rate limits than a plain loop is slow.
+ * Returns per-student results so the caller can show which ones failed
+ * without losing the ones that succeeded.
+ */
+export async function generateClaimCodesForClass(
+  studentIds: string[],
+): Promise<{ studentId: string; code?: string; error?: string }[]> {
+  const results: { studentId: string; code?: string; error?: string }[] = []
+  for (const studentId of studentIds) {
+    try {
+      const code = await generateClaimCode(studentId)
+      results.push({ studentId, code })
+    } catch (e) {
+      const err = e as { message?: string }
+      results.push({ studentId, error: err?.message ?? 'Failed' })
+    }
+  }
+  return results
 }
 
 export async function listOpenCodes(studentIds: string[]) {
@@ -324,3 +348,4 @@ export function toIntlDigits(raw: string | null): string | null {
   if (d.length === 10) return '234' + d
   return d.length >= 10 ? d : null
 }
+

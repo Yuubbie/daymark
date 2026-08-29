@@ -10,6 +10,7 @@ import {
   IconLesson,
   IconNotice,
   IconRegister,
+  IconSettings,
   IconSignOut,
   IconToday,
 } from './Icons'
@@ -49,6 +50,7 @@ const NAV: Record<string, Item[]> = {
     { to: '/parent', label: 'Today', Icon: IconToday },
     { to: '/parent/homework', label: 'Homework', Icon: IconHomework },
     { to: '/parent/notices', label: 'Notices', Icon: IconNotice },
+    { to: '/parent/settings', label: 'Settings', Icon: IconSettings, mobile: false },
   ],
 }
 
@@ -56,6 +58,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { profile, school, signOut } = useAuth()
   const navigate = useNavigate()
   const items = NAV[profile?.role ?? 'parent'] ?? []
+  const settingsPath = items.find((i) => i.label === 'Settings')?.to
 
   async function out() {
     await signOut()
@@ -128,9 +131,18 @@ export function AppShell({ children }: { children: ReactNode }) {
               {profile?.role}
             </div>
           </div>
+          {settingsPath && (
+            <NavLink
+              to={settingsPath}
+              className="ml-auto p-2 text-ink-invert/55 hover:text-brass transition-colors"
+              aria-label="Settings"
+            >
+              <IconSettings />
+            </NavLink>
+          )}
           <button
             onClick={out}
-            className="ml-auto p-2 -mr-2 text-ink-invert/55 hover:text-brass transition-colors"
+            className={`p-2 -mr-2 text-ink-invert/55 hover:text-brass transition-colors ${settingsPath ? '' : 'ml-auto'}`}
             aria-label="Sign out"
           >
             <IconSignOut />
@@ -174,3 +186,4 @@ export function AppShell({ children }: { children: ReactNode }) {
     </div>
   )
 }
+

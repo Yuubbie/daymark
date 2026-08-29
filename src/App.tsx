@@ -18,6 +18,7 @@ import Lesson from './routes/teacher/Lesson'
 import ParentHome from './routes/parent/Home'
 import Homework from './routes/parent/Homework'
 import Notices from './routes/parent/Notices'
+import ParentSettings from './routes/parent/Settings'
 import AdminNotices from './routes/admin/Notices'
 import Preview from './routes/Preview'
 import Diagnostics from './routes/Diagnostics'
@@ -186,6 +187,14 @@ export default function App() {
             }
           />
           <Route
+            path="/parent/settings"
+            element={
+              <Protected roles={['parent']}>
+                <ParentSettings />
+              </Protected>
+            }
+          />
+          <Route
             path="/admin/notices"
             element={
               <Protected roles={['admin']}>
@@ -200,3 +209,4 @@ export default function App() {
     </BrowserRouter>
   )
 }
+

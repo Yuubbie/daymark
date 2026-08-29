@@ -2,6 +2,8 @@ export type Role = 'admin' | 'teacher' | 'parent'
 
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused'
 
+export type DigestChannel = 'push' | 'sms' | 'none'
+
 export interface Profile {
   id: string
   school_id: string | null
@@ -10,6 +12,7 @@ export interface Profile {
   email: string | null
   phone: string | null
   is_active: boolean
+  digest_channel: DigestChannel
 }
 
 export interface School {
@@ -32,3 +35,4 @@ export interface AttendanceMark {
   date: string
   status: AttendanceStatus | null
 }
+

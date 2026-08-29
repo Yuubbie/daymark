@@ -34,7 +34,7 @@ type ProfileResult = { profile: Profile | null; problem: string | null }
 async function fetchProfile(userId: string, attempt = 0): Promise<ProfileResult> {
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, school_id, role, full_name, email, phone, is_active')
+    .select('id, school_id, role, full_name, email, phone, is_active, digest_channel')
     .eq('id', userId)
     .maybeSingle()
 
@@ -153,3 +153,4 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>')
   return ctx
 }
+
