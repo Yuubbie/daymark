@@ -57,7 +57,7 @@ export default function Preview() {
           <div className="space-y-6">
             <div>
               <div className="flex items-baseline justify-between mb-1">
-                <span className="text-[15px] font-semibold">Ada Okafor</span>
+                <span className="text-[15px] font-semibold">Sample Student</span>
                 <span className="eyebrow">JSS 1A</span>
               </div>
               <AttendanceSummary pct={91} marks={ada} caption="First term" />

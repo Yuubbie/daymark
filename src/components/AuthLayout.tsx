@@ -49,7 +49,7 @@ export function AuthLayout({
 
           <div className="mt-12 border border-ink-invert/15 rounded-lg p-5 max-w-[420px]">
             <div className="flex items-baseline justify-between">
-              <span className="text-[14px] font-semibold">Ada Okafor</span>
+              <span className="text-[14px] font-semibold">Sample Student</span>
               <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-invert/45">
                 JSS 1A
               </span>
