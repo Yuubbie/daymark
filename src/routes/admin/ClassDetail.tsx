@@ -13,6 +13,8 @@ import {
   TextArea,
 } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
+import { supabase } from '../../lib/supabase'
+import StudentPhotoUpload from '../../components/StudentPhotoUpload'
 import {
   addStudents,
   assignTeacher,
@@ -41,6 +43,7 @@ export default function ClassDetail() {
   const [allTeachers, setAllTeachers] = useState<Record<string, unknown>[]>([])
   const [codeError, setCodeError] = useState<string | null>(null)
   const [bulkBusy, setBulkBusy] = useState(false)
+  const [photoStudent, setPhotoStudent] = useState<{ id: string; name: string } | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -176,17 +179,27 @@ export default function ClassDetail() {
                     </>
                   }
                   right={
-                    codes[s.id] ? (
-                      <CodeChip code={codes[s.id]} />
-                    ) : s.linked_parents > 0 ? (
-                      <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-present">
-                        Linked
-                      </span>
-                    ) : (
-                      <Button variant="secondary" onClick={() => void makeCode(s.id)}>
-                        Get code
-                      </Button>
-                    )
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() =>
+                          setPhotoStudent({ id: s.id, name: `${s.first_name} ${s.last_name}` })
+                        }
+                        className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint hover:text-ink"
+                      >
+                        Photo
+                      </button>
+                      {codes[s.id] ? (
+                        <CodeChip code={codes[s.id]} />
+                      ) : s.linked_parents > 0 ? (
+                        <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-present">
+                          Linked
+                        </span>
+                      ) : (
+                        <Button variant="secondary" onClick={() => void makeCode(s.id)}>
+                          Get code
+                        </Button>
+                      )}
+                    </div>
                   }
                 />
               ))}
@@ -272,7 +285,60 @@ export default function ClassDetail() {
           void load()
         }}
       />
+
+      <PhotoModal
+        student={photoStudent}
+        onClose={() => setPhotoStudent(null)}
+      />
     </AppShell>
+  )
+}
+
+/**
+ * Small modal wrapping StudentPhotoUpload. Fetches the student's current
+ * photo_url fresh on open (rather than relying on StudentRow already
+ * having it), uploads to the "student-photos" Storage bucket, and writes
+ * the resulting public URL back to students.photo_url.
+ */
+function PhotoModal({
+  student,
+  onClose,
+}: {
+  student: { id: string; name: string } | null
+  onClose: () => void
+}) {
+  const [currentUrl, setCurrentUrl] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!student) return
+    setLoading(true)
+    setCurrentUrl(null)
+    supabase
+      .from('students')
+      .select('photo_url')
+      .eq('id', student.id)
+      .single()
+      .then(({ data }) => {
+        setCurrentUrl((data?.photo_url as string) ?? null)
+        setLoading(false)
+      })
+  }, [student])
+
+  if (!student) return null
+
+  return (
+    <Modal open={!!student} onClose={onClose} title={`Photo — ${student.name}`}>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <StudentPhotoUpload
+          studentId={student.id}
+          currentPhotoUrl={currentUrl}
+          onUploaded={(url) => setCurrentUrl(url)}
+        />
+      )}
+    </Modal>
   )
 }
 
@@ -324,7 +390,7 @@ function CodesSheetModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={`${className} — claim codes`}>
+    <Modal open={open} onClose={onClose} title={`${className} â€” claim codes`}>
       <div className="flex items-center justify-between mb-3.5 print:hidden">
         <p className="text-[13px] text-ink-faint">
           {rows.length} code{rows.length === 1 ? '' : 's'}. Print this and cut into slips, or
@@ -368,7 +434,7 @@ function CodesSheetModal({
 /**
  * Wires the already-existing assignTeacher() function to an actual screen.
  * A teacher can be assigned more than once to the same class under a
- * different subject — the unique constraint is (class_id, teacher_id,
+ * different subject â€” the unique constraint is (class_id, teacher_id,
  * subject), so we don't filter the teacher list down, we just surface a
  * clear message if the exact same pairing already exists.
  */
@@ -388,7 +454,7 @@ function AssignTeacherModal({
   onSaved: () => void
 }) {
   // teachers loads asynchronously after this component has already mounted,
-  // so the default can't be captured once in useState — it's derived fresh
+  // so the default can't be captured once in useState â€” it's derived fresh
   // every render instead, falling back to the first teacher only until the
   // person actually picks one themselves.
   const [pickedTeacherId, setPickedTeacherId] = useState('')
@@ -662,7 +728,7 @@ function AddStudentsModal({
               <p className="text-[12px] text-ink-faint">
                 {usedHeader
                   ? 'Matched columns from the header row.'
-                  : 'No header row found — used the first column as the name and the second as an admission number.'}
+                  : 'No header row found â€” used the first column as the name and the second as an admission number.'}
               </p>
             )}
           </div>
@@ -720,4 +786,3 @@ function AddStudentsModal({
     </Modal>
   )
 }
-

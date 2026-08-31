@@ -14,11 +14,13 @@ import ClassDetail from './routes/admin/ClassDetail'
 import Teachers from './routes/admin/Teachers'
 import Flagged from './routes/admin/Flagged'
 import Register from './routes/teacher/Register'
+import TeacherAssessmentsRoute from './routes/teacher/Assessments'
 import Lesson from './routes/teacher/Lesson'
 import ParentHome from './routes/parent/Home'
 import Homework from './routes/parent/Homework'
 import Notices from './routes/parent/Notices'
 import ParentSettings from './routes/parent/Settings'
+import ParentAssessmentsRoute from './routes/parent/Assessments'
 import AdminNotices from './routes/admin/Notices'
 import Preview from './routes/Preview'
 import Diagnostics from './routes/Diagnostics'
@@ -191,6 +193,22 @@ export default function App() {
             element={
               <Protected roles={['parent']}>
                 <ParentSettings />
+              </Protected>
+            }
+          />
+          <Route
+            path="/teacher/assessments"
+            element={
+              <Protected roles={['teacher', 'admin']}>
+                <TeacherAssessmentsRoute />
+              </Protected>
+            }
+          />
+          <Route
+            path="/parent/assessments"
+            element={
+              <Protected roles={['parent']}>
+                <ParentAssessmentsRoute />
               </Protected>
             }
           />
