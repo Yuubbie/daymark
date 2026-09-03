@@ -24,6 +24,7 @@ import ParentAssessmentsRoute from './routes/parent/Assessments'
 import AdminNotices from './routes/admin/Notices'
 import Preview from './routes/Preview'
 import Diagnostics from './routes/Diagnostics'
+import SubscriptionGate from './components/SubscriptionGate'
 
 /** Shown when we have a session but cannot resolve a profile. Never spin forever. */
 function Blocked({ problem }: { problem: string }) {
@@ -75,7 +76,15 @@ function Protected({ roles, children }: { roles: Role[]; children: ReactNode }) 
   if (!profile.school_id) return <Navigate to="/welcome" replace />
   if (!roles.includes(profile.role)) return <Navigate to="/" replace />
 
-  return <>{children}</>
+  return (
+    <SubscriptionGate
+      schoolId={profile.school_id}
+      role={profile.role}
+      schoolEmail={session.user.email ?? ''}
+    >
+      {children}
+    </SubscriptionGate>
+  )
 }
 
 /** Onboarding only. Anyone who already has a school gets sent to their home. */
@@ -227,4 +236,3 @@ export default function App() {
     </BrowserRouter>
   )
 }
-
