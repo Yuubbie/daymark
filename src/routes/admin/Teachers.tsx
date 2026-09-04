@@ -37,7 +37,7 @@ export default function Teachers() {
       </div>
 
       <div className="space-y-4">
-        <Panel title="On Daymark">
+        <Panel title="On Daymaark">
           {loading ? (
             <Spinner />
           ) : teachers.length === 0 ? (
@@ -80,7 +80,7 @@ export default function Teachers() {
               ))}
             </div>
             <p className="mt-4 pt-4 border-t border-rule text-[12px] text-ink-faint">
-              Tell them to sign up at your Daymark link with this exact email. They join your
+              Tell them to sign up at your Daymaark link with this exact email. They join your
               school automatically.
             </p>
           </Panel>

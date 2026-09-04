@@ -83,7 +83,7 @@ function BlockedForNonAdmin() {
           Your school's subscription needs to be renewed.
         </h1>
         <p className="mt-3 text-[14px] text-ink-soft leading-relaxed">
-          Please contact your school administrator to renew Daymark's
+          Please contact your school administrator to renew Daymaark's
           subscription. Access will resume automatically once payment is
           confirmed.
         </p>

@@ -1,14 +1,11 @@
 /* ---------------------------------------------------------------------------
-   Daymark identity.
-
+   Daymaark identity.
    A daymark is an unlit marker you steer by in daylight. Read the other way,
    it is one mark per day, which is exactly what the register strip draws.
-
    The mark is a tally of five: four uprights and a strike. It is the counting
    notation of every classroom register, it cannot be misread as a falling
    chart, and it is literally one week of the product.
 --------------------------------------------------------------------------- */
-
 export function Mark({
   className = '',
   accent = 'text-brass',
@@ -34,7 +31,6 @@ export function Mark({
     </svg>
   )
 }
-
 const SIZES = {
   xs: { mark: 'h-3.5 w-[18px]', text: 'text-[15px]', gap: 'gap-2' },
   sm: { mark: 'h-4 w-[21px]', text: 'text-[17px]', gap: 'gap-2' },
@@ -42,7 +38,6 @@ const SIZES = {
   lg: { mark: 'h-7 w-[37px]', text: 'text-[29px]', gap: 'gap-3' },
   xl: { mark: 'h-10 w-[52px]', text: 'text-[41px]', gap: 'gap-4' },
 } as const
-
 export function Wordmark({
   className = '',
   size = 'md',
@@ -60,12 +55,11 @@ export function Wordmark({
         className={`font-display font-bold tracking-[-0.035em] ${s.text}`}
         style={{ lineHeight: 1 }}
       >
-        Daymark
+        Daymaark
       </span>
     </span>
   )
 }
-
 /** Stacked lockup with the strapline. Auth screens, print, pitch deck. */
 export function Lockup({
   className = '',
