@@ -44,7 +44,7 @@ export default function Preview() {
           <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-invert/55">
             Design system
           </span>
-          <h1 className="text-[32px] mt-1">Daymark</h1>
+          <h1 className="text-[32px] mt-1">Daymaark</h1>
           <p className="mt-2 text-[14px] text-ink-invert/70 max-w-[42ch]">
             The app is the attendance register. Ruled surfaces, hairlines, tabular figures,
             marks in a row.
@@ -123,12 +123,12 @@ export default function Preview() {
           <div className="space-y-3">
             <div>
               <span className="eyebrow">Display · Bricolage Grotesque</span>
-              <h2 className="text-[28px] mt-1">Daymark stands by your child</h2>
+              <h2 className="text-[28px] mt-1">Daymaark stands by your child</h2>
             </div>
             <div>
               <span className="eyebrow">Body · Public Sans</span>
               <p className="text-[15px] text-ink-soft mt-1">
-                Parents pay fees and hear nothing until report card day. Daymark closes that
+                Parents pay fees and hear nothing until report card day. Daymaark closes that
                 silence with the day your child actually had.
               </p>
             </div>
@@ -165,7 +165,7 @@ export default function Preview() {
         </Panel>
 
         <div className="py-6 text-center">
-          <span className="eyebrow">Marks in a row · Daymark</span>
+          <span className="eyebrow">Marks in a row · Daymaark</span>
         </div>
       </div>
     </div>

@@ -118,7 +118,7 @@ export default function ParentSettings() {
             />
           ) : (
             <p className="text-[13px] text-ink-faint">
-              This browser does not support push notifications. Try adding Daymark to your home
+              This browser does not support push notifications. Try adding Daymaark to your home
               screen first.
             </p>
           )}
@@ -164,4 +164,3 @@ export default function ParentSettings() {
     </AppShell>
   )
 }
-

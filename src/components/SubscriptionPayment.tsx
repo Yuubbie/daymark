@@ -168,7 +168,7 @@ export default function SubscriptionPayment({
     <div className="min-h-dvh bg-paper flex items-center justify-center px-6">
       <div className="w-full max-w-[440px]">
         <span className="eyebrow">Subscription</span>
-        <h1 className="text-[26px] mt-1.5">Continue using Daymark</h1>
+        <h1 className="text-[26px] mt-1.5">Continue using Daymaark</h1>
         <p className="mt-3 text-[14px] text-ink-soft leading-relaxed">
           Your school's trial or paid period has ended. Continue for this
           term based on your current student count.
