@@ -2,18 +2,13 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { Button, Panel, Stat, Alert, Spinner } from "./ui";
 
-// --- Tiered pricing (must stay in sync with the Edge Function's formula) ---
-const MINIMUM_PER_TERM = 40000;
-
-function computePriceNaira(studentCount: number): number {
-  let perStudent: number;
-  if (studentCount < 150) perStudent = 500;
-  else if (studentCount <= 400) perStudent = 400;
-  else perStudent = 300;
-
-  const raw = studentCount * perStudent;
-  return Math.max(raw, MINIMUM_PER_TERM);
-}
+// --- Per-school pricing (Sep 2026 model change) ---
+// Pricing is no longer computed from student count. Each school is charged
+// its own set price, negotiated by the Daymaark team and stored directly on
+// the schools row (schools.price_naira). If a school has no price set yet,
+// this default minimum applies. Update a school's real price directly in
+// the database — there is deliberately no pricing formula here anymore.
+const DEFAULT_MINIMUM_PRICE_NAIRA = 200000;
 
 declare global {
   interface Window {
@@ -62,7 +57,7 @@ export default function SubscriptionPayment({
   onPaymentVerified,
 }: Props) {
   const [status, setStatus] = useState<Status>("loading");
-  const [studentCount, setStudentCount] = useState<number | null>(null);
+  const [priceNaira, setPriceNaira] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -70,15 +65,16 @@ export default function SubscriptionPayment({
 
     async function init() {
       try {
-        const { count, error } = await supabase
-          .from("students")
-          .select("id", { count: "exact", head: true })
-          .eq("school_id", schoolId);
+        const { data, error } = await supabase
+          .from("schools")
+          .select("price_naira")
+          .eq("id", schoolId)
+          .single();
 
         if (error) throw error;
         if (cancelled) return;
 
-        setStudentCount(count ?? 0);
+        setPriceNaira(data?.price_naira ?? DEFAULT_MINIMUM_PRICE_NAIRA);
         await loadPaystackScript();
         if (cancelled) return;
 
@@ -99,9 +95,9 @@ export default function SubscriptionPayment({
   }, [schoolId]);
 
   async function handlePay() {
-    if (studentCount === null || !window.PaystackPop) return;
+    if (priceNaira === null || !window.PaystackPop) return;
 
-    const amountNaira = computePriceNaira(studentCount);
+    const amountNaira = priceNaira;
     const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
     if (!publicKey) {
@@ -119,7 +115,6 @@ export default function SubscriptionPayment({
       currency: "NGN",
       metadata: {
         school_id: schoolId,
-        student_count: studentCount,
       },
       callback: (response: { reference: string }) => {
         // The popup's "success" is just a trigger — the Edge Function is
@@ -162,7 +157,7 @@ export default function SubscriptionPayment({
     return <Spinner />;
   }
 
-  const amount = studentCount !== null ? computePriceNaira(studentCount) : 0;
+  const amount = priceNaira ?? 0;
 
   return (
     <div className="min-h-dvh bg-paper flex items-center justify-center px-6">
@@ -171,7 +166,7 @@ export default function SubscriptionPayment({
         <h1 className="text-[26px] mt-1.5">Continue using Daymaark</h1>
         <p className="mt-3 text-[14px] text-ink-soft leading-relaxed">
           Your school's trial or paid period has ended. Continue for this
-          term based on your current student count.
+          term.
         </p>
 
         {status === "error" && errorMessage && (
@@ -180,7 +175,7 @@ export default function SubscriptionPayment({
           </div>
         )}
 
-        {studentCount === null ? (
+        {priceNaira === null ? (
           <div className="mt-6">
             <Button full onClick={() => window.location.reload()}>
               Try again
@@ -189,8 +184,7 @@ export default function SubscriptionPayment({
         ) : (
           <>
             <Panel className="mt-5">
-              <div className="flex items-center justify-between">
-                <Stat value={studentCount} label="Students" />
+              <div className="flex items-center justify-center">
                 <Stat
                   value={`₦${amount.toLocaleString("en-NG")}`}
                   label="Due this term"
