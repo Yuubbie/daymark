@@ -20,12 +20,27 @@ type ExistingStructure = {
   installments: { id: string; label: string; amount_naira: number; sequence_order: number }[]
 }
 
+type StudentRow = { id: string; first_name: string; last_name: string; class_id: string }
+
+type InstallmentFlat = { id: string; fee_structure_id: string; label: string; amount_naira: number }
+
+type OverrideRow = {
+  id: string
+  student_id: string
+  fee_installment_id: string
+  override_amount_naira: number
+  reason: string | null
+}
+
 export default function AdminFees() {
   const { profile } = useAuth()
   const schoolId = profile?.school_id ?? ''
 
   const [classes, setClasses] = useState<ClassRow[]>([])
   const [existing, setExisting] = useState<ExistingStructure[]>([])
+  const [students, setStudents] = useState<StudentRow[]>([])
+  const [installmentsFlat, setInstallmentsFlat] = useState<InstallmentFlat[]>([])
+  const [overrides, setOverrides] = useState<OverrideRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -37,6 +52,15 @@ export default function AdminFees() {
   ])
   const [saving, setSaving] = useState(false)
   const [savedMsg, setSavedMsg] = useState<string | null>(null)
+
+  // --- student fee override form state ---
+  const [overrideStudentId, setOverrideStudentId] = useState('')
+  const [overrideInstallmentId, setOverrideInstallmentId] = useState('')
+  const [overrideAmount, setOverrideAmount] = useState('')
+  const [overrideReason, setOverrideReason] = useState('')
+  const [overrideSaving, setOverrideSaving] = useState(false)
+  const [overrideError, setOverrideError] = useState<string | null>(null)
+  const [overrideSavedMsg, setOverrideSavedMsg] = useState<string | null>(null)
 
   async function loadEverything() {
     setLoading(true)
@@ -82,6 +106,8 @@ export default function AdminFees() {
       installmentRows = data ?? []
     }
 
+    setInstallmentsFlat(installmentRows)
+
     const merged: ExistingStructure[] = structures.map((s: any) => ({
       id: s.id,
       term: s.term,
@@ -99,6 +125,39 @@ export default function AdminFees() {
     }))
 
     setExisting(merged)
+
+    // Students and any existing overrides, for the discounts panel below.
+    const { data: studentRows, error: studentErr } = await supabase
+      .from('students')
+      .select('id, first_name, last_name, class_id')
+      .eq('school_id', schoolId)
+      .order('first_name')
+
+    if (studentErr) {
+      setError(studentErr.message)
+      setLoading(false)
+      return
+    }
+    setStudents(studentRows ?? [])
+
+    if (installmentRows.length > 0) {
+      const { data: overrideRows, error: overrideErr } = await supabase
+        .from('student_fee_overrides')
+        .select('id, student_id, fee_installment_id, override_amount_naira, reason')
+        .in(
+          'fee_installment_id',
+          installmentRows.map((i: any) => i.id)
+        )
+      if (overrideErr) {
+        setError(overrideErr.message)
+        setLoading(false)
+        return
+      }
+      setOverrides(overrideRows ?? [])
+    } else {
+      setOverrides([])
+    }
+
     setLoading(false)
   }
 
@@ -202,6 +261,84 @@ export default function AdminFees() {
       `Fees set for this class and term — ₦${totalAmount.toLocaleString('en-NG')} across ${installmentInserts.length} instalment${installmentInserts.length === 1 ? '' : 's'}.`
     )
     resetForm()
+    void loadEverything()
+  }
+
+  // --- overrides: derived data ---
+  const selectedOverrideStudent = students.find((s) => s.id === overrideStudentId)
+
+  const availableInstallmentsForOverride = selectedOverrideStudent
+    ? existing
+        .filter((s) => s.class_id === selectedOverrideStudent.class_id)
+        .flatMap((s) =>
+          s.installments.map((i) => ({
+            id: i.id,
+            label: i.label,
+            amount_naira: i.amount_naira,
+            term: s.term,
+            className: s.className,
+          }))
+        )
+    : []
+
+  function studentName(id: string) {
+    const s = students.find((x) => x.id === id)
+    return s ? `${s.first_name} ${s.last_name}` : 'Unknown student'
+  }
+
+  function installmentInfo(id: string) {
+    const i = installmentsFlat.find((x) => x.id === id)
+    if (!i) return { label: 'Unknown instalment', term: '', className: '' }
+    const structure = existing.find((s) => s.id === i.fee_structure_id)
+    return { label: i.label, term: structure?.term ?? '', className: structure?.className ?? '' }
+  }
+
+  function resetOverrideForm() {
+    setOverrideStudentId('')
+    setOverrideInstallmentId('')
+    setOverrideAmount('')
+    setOverrideReason('')
+  }
+
+  async function handleAddOverride(e: React.FormEvent) {
+    e.preventDefault()
+    setOverrideError(null)
+    setOverrideSavedMsg(null)
+
+    if (!overrideStudentId) {
+      setOverrideError('Choose a student first.')
+      return
+    }
+    if (!overrideInstallmentId) {
+      setOverrideError('Choose which instalment this discount applies to.')
+      return
+    }
+    const amount = Number(overrideAmount)
+    if (overrideAmount === '' || Number.isNaN(amount) || amount < 0) {
+      setOverrideError('Enter a valid override amount (₦0 or more).')
+      return
+    }
+
+    setOverrideSaving(true)
+
+    const { error: insertErr } = await supabase.from('student_fee_overrides').insert({
+      student_id: overrideStudentId,
+      fee_installment_id: overrideInstallmentId,
+      override_amount_naira: amount,
+      reason: overrideReason.trim() || null,
+    })
+
+    setOverrideSaving(false)
+
+    if (insertErr) {
+      setOverrideError(insertErr.message)
+      return
+    }
+
+    setOverrideSavedMsg(
+      `Override saved — ${studentName(overrideStudentId)} now owes ₦${amount.toLocaleString('en-NG')} for that instalment.`
+    )
+    resetOverrideForm()
     void loadEverything()
   }
 
@@ -331,7 +468,71 @@ export default function AdminFees() {
             </div>
           )}
         </Panel>
-      </div>
-    </AppShell>
-  )
-}
+
+        <Panel title="Student discounts">
+          {students.length === 0 ? (
+            <Empty line="No students yet. Add students to a class before setting up a discount." />
+          ) : existing.length === 0 ? (
+            <Empty line="Set up a fee structure for a class first, then come back here to give an individual student a discount on one of its instalments." />
+          ) : (
+            <>
+              {overrideError && (
+                <div className="mb-3">
+                  <Alert>{overrideError}</Alert>
+                </div>
+              )}
+              {overrideSavedMsg && !overrideError && (
+                <div className="mb-3 text-[13px] text-present font-semibold">{overrideSavedMsg}</div>
+              )}
+
+              <form onSubmit={handleAddOverride} className="space-y-3.5">
+                <label className="block">
+                  <span className="eyebrow block mb-1.5">Student</span>
+                  <select
+                    className="w-full h-11 px-3 bg-surface border border-rule-strong rounded-md text-[15px] text-ink"
+                    value={overrideStudentId}
+                    onChange={(e) => {
+                      setOverrideStudentId(e.target.value)
+                      setOverrideInstallmentId('')
+                    }}
+                  >
+                    <option value="">Choose a student</option>
+                    {students.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.first_name} {s.last_name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="block">
+                  <span className="eyebrow block mb-1.5">Instalment</span>
+                  <select
+                    className="w-full h-11 px-3 bg-surface border border-rule-strong rounded-md text-[15px] text-ink"
+                    value={overrideInstallmentId}
+                    onChange={(e) => setOverrideInstallmentId(e.target.value)}
+                    disabled={!overrideStudentId}
+                  >
+                    <option value="">
+                      {overrideStudentId
+                        ? availableInstallmentsForOverride.length === 0
+                          ? 'No fee structure set for this student\u2019s class yet'
+                          : 'Choose an instalment'
+                        : 'Choose a student first'}
+                    </option>
+                    {availableInstallmentsForOverride.map((i) => (
+                      <option key={i.id} value={i.id}>
+                        {i.className} — {i.term} — {i.label} (normally ₦
+                        {i.amount_naira.toLocaleString('en-NG')})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <Field
+                  label="Override amount (₦)"
+                  placeholder="e.g. 0 for a full waiver, or a reduced amount"
+                  inputMode="numeric"
+                  value={overrideAmount}
+                  onChange={(e) => setOverrideAmount(e.target.value)}
+                  hint="This
