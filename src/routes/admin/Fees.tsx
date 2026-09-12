@@ -32,6 +32,8 @@ type OverrideRow = {
   reason: string | null
 }
 
+const NAIRA = '\u20A6'
+
 export default function AdminFees() {
   const { profile } = useAuth()
   const schoolId = profile?.school_id ?? ''
@@ -213,7 +215,7 @@ export default function AdminFees() {
     const alreadyExists = existing.some((s) => s.class_id === classId && s.term.trim() === term.trim())
     if (alreadyExists) {
       setError(
-        "A fee structure already exists for this class and term. Editing an existing one isn't supported here yet — contact support to change it."
+        "A fee structure already exists for this class and term. Editing an existing one isn't supported here yet - contact support to change it."
       )
       return
     }
@@ -258,7 +260,7 @@ export default function AdminFees() {
     }
 
     setSavedMsg(
-      `Fees set for this class and term — ₦${totalAmount.toLocaleString('en-NG')} across ${installmentInserts.length} instalment${installmentInserts.length === 1 ? '' : 's'}.`
+      `Fees set for this class and term - ${NAIRA}${totalAmount.toLocaleString('en-NG')} across ${installmentInserts.length} instalment${installmentInserts.length === 1 ? '' : 's'}.`
     )
     resetForm()
     void loadEverything()
@@ -315,7 +317,7 @@ export default function AdminFees() {
     }
     const amount = Number(overrideAmount)
     if (overrideAmount === '' || Number.isNaN(amount) || amount < 0) {
-      setOverrideError('Enter a valid override amount (₦0 or more).')
+      setOverrideError(`Enter a valid override amount (${NAIRA}0 or more).`)
       return
     }
 
@@ -336,7 +338,7 @@ export default function AdminFees() {
     }
 
     setOverrideSavedMsg(
-      `Override saved — ${studentName(overrideStudentId)} now owes ₦${amount.toLocaleString('en-NG')} for that instalment.`
+      `Override saved - ${studentName(overrideStudentId)} now owes ${NAIRA}${amount.toLocaleString('en-NG')} for that instalment.`
     )
     resetOverrideForm()
     void loadEverything()
@@ -407,7 +409,7 @@ export default function AdminFees() {
                       />
                       <input
                         className="w-40 h-11 px-3 bg-surface border border-rule-strong rounded-md text-[14px] text-ink"
-                        placeholder="Amount (₦)"
+                        placeholder={`Amount (${NAIRA})`}
                         inputMode="numeric"
                         value={row.amount}
                         onChange={(e) => updateInstallment(index, 'amount', e.target.value)}
@@ -449,18 +451,18 @@ export default function AdminFees() {
                   left={
                     <>
                       <div className="text-[15px] font-semibold">
-                        {s.className} — {s.term}
+                        {s.className} - {s.term}
                       </div>
                       <div className="text-[12px] text-ink-faint mt-0.5">
                         {s.installments
-                          .map((i) => `${i.label}: ₦${i.amount_naira.toLocaleString('en-NG')}`)
-                          .join(' · ')}
+                          .map((i) => `${i.label}: ${NAIRA}${i.amount_naira.toLocaleString('en-NG')}`)
+                          .join(' - ')}
                       </div>
                     </>
                   }
                   right={
                     <span className="tnum text-[15px] font-semibold">
-                      ₦{s.total_amount_naira.toLocaleString('en-NG')}
+                      {NAIRA}{s.total_amount_naira.toLocaleString('en-NG')}
                     </span>
                   }
                 />
@@ -516,23 +518,68 @@ export default function AdminFees() {
                     <option value="">
                       {overrideStudentId
                         ? availableInstallmentsForOverride.length === 0
-                          ? 'No fee structure set for this student\u2019s class yet'
+                          ? "No fee structure set for this student's class yet"
                           : 'Choose an instalment'
                         : 'Choose a student first'}
                     </option>
                     {availableInstallmentsForOverride.map((i) => (
                       <option key={i.id} value={i.id}>
-                        {i.className} — {i.term} — {i.label} (normally ₦
-                        {i.amount_naira.toLocaleString('en-NG')})
+                        {`${i.className} - ${i.term} - ${i.label} (normally ${NAIRA}${i.amount_naira.toLocaleString('en-NG')})`}
                       </option>
                     ))}
                   </select>
                 </label>
 
                 <Field
-                  label="Override amount (₦)"
+                  label={`Override amount (${NAIRA})`}
                   placeholder="e.g. 0 for a full waiver, or a reduced amount"
                   inputMode="numeric"
                   value={overrideAmount}
                   onChange={(e) => setOverrideAmount(e.target.value)}
-                  hint="This
+                  hint="This replaces the normal amount for this student on this instalment only."
+                />
+
+                <Field
+                  label="Reason (optional)"
+                  placeholder="e.g. Staff child discount, scholarship"
+                  value={overrideReason}
+                  onChange={(e) => setOverrideReason(e.target.value)}
+                />
+
+                <Button type="submit" loading={overrideSaving} full>
+                  Save discount
+                </Button>
+              </form>
+
+              {overrides.length > 0 && (
+                <div className="mt-5 pt-4 border-t border-rule divide-y divide-rule -my-3">
+                  {overrides.map((o) => {
+                    const info = installmentInfo(o.fee_installment_id)
+                    return (
+                      <Row
+                        key={o.id}
+                        left={
+                          <>
+                            <div className="text-[15px] font-semibold">{studentName(o.student_id)}</div>
+                            <div className="text-[12px] text-ink-faint mt-0.5">
+                              {`${info.className} - ${info.term} - ${info.label}${o.reason ? ' - ' + o.reason : ''}`}
+                            </div>
+                          </>
+                        }
+                        right={
+                          <span className="tnum text-[15px] font-semibold">
+                            {NAIRA}{o.override_amount_naira.toLocaleString('en-NG')}
+                          </span>
+                        }
+                      />
+                    )
+                  })}
+                </div>
+              )}
+            </>
+          )}
+        </Panel>
+      </div>
+    </AppShell>
+  )
+}
