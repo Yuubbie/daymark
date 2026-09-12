@@ -2,9 +2,9 @@
 //
 // Since students have no login of their own, a parent logs in and picks
 // which of their linked children they're acting on behalf of. Once picked,
-// the existing StudentAssessments / StudentReport components render exactly
-// as already built — this component's only job is supplying the right
-// studentId (and classId/subject) into them.
+// the existing StudentAssessments / StudentReport / FeePayment components
+// render exactly as already built — this component's only job is
+// supplying the right studentId (and classId/schoolId/subject) into them.
 //
 // ASSUMPTIONS TO ADJUST:
 // - Supabase client imported from '../lib/supabase' as `supabase`.
@@ -15,21 +15,24 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from '../lib/supabase';
 import StudentAssessments from "./StudentAssessments";
 import StudentReport from "./StudentReport";
+import FeePayment from "./FeePayment";
 
 interface LinkedChild {
   student_id: string;
   first_name: string;
   last_name: string;
   class_id: string;
+  school_id: string;
   photo_url: string | null;
 }
 
-type View = "picker" | "assessments" | "report";
+type View = "picker" | "assessments" | "report" | "fees";
 
 export default function ParentChildPicker({ term }: { term: string }) {
   const [children, setChildren] = useState<LinkedChild[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [parentEmail, setParentEmail] = useState<string>("");
 
   const [selected, setSelected] = useState<LinkedChild | null>(null);
   const [view, setView] = useState<View>("picker");
@@ -45,10 +48,12 @@ export default function ParentChildPicker({ term }: { term: string }) {
     } = await supabase.auth.getUser();
 
     if (authErr || !user) {
-      setError("You need to be logged in to view your children's assessments.");
+      setError("You need to be logged in to view your children.");
       setLoading(false);
       return;
     }
+
+    setParentEmail(user.email ?? "");
 
     // parent_student_links.parent_id is assumed to equal auth.uid() (standard
     // Supabase pattern where profiles.id = auth.users.id). Adjust the join
@@ -56,7 +61,7 @@ export default function ParentChildPicker({ term }: { term: string }) {
     // relationship.
     const { data, error: linkErr } = await supabase
       .from("parent_student_links")
-      .select("student_id, students(id, first_name, last_name, class_id, photo_url)")
+      .select("student_id, students(id, first_name, last_name, class_id, school_id, photo_url)")
       .eq("parent_id", user.id);
 
     if (linkErr) {
@@ -73,6 +78,7 @@ export default function ParentChildPicker({ term }: { term: string }) {
         first_name: s.first_name,
         last_name: s.last_name,
         class_id: s.class_id,
+        school_id: s.school_id,
         photo_url: s.photo_url,
       }));
 
@@ -110,7 +116,7 @@ export default function ParentChildPicker({ term }: { term: string }) {
     );
   }
 
-  // ─── Child picked, viewing their assessments ───
+  // --- Child picked, viewing their assessments ---
   if (selected && view === "assessments") {
     return (
       <div>
@@ -124,7 +130,7 @@ export default function ParentChildPicker({ term }: { term: string }) {
     );
   }
 
-  // ─── Child picked, viewing their report (needs a subject chosen) ───
+  // --- Child picked, viewing their report (needs a subject chosen) ---
   if (selected && view === "report") {
     return (
       <div className="max-w-xl mx-auto p-4">
@@ -152,7 +158,27 @@ export default function ParentChildPicker({ term }: { term: string }) {
     );
   }
 
-  // ─── Picker view ───
+  // --- Child picked, viewing fees ---
+  if (selected && view === "fees") {
+    return (
+      <div>
+        <div className="max-w-2xl mx-auto pt-4 px-4">
+          <button onClick={backToPicker} className="text-sm text-blue-600 mb-2">
+            ← Back to my children
+          </button>
+        </div>
+        <FeePayment
+          studentId={selected.student_id}
+          schoolId={selected.school_id}
+          term={term}
+          parentEmail={parentEmail}
+          studentName={`${selected.first_name} ${selected.last_name}`}
+        />
+      </div>
+    );
+  }
+
+  // --- Picker view ---
   return (
     <div className="max-w-md mx-auto p-4">
       <h1 className="text-lg font-semibold mb-4">Your children</h1>
@@ -189,6 +215,15 @@ export default function ParentChildPicker({ term }: { term: string }) {
                 className="text-sm border rounded px-2 py-1"
               >
                 Report
+              </button>
+              <button
+                onClick={() => {
+                  setSelected(child);
+                  setView("fees");
+                }}
+                className="text-sm border rounded px-2 py-1"
+              >
+                Fees
               </button>
             </div>
           </li>

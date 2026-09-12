@@ -22,6 +22,8 @@ import Notices from './routes/parent/Notices'
 import ParentSettings from './routes/parent/Settings'
 import ParentAssessmentsRoute from './routes/parent/Assessments'
 import AdminNotices from './routes/admin/Notices'
+import AdminFees from './routes/admin/Fees'
+import ParentFeesRoute from './routes/parent/Fees'
 import Preview from './routes/Preview'
 import Diagnostics from './routes/Diagnostics'
 import SubscriptionGate from './components/SubscriptionGate'
@@ -198,6 +200,14 @@ export default function App() {
             }
           />
           <Route
+            path="/parent/fees"
+            element={
+              <Protected roles={['parent']}>
+                <ParentFeesRoute />
+              </Protected>
+            }
+          />
+          <Route
             path="/parent/settings"
             element={
               <Protected roles={['parent']}>
@@ -226,6 +236,14 @@ export default function App() {
             element={
               <Protected roles={['admin']}>
                 <AdminNotices />
+              </Protected>
+            }
+          />
+          <Route
+            path="/admin/fees"
+            element={
+              <Protected roles={['admin']}>
+                <AdminFees />
               </Protected>
             }
           />
