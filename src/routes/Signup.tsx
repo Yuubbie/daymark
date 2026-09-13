@@ -70,10 +70,11 @@ export default function Signup() {
       >
         {error && <Alert>{error}</Alert>}
         <Field
-          label="Full name"
+          label="Your full name"
           required
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
+          hint="Not your school's name - you'll be asked for that next."
         />
         <Field
           label="Email"
