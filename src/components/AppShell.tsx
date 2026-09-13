@@ -41,6 +41,7 @@ const NAV: Record<string, Item[]> = {
     { to: '/teacher/assessments', label: 'Assessments', Icon: IconLesson, mobile: false },
     { to: '/admin/classes', label: 'Classes', Icon: IconClass, mobile: false },
     { to: '/admin/teachers', label: 'Teachers', Icon: IconClass, mobile: false },
+    { to: '/admin/fees', label: 'Fees', Icon: IconClass, mobile: false },
     { to: '/admin/notices', label: 'Notices', Icon: IconNotice, mobile: false },
   ],
   teacher: [
