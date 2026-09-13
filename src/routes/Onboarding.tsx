@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
@@ -20,6 +20,17 @@ export default function Onboarding() {
   const [fullName, setFullName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+
+  // Pre-fill from the name already given at signup, so nobody has to type
+  // their name twice (and risk it not matching between the two places).
+  useEffect(() => {
+    void (async () => {
+      const { data } = await supabase.auth.getUser()
+      const signupName = (data.user?.user_metadata as { full_name?: string } | undefined)
+        ?.full_name
+      if (signupName) setFullName(signupName)
+    })()
+  }, [])
 
   async function redeem() {
     setError(null)
