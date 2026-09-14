@@ -328,7 +328,7 @@ function PhotoModal({
   if (!student) return null
 
   return (
-    <Modal open={!!student} onClose={onClose} title={`Photo — ${student.name}`}>
+    <Modal open={!!student} onClose={onClose} title={`Photo - ${student.name}`}>
       {loading ? (
         <Spinner />
       ) : (
@@ -390,7 +390,7 @@ function CodesSheetModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={`${className} â€” claim codes`}>
+    <Modal open={open} onClose={onClose} title={`${className} - claim codes`}>
       <div className="flex items-center justify-between mb-3.5 print:hidden">
         <p className="text-[13px] text-ink-faint">
           {rows.length} code{rows.length === 1 ? '' : 's'}. Print this and cut into slips, or
@@ -434,7 +434,7 @@ function CodesSheetModal({
 /**
  * Wires the already-existing assignTeacher() function to an actual screen.
  * A teacher can be assigned more than once to the same class under a
- * different subject â€” the unique constraint is (class_id, teacher_id,
+ * different subject - the unique constraint is (class_id, teacher_id,
  * subject), so we don't filter the teacher list down, we just surface a
  * clear message if the exact same pairing already exists.
  */
@@ -454,7 +454,7 @@ function AssignTeacherModal({
   onSaved: () => void
 }) {
   // teachers loads asynchronously after this component has already mounted,
-  // so the default can't be captured once in useState â€” it's derived fresh
+  // so the default can't be captured once in useState - it's derived fresh
   // every render instead, falling back to the first teacher only until the
   // person actually picks one themselves.
   const [pickedTeacherId, setPickedTeacherId] = useState('')
@@ -728,7 +728,7 @@ function AddStudentsModal({
               <p className="text-[12px] text-ink-faint">
                 {usedHeader
                   ? 'Matched columns from the header row.'
-                  : 'No header row found â€” used the first column as the name and the second as an admission number.'}
+                  : 'No header row found - used the first column as the name and the second as an admission number.'}
               </p>
             )}
           </div>
