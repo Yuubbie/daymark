@@ -34,8 +34,42 @@ type OverrideRow = {
 
 const NAIRA = '\u20A6'
 
+// Common Nigerian bank codes Paystack recognizes for subaccount creation.
+// Not exhaustive - if a school's bank isn't listed, Paystack's own bank
+// list (via their API) has the full set, but this covers the large
+// majority of schools' actual banks.
+const BANKS: { code: string; name: string }[] = [
+  { code: '044', name: 'Access Bank' },
+  { code: '063', name: 'Access Bank (Diamond)' },
+  { code: '023', name: 'Citibank Nigeria' },
+  { code: '050', name: 'Ecobank Nigeria' },
+  { code: '070', name: 'Fidelity Bank' },
+  { code: '011', name: 'First Bank of Nigeria' },
+  { code: '214', name: 'First City Monument Bank' },
+  { code: '058', name: 'Guaranty Trust Bank' },
+  { code: '030', name: 'Heritage Bank' },
+  { code: '301', name: 'Jaiz Bank' },
+  { code: '082', name: 'Keystone Bank' },
+  { code: '50211', name: 'Kuda Bank' },
+  { code: '50515', name: 'Moniepoint Microfinance Bank' },
+  { code: '999992', name: 'OPay' },
+  { code: '999991', name: 'PalmPay' },
+  { code: '076', name: 'Polaris Bank' },
+  { code: '101', name: 'Providus Bank' },
+  { code: '221', name: 'Stanbic IBTC Bank' },
+  { code: '068', name: 'Standard Chartered Bank' },
+  { code: '232', name: 'Sterling Bank' },
+  { code: '100', name: 'SunTrust Bank' },
+  { code: '102', name: 'Titan Trust Bank' },
+  { code: '032', name: 'Union Bank of Nigeria' },
+  { code: '033', name: 'United Bank For Africa' },
+  { code: '215', name: 'Unity Bank' },
+  { code: '035', name: 'Wema Bank' },
+  { code: '057', name: 'Zenith Bank' },
+]
+
 export default function AdminFees() {
-  const { profile } = useAuth()
+  const { profile, school } = useAuth()
   const schoolId = profile?.school_id ?? ''
 
   const [classes, setClasses] = useState<ClassRow[]>([])
@@ -45,6 +79,15 @@ export default function AdminFees() {
   const [overrides, setOverrides] = useState<OverrideRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // --- bank account / subaccount state ---
+  const [subaccountCode, setSubaccountCode] = useState<string | null>(null)
+  const [businessName, setBusinessName] = useState('')
+  const [bankCode, setBankCode] = useState('')
+  const [accountNumber, setAccountNumber] = useState('')
+  const [subaccountSaving, setSubaccountSaving] = useState(false)
+  const [subaccountError, setSubaccountError] = useState<string | null>(null)
+  const [resolvedAccountName, setResolvedAccountName] = useState<string | null>(null)
 
   // --- new fee structure form state ---
   const [classId, setClassId] = useState('')
@@ -160,6 +203,20 @@ export default function AdminFees() {
       setOverrides([])
     }
 
+    // Bank account / subaccount status.
+    const { data: schoolRow, error: schoolErr } = await supabase
+      .from('schools')
+      .select('paystack_subaccount_code')
+      .eq('id', schoolId)
+      .single()
+
+    if (schoolErr) {
+      setError(schoolErr.message)
+      setLoading(false)
+      return
+    }
+    setSubaccountCode(schoolRow?.paystack_subaccount_code ?? null)
+
     setLoading(false)
   }
 
@@ -167,6 +224,55 @@ export default function AdminFees() {
     if (schoolId) void loadEverything()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [schoolId])
+
+  useEffect(() => {
+    if (school?.name && !businessName) setBusinessName(school.name)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [school?.name])
+
+  async function handleCreateSubaccount(e: React.FormEvent) {
+    e.preventDefault()
+    setSubaccountError(null)
+    setResolvedAccountName(null)
+
+    if (!businessName.trim()) {
+      setSubaccountError('Enter the business name Paystack should show for this school.')
+      return
+    }
+    if (!bankCode) {
+      setSubaccountError('Choose a bank.')
+      return
+    }
+    if (!accountNumber.trim() || accountNumber.trim().length < 10) {
+      setSubaccountError('Enter a valid 10 digit account number.')
+      return
+    }
+
+    setSubaccountSaving(true)
+
+    const { data, error: invokeErr } = await supabase.functions.invoke('create-school-subaccount', {
+      body: {
+        school_id: schoolId,
+        business_name: businessName.trim(),
+        settlement_bank: bankCode,
+        account_number: accountNumber.trim(),
+      },
+    })
+
+    setSubaccountSaving(false)
+
+    if (invokeErr) {
+      setSubaccountError(invokeErr.message)
+      return
+    }
+    if (!data?.success) {
+      setSubaccountError(data?.error ?? 'Could not create the bank account link.')
+      return
+    }
+
+    setSubaccountCode(data.subaccount_code)
+    setResolvedAccountName(data.resolved_account_name)
+  }
 
   function addInstallmentRow() {
     setInstallments((prev) => [...prev, { label: '', amount: '' }])
@@ -367,6 +473,83 @@ export default function AdminFees() {
       )}
 
       <div className="space-y-4">
+        <Panel title="Bank account for fee payments">
+          {subaccountCode ? (
+            <div className="text-[13px] text-ink-soft leading-relaxed">
+              <p className="text-present font-semibold mb-1.5">Connected.</p>
+              <p>
+                Fee payments from parents will settle to this school's own bank account,
+                automatically, minus Daymaark's platform fee. Subaccount code:{' '}
+                <span className="font-mono text-ink">{subaccountCode}</span>.
+              </p>
+              <p className="mt-2 text-ink-faint">
+                To change the bank account on file, contact support - a subaccount's bank
+                details aren't editable from here once created, to avoid fee income being
+                silently redirected.
+              </p>
+            </div>
+          ) : (
+            <>
+              <p className="text-[13px] text-ink-soft mb-3.5 leading-relaxed">
+                Before parents can pay fees, this school needs a bank account connected. Fee
+                payments will go straight to this account, automatically, minus Daymaark's
+                platform fee. This only needs to be done once.
+              </p>
+
+              {subaccountError && (
+                <div className="mb-3">
+                  <Alert>{subaccountError}</Alert>
+                </div>
+              )}
+              {resolvedAccountName && (
+                <div className="mb-3 text-[13px] text-present font-semibold">
+                  Connected. Paystack resolved this account to: {resolvedAccountName}. Double
+                  check this matches the school's real account holder name.
+                </div>
+              )}
+
+              <form onSubmit={handleCreateSubaccount} className="space-y-3.5">
+                <Field
+                  label="Business name"
+                  placeholder="Bright Future Academy"
+                  hint="Shown on Paystack's side for this account."
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                />
+
+                <label className="block">
+                  <span className="eyebrow block mb-1.5">Bank</span>
+                  <select
+                    className="w-full h-11 px-3 bg-surface border border-rule-strong rounded-md text-[15px] text-ink"
+                    value={bankCode}
+                    onChange={(e) => setBankCode(e.target.value)}
+                  >
+                    <option value="">Choose a bank</option>
+                    {BANKS.map((b) => (
+                      <option key={b.code} value={b.code}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <Field
+                  label="Account number"
+                  placeholder="0123456789"
+                  inputMode="numeric"
+                  hint="10 digits. Paystack will verify this matches a real account before connecting it."
+                  value={accountNumber}
+                  onChange={(e) => setAccountNumber(e.target.value)}
+                />
+
+                <Button type="submit" loading={subaccountSaving} full>
+                  Connect bank account
+                </Button>
+              </form>
+            </>
+          )}
+        </Panel>
+
         <Panel title="Set fees for a class">
           {classes.length === 0 ? (
             <Empty line="Create a class first, then come back here to set its fees." />
