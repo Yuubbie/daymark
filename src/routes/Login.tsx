@@ -32,7 +32,7 @@ export default function Login() {
       sub="Attendance, lessons and homework. The day your child actually had, not a summary three months late."
     >
       <span className="eyebrow">Sign in</span>
-      <h2 className="text-[24px] mt-1.5 mb-6">Welcome back.</h2>
+      <h2 className="text-[24px] mt-1.5 mb-6">Welcome.</h2>
 
       <form
         className="space-y-3.5"
