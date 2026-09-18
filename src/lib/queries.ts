@@ -116,6 +116,10 @@ export async function addStudents(
   )
 }
 
+export async function deactivateStudent(studentId: string) {
+  return supabase.from('students').update({ is_active: false }).eq('id', studentId)
+}
+
 export async function generateClaimCode(studentId: string) {
   const { data, error } = await supabase.rpc('generate_claim_code', {
     p_student_id: studentId,
@@ -126,7 +130,7 @@ export async function generateClaimCode(studentId: string) {
 
 /**
  * Runs generate_claim_code once per student, in sequence rather than in
- * parallel — a burst of concurrent RPC calls under Supabase's connection
+ * parallel - a burst of concurrent RPC calls under Supabase's connection
  * pooling is more likely to trip rate limits than a plain loop is slow.
  * Returns per-student results so the caller can show which ones failed
  * without losing the ones that succeeded.
@@ -348,4 +352,3 @@ export function toIntlDigits(raw: string | null): string | null {
   if (d.length === 10) return '234' + d
   return d.length >= 10 ? d : null
 }
-
