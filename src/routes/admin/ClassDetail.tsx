@@ -78,8 +78,6 @@ export default function ClassDetail() {
       const code = await generateClaimCode(studentId)
       setCodes((c) => ({ ...c, [studentId]: code }))
     } catch (e) {
-      // Supabase errors are objects. String() on them gives [object Object],
-      // which tells nobody anything.
       const err = e as { message?: string; hint?: string; details?: string }
       setCodeError(err?.message ?? err?.details ?? 'Could not generate a code.')
     }
@@ -268,3 +266,576 @@ export default function ClassDetail() {
                     left={
                       <>
                         <div className="text-[15px]">{p?.full_name ?? p?.email ?? 'Teacher'}</div>
+                        <div className="text-[12px] text-ink-faint">
+                          {(t.subject as string) ?? 'All subjects'}
+                          {t.is_form_teacher ? ' \u00b7 Form teacher' : ''}
+                        </div>
+                      </>
+                    }
+                  />
+                )
+              })}
+            </div>
+          )}
+        </Panel>
+      </div>
+
+      <AddStudentsModal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        schoolId={profile?.school_id ?? ''}
+        classId={id}
+        existingStudents={students}
+        onSaved={() => {
+          setAddOpen(false)
+          void load()
+        }}
+      />
+
+      <CodesSheetModal
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        className={(cls?.name as string) ?? ''}
+        rows={students
+          .filter((s) => codes[s.id])
+          .map((s) => ({ name: `${s.first_name} ${s.last_name}`, code: codes[s.id] }))}
+      />
+
+      <AssignTeacherModal
+        open={assignOpen}
+        onClose={() => setAssignOpen(false)}
+        schoolId={profile?.school_id ?? ''}
+        classId={id}
+        teachers={allTeachers}
+        onSaved={() => {
+          setAssignOpen(false)
+          void load()
+        }}
+      />
+
+      <PhotoModal
+        student={photoStudent}
+        onClose={() => setPhotoStudent(null)}
+      />
+
+      <Modal
+        open={!!removeStudent}
+        onClose={() => {
+          setRemoveStudent(null)
+          setRemoveError(null)
+        }}
+        title="Remove student"
+      >
+        {removeStudent && (
+          <div className="space-y-3.5">
+            {removeError && <Alert>{removeError}</Alert>}
+            <p className="text-[14px] text-ink-soft leading-relaxed">
+              Remove <span className="font-semibold text-ink">{removeStudent.name}</span> from
+              this class? They will no longer appear in class lists, attendance, or fees, but
+              their existing records (attendance history, fee payments, claim codes) are kept,
+              not deleted. This can be reversed later by support if needed.
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                full
+                onClick={() => {
+                  setRemoveStudent(null)
+                  setRemoveError(null)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button full loading={removeBusy} onClick={() => void confirmRemoveStudent()}>
+                Remove student
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+    </AppShell>
+  )
+}
+
+/**
+ * Small modal wrapping StudentPhotoUpload. Fetches the student's current
+ * photo_url fresh on open (rather than relying on StudentRow already
+ * having it), uploads to the "student-photos" Storage bucket, and writes
+ * the resulting public URL back to students.photo_url.
+ */
+function PhotoModal({
+  student,
+  onClose,
+}: {
+  student: { id: string; name: string } | null
+  onClose: () => void
+}) {
+  const [currentUrl, setCurrentUrl] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!student) return
+    setLoading(true)
+    setCurrentUrl(null)
+    supabase
+      .from('students')
+      .select('photo_url')
+      .eq('id', student.id)
+      .single()
+      .then(({ data }) => {
+        setCurrentUrl((data?.photo_url as string) ?? null)
+        setLoading(false)
+      })
+  }, [student])
+
+  if (!student) return null
+
+  return (
+    <Modal open={!!student} onClose={onClose} title={`Photo - ${student.name}`}>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <StudentPhotoUpload
+          studentId={student.id}
+          currentPhotoUrl={currentUrl}
+          onUploaded={(url) => setCurrentUrl(url)}
+        />
+      )}
+    </Modal>
+  )
+}
+
+function CodeChip({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false)
+  return (
+    <button
+      onClick={() => {
+        void navigator.clipboard.writeText(code)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1600)
+      }}
+      className="font-mono text-[12px] tracking-[0.14em] px-2 h-7 rounded-sm border
+                 border-brass/40 bg-brass-wash text-ink hover:border-brass transition-colors"
+      title="Copy code"
+    >
+      {copied ? 'Copied' : code}
+    </button>
+  )
+}
+
+/**
+ * Print-friendly sheet of every generated code in this class, plus a CSV
+ * export. This is the thing an admin actually hands to staff: cut into
+ * slips, one per child, sent home. Without this, a bulk-generated batch of
+ * 40 codes is just 40 rows nobody can act on.
+ */
+function CodesSheetModal({
+  open,
+  onClose,
+  className,
+  rows,
+}: {
+  open: boolean
+  onClose: () => void
+  className: string
+  rows: { name: string; code: string }[]
+}) {
+  function downloadCsv() {
+    const header = 'Student,Claim Code\n'
+    const body = rows.map((r) => `"${r.name.replace(/"/g, '""')}",${r.code}`).join('\n')
+    const blob = new Blob([header + body], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${className || 'class'}-claim-codes.csv`.replace(/\s+/g, '-').toLowerCase()
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title={`${className} - claim codes`}>
+      <div className="flex items-center justify-between mb-3.5 print:hidden">
+        <p className="text-[13px] text-ink-faint">
+          {rows.length} code{rows.length === 1 ? '' : 's'}. Print this and cut into slips, or
+          export as a spreadsheet.
+        </p>
+        <div className="flex gap-2 shrink-0 ml-3">
+          <Button variant="secondary" onClick={downloadCsv}>
+            Export CSV
+          </Button>
+          <Button variant="secondary" onClick={() => window.print()}>
+            Print
+          </Button>
+        </div>
+      </div>
+      <div className="border border-rule rounded-md max-h-[50vh] overflow-y-auto print:max-h-none print:border-0">
+        <table className="w-full text-[13px]">
+          <thead className="print:table-header-group">
+            <tr className="border-b border-rule text-left">
+              <th className="py-2 px-3 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint">
+                Student
+              </th>
+              <th className="py-2 px-3 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint">
+                Code
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.code} className="border-b border-rule last:border-0 print:break-inside-avoid">
+                <td className="py-2 px-3">{r.name}</td>
+                <td className="py-2 px-3 font-mono tracking-[0.14em]">{r.code}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Modal>
+  )
+}
+
+/**
+ * Wires the already-existing assignTeacher() function to an actual screen.
+ * A teacher can be assigned more than once to the same class under a
+ * different subject - the unique constraint is (class_id, teacher_id,
+ * subject), so we don't filter the teacher list down, we just surface a
+ * clear message if the exact same pairing already exists.
+ */
+function AssignTeacherModal({
+  open,
+  onClose,
+  schoolId,
+  classId,
+  teachers,
+  onSaved,
+}: {
+  open: boolean
+  onClose: () => void
+  schoolId: string
+  classId: string
+  teachers: Record<string, unknown>[]
+  onSaved: () => void
+}) {
+  const [pickedTeacherId, setPickedTeacherId] = useState('')
+  const teacherId = pickedTeacherId || (teachers[0]?.id as string) || ''
+  const [subject, setSubject] = useState('')
+  const [isForm, setIsForm] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  async function save() {
+    setError(null)
+    if (!teacherId) return setError('Pick a teacher.')
+    if (!isForm && !subject.trim()) return setError('Which subject, or mark as form teacher.')
+    setBusy(true)
+    const { error } = await assignTeacher(schoolId, classId, teacherId, subject, isForm)
+    setBusy(false)
+    if (error) {
+      return setError(
+        /duplicate key/i.test(error.message)
+          ? 'This teacher is already assigned to that subject in this class.'
+          : error.message,
+      )
+    }
+    setSubject('')
+    setIsForm(false)
+    setPickedTeacherId('')
+    onSaved()
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title="Assign a teacher">
+      <form
+        className="space-y-3.5"
+        onSubmit={(e) => {
+          e.preventDefault()
+          void save()
+        }}
+      >
+        {error && <Alert>{error}</Alert>}
+
+        <div>
+          <span className="eyebrow">Teacher</span>
+          <select
+            value={teacherId}
+            onChange={(e) => setPickedTeacherId(e.target.value)}
+            className="mt-1.5 w-full h-11 px-3 border border-rule-strong rounded-md bg-surface text-[14px]"
+          >
+            {teachers.map((t) => (
+              <option key={t.id as string} value={t.id as string}>
+                {(t.full_name as string) || (t.email as string)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <Field
+          label="Subject"
+          placeholder="Mathematics"
+          hint={isForm ? 'Optional for a form teacher.' : 'Required.'}
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+        />
+
+        <label className="flex items-center gap-2.5 text-[13px] text-ink-soft cursor-pointer">
+          <input
+            type="checkbox"
+            checked={isForm}
+            onChange={(e) => setIsForm(e.target.checked)}
+          />
+          Form / class teacher for this class
+        </label>
+
+        <Button type="submit" full loading={busy}>
+          Assign
+        </Button>
+      </form>
+    </Modal>
+  )
+}
+
+function AddStudentsModal({
+  open,
+  onClose,
+  schoolId,
+  classId,
+  existingStudents,
+  onSaved,
+}: {
+  open: boolean
+  onClose: () => void
+  schoolId: string
+  classId: string
+  existingStudents: StudentRow[]
+  onSaved: () => void
+}) {
+  const [mode, setMode] = useState<'paste' | 'file'>('paste')
+
+  const [raw, setRaw] = useState('')
+  const pasted: ParsedStudent[] = raw
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const clean = line.replace(/^\d+[.)]\s*/, '')
+      const parts = clean.split(/\s+/)
+      if (parts.length === 1) return { first: parts[0], last: '' }
+      return { last: parts[0].replace(/,$/, ''), first: parts.slice(1).join(' ') }
+    })
+
+  const [fileName, setFileName] = useState('')
+  const [fromFile, setFromFile] = useState<ParsedStudent[]>([])
+  const [usedHeader, setUsedHeader] = useState(false)
+  const [fileError, setFileError] = useState<string | null>(null)
+
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [includeDuplicates, setIncludeDuplicates] = useState(false)
+
+  const parsed = mode === 'paste' ? pasted : fromFile
+
+  const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, ' ')
+  const existingNames = new Set(
+    existingStudents.map((s) => norm(`${s.last_name} ${s.first_name}`)),
+  )
+  const existingAdmissions = new Set(
+    existingStudents.map((s) => s.admission_number).filter((a): a is string => !!a),
+  )
+  const seenInThisBatch = new Set<string>()
+
+  const withDuplicateFlag = parsed.map((p) => {
+    const nameKey = norm(`${p.last} ${p.first}`)
+    const isDuplicate =
+      existingNames.has(nameKey) ||
+      (!!p.admission_number && existingAdmissions.has(p.admission_number)) ||
+      seenInThisBatch.has(nameKey)
+    seenInThisBatch.add(nameKey)
+    return { ...p, isDuplicate }
+  })
+
+  const duplicateCount = withDuplicateFlag.filter((p) => p.isDuplicate).length
+  const toSubmit = includeDuplicates
+    ? parsed
+    : withDuplicateFlag.filter((p) => !p.isDuplicate)
+
+  async function handleFile(f: File) {
+    setFileError(null)
+    setFileName(f.name)
+    try {
+      const buf = await f.arrayBuffer()
+      const { students, usedHeader } = await parseStudentSheet(buf)
+      if (students.length === 0) {
+        setFileError('No rows found in that file. Check it has at least one name in it.')
+      }
+      setFromFile(students)
+      setUsedHeader(usedHeader)
+    } catch {
+      setFileError('Could not read that file. Make sure it is a real .xlsx, .xls, or .csv file.')
+      setFromFile([])
+    }
+  }
+
+  function downloadTemplate() {
+    const csv = 'Surname,First Name,Admission Number\nOkafor,Ada,BFA-0001\nAdeyemi,Bola,BFA-0002\n'
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'student-import-template.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function save() {
+    setError(null)
+    if (toSubmit.length === 0) {
+      return setError(
+        duplicateCount > 0
+          ? 'Everything here already looks like it is in this class.'
+          : 'Nothing to add.',
+      )
+    }
+    setBusy(true)
+    const { error } = await addStudents(schoolId, classId, toSubmit)
+    setBusy(false)
+    if (error) {
+      return setError(
+        /duplicate key/i.test(error.message)
+          ? 'One of these admission numbers is already used in this school. Check for a repeated row.'
+          : error.message,
+      )
+    }
+    setRaw('')
+    setFromFile([])
+    setFileName('')
+    setIncludeDuplicates(false)
+    onSaved()
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title="Add students">
+      <div className="flex gap-1 mb-4 p-1 bg-surface-alt rounded-md w-fit">
+        {(['paste', 'file'] as const).map((m) => (
+          <button
+            key={m}
+            onClick={() => setMode(m)}
+            className={`px-3 h-8 rounded text-[13px] font-medium transition-colors ${
+              mode === m ? 'bg-surface shadow-sm text-ink' : 'text-ink-faint hover:text-ink-soft'
+            }`}
+          >
+            {m === 'paste' ? 'Paste a list' : 'Upload a file'}
+          </button>
+        ))}
+      </div>
+
+      <form
+        className="space-y-3.5"
+        onSubmit={(e) => {
+          e.preventDefault()
+          void save()
+        }}
+      >
+        {error && <Alert>{error}</Alert>}
+
+        {mode === 'paste' ? (
+          <TextArea
+            label="Class list"
+            rows={8}
+            placeholder={'Okafor Ada\nAdeyemi Bola\nEze Chidi'}
+            hint="One student per line, surname first. Numbered lists are fine, the numbers are stripped."
+            value={raw}
+            onChange={(e) => setRaw(e.target.value)}
+          />
+        ) : (
+          <div className="space-y-2.5">
+            <div>
+              <span className="eyebrow">Spreadsheet file</span>
+              <label
+                className="mt-1.5 flex items-center justify-center h-24 border-2 border-dashed
+                           border-rule-strong rounded-md cursor-pointer hover:border-brass
+                           transition-colors text-center px-4"
+              >
+                <input
+                  type="file"
+                  accept=".csv,.xlsx,.xls"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0]
+                    if (f) void handleFile(f)
+                  }}
+                />
+                <span className="text-[13px] text-ink-faint">
+                  {fileName || 'Click to choose a .xlsx, .xls, or .csv file'}
+                </span>
+              </label>
+            </div>
+            {fileError && <Alert>{fileError}</Alert>}
+            <button
+              type="button"
+              onClick={downloadTemplate}
+              className="text-[12px] text-ink-faint hover:text-ink underline underline-offset-2"
+            >
+              Download a blank template
+            </button>
+            {fromFile.length > 0 && (
+              <p className="text-[12px] text-ink-faint">
+                {usedHeader
+                  ? 'Matched columns from the header row.'
+                  : 'No header row found - used the first column as the name and the second as an admission number.'}
+              </p>
+            )}
+          </div>
+        )}
+
+        {parsed.length > 0 && (
+          <div className="border border-rule rounded-md p-3 max-h-40 overflow-y-auto">
+            <span className="eyebrow">Preview, {parsed.length}</span>
+            <ul className="mt-2 space-y-1">
+              {withDuplicateFlag.slice(0, 30).map((p, i) => (
+                <li
+                  key={i}
+                  className={`text-[13px] ${p.isDuplicate ? 'text-ink-faint' : ''}`}
+                >
+                  {p.last}
+                  {p.last && ', '}
+                  {p.first}
+                  {p.admission_number && (
+                    <span className="text-ink-faint"> &middot; {p.admission_number}</span>
+                  )}
+                  {p.isDuplicate && (
+                    <span className="text-absent"> &middot; already in this class</span>
+                  )}
+                </li>
+              ))}
+              {parsed.length > 30 && (
+                <li className="text-[12px] text-ink-faint">and {parsed.length - 30} more</li>
+              )}
+            </ul>
+          </div>
+        )}
+
+        {duplicateCount > 0 && (
+          <div>
+            <Alert>
+              {duplicateCount} of {parsed.length} match a name or admission number already in
+              this class. They will be skipped unless you choose to add them anyway.
+            </Alert>
+            <label className="flex items-center gap-2.5 mt-2.5 text-[13px] text-ink-soft cursor-pointer">
+              <input
+                type="checkbox"
+                checked={includeDuplicates}
+                onChange={(e) => setIncludeDuplicates(e.target.checked)}
+              />
+              Add them anyway (use this only if they are genuinely different students, e.g. two
+              children who share a name)
+            </label>
+          </div>
+        )}
+
+        <Button type="submit" full loading={busy}>
+          Add {toSubmit.length > 0 ? toSubmit.length : ''} students
+        </Button>
+      </form>
+    </Modal>
+  )
+}
