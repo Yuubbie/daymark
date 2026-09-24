@@ -158,6 +158,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* ---------- Content ---------- */}
       <main className="lg:pl-[248px]">
         <div className="mx-auto w-full max-w-3xl px-4 lg:px-10 py-5 lg:py-10 pb-24 lg:pb-12">
+          <button
+            onClick={() => navigate(-1)}
+            className="mb-4 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint hover:text-ink transition-colors"
+          >
+            &larr; Back
+          </button>
           {children}
         </div>
       </main>
