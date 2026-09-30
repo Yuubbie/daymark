@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { supabase } from './supabase'
+import { isSupabaseConfigured, supabase } from './supabase'
 import type { Profile, School } from './types'
 
 interface AuthValue {
@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async (s: Session | null) => {
-    if (!s?.user) {
+    if (!isSupabaseConfigured || !s?.user) {
       setProfile(null)
       setSchool(null)
       setProblem(null)
@@ -106,6 +106,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true
+
+    if (!isSupabaseConfigured) {
+      setLoading(false)
+      return
+    }
 
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return
@@ -134,7 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [load])
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut()
+    if (isSupabaseConfigured) await supabase.auth.signOut()
     setProfile(null)
     setSchool(null)
     setProblem(null)

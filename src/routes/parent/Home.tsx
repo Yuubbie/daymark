@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { AttendanceSummary, RegisterLegend } from '../../components/RegisterStrip'
 import { Empty, Panel, Spinner } from '../../components/ui'
@@ -192,6 +193,39 @@ export default function ParentHome() {
               <Empty line="Nothing posted yet. Lessons and homework will appear here as teachers add them." />
             </Panel>
           )}
+
+          <Panel title="Quick actions">
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                to="/parent/homework"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Due</div>
+                <div className="text-[14px] font-semibold mt-1">Homework</div>
+              </Link>
+              <Link
+                to="/parent/fees"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">This term</div>
+                <div className="text-[14px] font-semibold mt-1">Fee statement</div>
+              </Link>
+              <Link
+                to="/parent/notices"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">School</div>
+                <div className="text-[14px] font-semibold mt-1">Notices</div>
+              </Link>
+              <Link
+                to="/parent/assessments"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Results</div>
+                <div className="text-[14px] font-semibold mt-1">Assessments</div>
+              </Link>
+            </div>
+          </Panel>
 
           {earlier.length > 0 && (
             <Panel title="Earlier this fortnight">

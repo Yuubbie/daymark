@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+import { isSupabaseConfigured, supabase } from '../lib/supabase'
 import { AuthLayout } from '../components/AuthLayout'
 import { Alert, Button, Field } from '../components/ui'
 
@@ -15,6 +15,9 @@ export default function Signup() {
 
   async function submit() {
     setError(null)
+    if (!isSupabaseConfigured) {
+      return setError('This preview has no database connected. Use Try the live demo, or add Supabase keys.')
+    }
     setBusy(true)
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -106,6 +109,13 @@ export default function Signup() {
         <Link to="/login" className="text-ink underline underline-offset-4 decoration-brass">
           Sign in
         </Link>
+      </p>
+      <p className="mt-3 text-[13px] text-ink-faint">
+        Or{' '}
+        <Link to="/demo" className="text-ink underline underline-offset-4 decoration-brass">
+          walk the live demo
+        </Link>
+        {' without creating an account.'}
       </p>
     </AuthLayout>
   )

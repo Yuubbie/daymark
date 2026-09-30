@@ -27,6 +27,8 @@ import ParentFeesRoute from './routes/parent/Fees'
 import Preview from './routes/Preview'
 import Diagnostics from './routes/Diagnostics'
 import SubscriptionGate from './components/SubscriptionGate'
+import Marketing from './routes/Marketing'
+import DemoApp from './routes/demo/DemoApp'
 
 /** Shown when we have a session but cannot resolve a profile. Never spin forever. */
 function Blocked({ problem }: { problem: string }) {
@@ -55,7 +57,7 @@ function Landing() {
   const { session, profile, loading, problem } = useAuth()
 
   if (loading) return <Spinner />
-  if (!session) return <Navigate to="/login" replace />
+  if (!session) return <Marketing />
   if (problem) return <Blocked problem={problem} />
   if (!profile) return <Spinner />
   if (!profile.school_id) return <Navigate to="/welcome" replace />
@@ -107,6 +109,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/demo" element={<DemoApp />} />
           <Route path="/preview" element={<Preview />} />
           <Route path="/diagnostics" element={<Diagnostics />} />
 

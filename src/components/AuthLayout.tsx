@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { Wordmark } from './Logo'
 import { RegisterStrip } from './RegisterStrip'
 import type { AttendanceMark, AttendanceStatus } from '../lib/types'
@@ -39,7 +40,9 @@ export function AuthLayout({
     <div className="min-h-dvh bg-paper lg:grid lg:grid-cols-[1.05fr_1fr]">
       <aside className="bg-ink text-ink-invert flex flex-col">
         <div className="px-6 pt-6 lg:px-12 lg:pt-12">
-          <Wordmark size="md" className="text-ink-invert" />
+          <Link to="/" aria-label="Daymaark home">
+            <Wordmark size="md" className="text-ink-invert" />
+          </Link>
         </div>
 
         {/* Desktop panel */}

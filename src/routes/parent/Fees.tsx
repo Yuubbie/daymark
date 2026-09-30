@@ -1,17 +1,6 @@
-// src/routes/parent/Fees.tsx
-//
-// Dedicated top-level route for the parent Fees sidebar item, so Fees is
-// reachable on its own instead of only via the Assessments picker screen.
-// Mirrors routes/parent/Assessments.tsx — same term-entry step, same
-// ParentChildPicker underneath, just its own nav destination.
-//
-// FIX: original version swapped to ParentChildPicker on every keystroke
-// (any non-empty term made `!term` false), so it was impossible to finish
-// typing the term before the screen changed. Added a draft value + a
-// Continue button/Enter key so the switch only happens on submit.
-
 import { useState } from 'react'
 import { AppShell } from '../../components/AppShell'
+import { Button, Field, Panel } from '../../components/ui'
 import ParentChildPicker from '../../components/ParentChildPicker'
 
 export default function ParentFeesRoute() {
@@ -25,33 +14,48 @@ export default function ParentFeesRoute() {
   if (!term) {
     return (
       <AppShell>
-        <div className="max-w-md mx-auto p-4">
-          <h1 className="text-lg font-semibold mb-3">Fees</h1>
-          <label className="text-sm font-medium block mb-1">Term</label>
-          <input
-            className="w-full border rounded p-2 text-sm mb-3"
+        <span className="eyebrow">Fees</span>
+        <h1 className="text-[26px] mt-1">Which term?</h1>
+        <p className="mt-2 text-[14px] text-ink-soft max-w-[42ch]">
+          Statements are kept per term so last year’s balance does not mix with this one.
+        </p>
+        <form
+          className="mt-6 max-w-md space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault()
+            submit()
+          }}
+        >
+          <Field
+            label="Term"
             placeholder="e.g. First Term 2026/2027"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') submit()
-            }}
+            required
           />
-          <button
-            onClick={submit}
-            disabled={!draft.trim()}
-            className="text-sm border rounded px-3 py-1.5 disabled:opacity-40"
-          >
+          <Button type="submit" disabled={!draft.trim()}>
             Continue
-          </button>
-        </div>
+          </Button>
+        </form>
       </AppShell>
     )
   }
 
   return (
     <AppShell>
-      <ParentChildPicker term={term} />
+      <Panel title={term} action={
+        <button
+          onClick={() => {
+            setTerm('')
+            setDraft('')
+          }}
+          className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-faint hover:text-ink"
+        >
+          Change term
+        </button>
+      }>
+        <ParentChildPicker term={term} />
+      </Panel>
     </AppShell>
   )
 }

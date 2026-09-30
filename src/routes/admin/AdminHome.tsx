@@ -98,6 +98,39 @@ export default function AdminHome() {
             </Panel>
           )}
 
+          <Panel title="Jump">
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                to="/teacher"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Morning</div>
+                <div className="text-[14px] font-semibold mt-1">Take register</div>
+              </Link>
+              <Link
+                to="/admin/classes"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Setup</div>
+                <div className="text-[14px] font-semibold mt-1">Classes</div>
+              </Link>
+              <Link
+                to="/admin/flagged"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Watch</div>
+                <div className="text-[14px] font-semibold mt-1">Flagged pupils</div>
+              </Link>
+              <Link
+                to="/admin/fees"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Money</div>
+                <div className="text-[14px] font-semibold mt-1">Fees</div>
+              </Link>
+            </div>
+          </Panel>
+
           <Panel title="Today">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
               <Stat value={sum?.students ?? 0} label="Students" />
