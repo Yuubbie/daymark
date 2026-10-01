@@ -5,7 +5,15 @@ export const DEMO_TERM = 'First Term 2025/2026'
 export const DEMO_CLASS = 'JSS 1A'
 export const DEMO_CLAIM = 'ADAEZE01'
 
-export type DemoRole = 'parent' | 'teacher' | 'admin'
+export const PLAN = {
+  name: 'School',
+  trialDays: 30,
+  price: 200000,
+  per: 'year',
+  students: 'Unlimited students',
+}
+
+export type DemoRole = 'proprietor' | 'admin' | 'teacher' | 'parent' | 'student'
 
 export type DemoStudent = {
   id: string
@@ -164,6 +172,46 @@ export const demoBehaviour = [
   { id: 'b3', points: -1, note: 'Talking during silent reading', date: 'Mon' },
 ]
 
+/* ---------------------------------------------------------------------------
+   Student surface
+--------------------------------------------------------------------------- */
+
+export const studentAssignments = [
+  {
+    id: 'a1',
+    subject: 'Mathematics',
+    title: 'Exercise 4.2 — Linear equations',
+    due: 'Tomorrow',
+    status: 'open' as const,
+  },
+  {
+    id: 'a2',
+    subject: 'English Language',
+    title: 'Write a 120-word recount',
+    due: 'Friday',
+    status: 'submitted' as const,
+  },
+  {
+    id: 'a3',
+    subject: 'Basic Science',
+    title: 'Label the leaf cross-section',
+    due: 'Monday',
+    status: 'open' as const,
+  },
+]
+
+export const studentResults = [
+  { subject: 'Mathematics', ca: 28, exam: 61, total: 89, grade: 'A' },
+  { subject: 'English Language', ca: 25, exam: 54, total: 79, grade: 'B' },
+  { subject: 'Basic Science', ca: 27, exam: 58, total: 85, grade: 'A' },
+  { subject: 'Social Studies', ca: 22, exam: 49, total: 71, grade: 'B' },
+  { subject: 'Yoruba', ca: 29, exam: 63, total: 92, grade: 'A' },
+]
+
+/* ---------------------------------------------------------------------------
+   Admin surface
+--------------------------------------------------------------------------- */
+
 export const demoAdmin = {
   students: 248,
   classes: 12,
@@ -175,5 +223,83 @@ export const demoAdmin = {
   flagged: [
     { name: 'Bola Adeyemi', klass: 'JSS 1A', pct: 68, reason: 'Attendance falling' },
     { name: 'Tunde Balogun', klass: 'JSS 1A', pct: 71, reason: 'Three absences this fortnight' },
+  ],
+}
+
+export const adminClasses = [
+  { name: 'JSS 1A', n: 32, teacher: 'Mr. Okafor', posted: true, pct: 96 },
+  { name: 'JSS 1B', n: 30, teacher: 'Mrs. Bello', posted: true, pct: 94 },
+  { name: 'JSS 2A', n: 31, teacher: 'Mr. Adewale', posted: true, pct: 92 },
+  { name: 'JSS 2B', n: 28, teacher: 'Ms. Nnaji', posted: false, pct: 88 },
+  { name: 'Primary 4A', n: 36, teacher: 'Mrs. Eze', posted: false, pct: 90 },
+  { name: 'Primary 4B', n: 34, teacher: 'Mr. Danjuma', posted: true, pct: 95 },
+]
+
+export const demoTasks = [
+  { id: 't1', title: 'Enter WAEC mock scores for SS3', who: 'Exams officer', due: 'Fri', done: false },
+  { id: 't2', title: 'Send term fee reminders', who: 'Bursar', due: 'Today', done: false },
+  { id: 't3', title: 'Approve JSS 2B lesson plan', who: 'Head teacher', due: 'Wed', done: true },
+  { id: 't4', title: 'Order next term textbooks', who: 'Admin', due: 'Next week', done: false },
+]
+
+/* ---------------------------------------------------------------------------
+   Proprietor surface
+--------------------------------------------------------------------------- */
+
+export const demoSchool = {
+  enrolment: 248,
+  staff: 34,
+  campuses: 1,
+  term: DEMO_TERM,
+  attendancePct: 94,
+  collected: 18600000,
+  outstanding: 3400000,
+  billed: 22000000,
+  expense: 9400000,
+  enrolmentTrend: [
+    { label: '2022', value: 180 },
+    { label: '2023', value: 205 },
+    { label: '2024', value: 224 },
+    { label: '2025', value: 248 },
+  ],
+  classPerformance: [
+    { name: 'JSS 1', pct: 91 },
+    { name: 'JSS 2', pct: 87 },
+    { name: 'JSS 3', pct: 84 },
+    { name: 'SS 1', pct: 82 },
+    { name: 'SS 2', pct: 80 },
+    { name: 'SS 3', pct: 78 },
+  ],
+  feeByClass: [
+    { name: 'JSS 1A', collected: 96 },
+    { name: 'JSS 2A', collected: 88 },
+    { name: 'SS 2', collected: 74 },
+    { name: 'SS 3', collected: 61 },
+  ],
+  staffOnLeave: 2,
+  staffPending: 3,
+}
+
+export const demoSchoolNotices = [
+  { id: 'p1', title: 'First Term results published', audience: 'All families', date: 'Today', read: 82 },
+  { id: 'p2', title: 'Staff development day', audience: 'Teachers', date: 'Mon', read: 100 },
+  { id: 'p3', title: 'Fee reminder — 3rd instalment', audience: 'Debtors', date: 'Yesterday', read: 64 },
+]
+
+/* ---------------------------------------------------------------------------
+   Subscription / billing surface
+--------------------------------------------------------------------------- */
+
+export const demoSubscription = {
+  plan: PLAN.name,
+  status: 'trial' as 'trial' | 'active' | 'lapsed',
+  startedOn: '1 September 2026',
+  trialEnds: '1 October 2026',
+  daysLeft: 12,
+  price: PLAN.price,
+  billedTo: 'Greenfield Academy',
+  method: null as string | null,
+  invoices: [
+    { id: 'INV-0001', date: '1 Sep 2026', amount: 0, status: 'Trial' },
   ],
 }

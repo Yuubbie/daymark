@@ -109,9 +109,10 @@ export default function Marketing() {
             <h1 className="mt-4 text-[40px] sm:text-[56px] lg:text-[64px] leading-[1.02] max-w-[14ch]">
               What happened at school today.
             </h1>
-            <p className="mt-5 text-[16px] sm:text-[18px] leading-relaxed text-ink-invert/70 max-w-[42ch]">
-              Parents pay fees, then hear nothing until report-card day. Daymaark closes that
-              silence: attendance, the lesson, and the homework, the same day it happens.
+            <p className="mt-5 text-[16px] sm:text-[18px] leading-relaxed text-ink-invert/70 max-w-[44ch]">
+              A complete school platform for Nigerian schools: proprietor, admin, teacher, parent
+              and student, on one record. Register, lessons, homework, results, fees and finance,
+              from a morning register to a term balance sheet.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/demo">
@@ -122,7 +123,7 @@ export default function Marketing() {
               </Button>
             </div>
             <p className="mt-4 text-[12px] text-ink-invert/45">
-              No signup. Three roles. Sample school, real product.
+              No signup. Five dashboards. Sample school, real product.
             </p>
           </div>
 
@@ -163,9 +164,9 @@ export default function Marketing() {
         <div className="mx-auto max-w-6xl px-5 py-10 grid grid-cols-2 lg:grid-cols-4 gap-8">
           {[
             ['20s', 'To mark a class present'],
-            ['Same day', 'Parents see the lesson'],
-            ['N300–500', 'Per student, per term'],
-            ['PWA', 'No app store required'],
+            ['5 dashboards', 'Proprietor to student'],
+            ['30 days free', 'Then N200,000 a year'],
+            ['Offline-safe', 'Register works on 2G'],
           ].map(([k, v]) => (
             <div key={k}>
               <div className="tnum text-[28px] font-semibold leading-none">{k}</div>
@@ -205,10 +206,10 @@ export default function Marketing() {
 
       <section id="how" className="bg-surface-alt border-y border-rule">
         <div className="mx-auto max-w-6xl px-5 py-20">
-          <span className="eyebrow">How it works</span>
-          <h2 className="text-[32px] sm:text-[40px] mt-2 max-w-[16ch]">
-            Three roles. One school day.
-          </h2>
+        <span className="eyebrow">How it works</span>
+        <h2 className="text-[32px] sm:text-[40px] mt-2 max-w-[16ch]">
+          Five dashboards. One school record.
+        </h2>
           <ol className="mt-10 grid md:grid-cols-3 gap-6">
             {[
               {
@@ -296,7 +297,7 @@ export default function Marketing() {
         </RoleBlock>
 
         <RoleBlock
-          kicker="For proprietors"
+          kicker="For admin"
           title="Who has not posted. Who is slipping."
           body="Today’s counts, classes with no lesson, parents still unlinked, and the two children whose attendance is falling. The school, on one page."
           cta="Open the admin demo"
@@ -321,27 +322,81 @@ export default function Marketing() {
             </div>
           </div>
         </RoleBlock>
+
+        <RoleBlock
+          kicker="For proprietors"
+          title="The school as a business."
+          body="Enrolment, fee collection, outstanding balances, expenses and margin, term by term. One subscription covers the whole school."
+          cta="Open the proprietor demo"
+          to="/demo?role=proprietor"
+          reverse
+        >
+          <div className="bg-surface border border-rule rounded-lg p-5">
+            <div className="grid grid-cols-2 gap-5">
+              <Stat n="N18.6m" l="Collected" />
+              <Stat n="N3.4m" l="Outstanding" />
+              <Stat n="94%" l="Attendance" />
+              <Stat n="34" l="Staff" />
+            </div>
+            <div className="mt-5 pt-4 border-t border-brass border-rule">
+              <div className="flex items-center justify-between">
+                <span className="eyebrow">Subscription</span>
+                <span className="tnum text-[13px] text-brass">N200,000 / year</span>
+              </div>
+            </div>
+          </div>
+        </RoleBlock>
+
+        <RoleBlock
+          kicker="For students"
+          title="Their own school day."
+          body="Assignments with deadlines, resources, and results as they are published. A student sees their record, not the whole school's."
+          cta="Open the student demo"
+          to="/demo?role=student"
+        >
+          <div className="bg-surface border border-rule rounded-lg p-5">
+            <div className="divide-y divide-rule">
+              {[
+                ['Mathematics', 'Exercise 4.2', 'Tomorrow', 'Open'],
+                ['English Language', 'Recount', 'Friday', 'Submitted'],
+                ['Basic Science', 'Leaf cross-section', 'Monday', 'Open'],
+              ].map(([s, t, d, st]) => (
+                <div key={t} className="flex items-center gap-3 py-3">
+                  <div>
+                    <div className="eyebrow">{s}</div>
+                    <div className="text-[14px] font-semibold">{t}</div>
+                  </div>
+                  <div className="ml-auto text-right">
+                    <div className="tnum text-[12px] text-ink-faint">Due {d}</div>
+                    <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-soft">{st}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </RoleBlock>
       </section>
 
       <section className="bg-ink text-ink-invert">
         <div className="mx-auto max-w-6xl px-5 py-20 grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-brass">
-              Not another ERP
+              Not another heavyweight ERP
             </span>
             <h2 className="text-[32px] sm:text-[40px] mt-3 max-w-[16ch]">
-              Sits beside the school you already run.
+              A full school system, light enough to actually run.
             </h2>
             <p className="mt-4 text-[15px] leading-relaxed text-ink-invert/70 max-w-[48ch]">
-              Fees, admissions and accounts can stay where they are. Daymaark answers the question
-              every parent actually asks, and it works on a mid-range Android, on patchy data.
+              Enrolment, register, lessons, results, fees and finance on one record, for five
+              dashboards. It works on a mid-range Android and on patchy data, which is where most
+              school software gives up.
             </p>
           </div>
           <ul className="space-y-3">
             {[
-              ['EDVES-class platforms', 'Try to own the whole school. Heavy to start. Parents still wait for reports.'],
+              ['Legacy school ERPs', 'Own the whole school on paper, but are heavy to start and parents still wait for reports.'],
               ['WhatsApp groups', 'Free, familiar, and structurally the wrong tool for a record.'],
-              ['Daymaark', 'Attendance, lessons, homework, notices, fees visibility. Same day. Light enough to actually use.'],
+              ['Daymaark', 'The full school record, live the same day, offline-safe, for one flat yearly price.'],
             ].map(([t, b]) => (
               <li key={t} className="border border-ink-invert/15 rounded-lg p-4">
                 <div className="text-[14px] font-semibold">{t}</div>
@@ -354,26 +409,38 @@ export default function Marketing() {
 
       <section id="pricing" className="mx-auto max-w-6xl px-5 py-20">
         <span className="eyebrow">Pricing</span>
-        <h2 className="text-[32px] sm:text-[40px] mt-2">The school buys. Families are included.</h2>
+        <h2 className="text-[32px] sm:text-[40px] mt-2">
+          30 days free. Then one price for the whole school.
+        </h2>
+        <p className="mt-3 text-[15px] text-ink-soft max-w-[56ch]">
+          N200,000 a year, unlimited students. Parents, teachers and students are included, not
+          charged per seat. No card needed to start the trial.
+        </p>
         <div className="mt-10 grid md:grid-cols-3 gap-4">
           <PriceCard
-            name="Pilot"
-            price="Free"
-            unit="one term, one school"
-            points={['Full product', 'Up to 80 students', 'Email support']}
+            name="Free trial"
+            price="N0"
+            unit="30 days, full product"
+            points={['Every dashboard switched on', 'Unlimited students', 'Bring your class list']}
           />
           <PriceCard
-            name="Term"
-            price="N400"
-            unit="per student / term"
+            name="School"
+            price="N200,000"
+            unit="per year, unlimited students"
             featured
-            points={['Parents and teachers included', 'Offline register', 'Daily digest', 'Claim-code onboarding']}
+            points={[
+              'Proprietor, admin, teacher, parent, student',
+              'Register, lessons, homework, results',
+              'Fees, invoicing and finance reporting',
+              'Notices and same-day absence alerts',
+              'Offline-safe register',
+            ]}
           />
           <PriceCard
             name="Group"
             price="Talk"
             unit="multi-campus"
-            points={['Consolidated attendance', 'Shared branding', 'Onboarding for staff']}
+            points={['Consolidated reporting', 'Shared branding', 'Staff onboarding and migration']}
           />
         </div>
       </section>
@@ -409,8 +476,12 @@ export default function Marketing() {
         <dl className="mt-8 divide-y divide-rule border-y border-rule">
           {[
             [
-              'Do we have to replace our current school software?',
-              'No. Daymaark is a transparency layer. Keep your fees and admin tools. Parents get the school day.',
+              'What does it replace?',
+              'The register book, the homework WhatsApp group, the results spreadsheet and the fee ledger. Admissions and accounts are covered too, so most schools run on Daymaark alone.',
+            ],
+            [
+              'What does it cost?',
+              '30 days free, then N200,000 a year for the whole school. Unlimited students. Parents, teachers and students are not charged per seat.',
             ],
             [
               'Can parents use it without a smartphone?',
@@ -440,9 +511,10 @@ export default function Marketing() {
       <section className="bg-ink text-ink-invert">
         <div className="mx-auto max-w-6xl px-5 py-16 flex flex-col lg:flex-row lg:items-end gap-6 justify-between">
           <div>
-            <h2 className="text-[36px] max-w-[14ch]">Put the school day in the parent’s pocket.</h2>
-            <p className="mt-3 text-ink-invert/65 max-w-[40ch]">
-              Walk the product as a parent, a teacher and a proprietor. Then book a session with your own class list.
+            <h2 className="text-[36px] max-w-[16ch]">Run the whole school. Show the whole family.</h2>
+            <p className="mt-3 text-ink-invert/65 max-w-[44ch]">
+              Walk all five dashboards on a live school, then book a session with your own class list.
+              N200,000 a year after a 30-day trial.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
