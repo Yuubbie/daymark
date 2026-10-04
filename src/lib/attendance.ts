@@ -87,7 +87,7 @@ async function fetchTeachableClasses(
   role: Role,
   userId: string,
 ): Promise<TeachableClass[]> {
-  if (role === 'admin') {
+  if (role === 'admin' || role === 'proprietor') {
     const { data, error } = await supabase
       .from('classes')
       .select('id, name, level')

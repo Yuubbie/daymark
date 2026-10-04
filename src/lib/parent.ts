@@ -127,12 +127,13 @@ export type Notice = {
   body: string
   published_at: string
   class_id: string | null
+  audience?: string
 }
 
 export async function listNotices(): Promise<Notice[]> {
   const { data, error } = await supabase
     .from('announcements')
-    .select('id, title, body, published_at, class_id')
+    .select('id, title, body, published_at, class_id, audience')
     .order('published_at', { ascending: false })
     .limit(30)
   if (error) throw error
@@ -145,6 +146,7 @@ export async function postNotice(
   title: string,
   body: string,
   createdBy: string,
+  audience: string = 'all',
 ) {
   return supabase.from('announcements').insert({
     school_id: schoolId,
@@ -152,5 +154,6 @@ export async function postNotice(
     title: title.trim(),
     body: body.trim(),
     created_by: createdBy,
+    audience,
   })
 }

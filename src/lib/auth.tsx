@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { supabase } from './supabase'
+import { isSupabaseConfigured, supabase } from './supabase'
 import type { Profile, School } from './types'
 
 interface AuthValue {
@@ -32,11 +32,26 @@ type ProfileResult = { profile: Profile | null; problem: string | null }
  * up we surface why rather than spinning forever.
  */
 async function fetchProfile(userId: string, attempt = 0): Promise<ProfileResult> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, school_id, role, full_name, email, phone, is_active, digest_channel')
-    .eq('id', userId)
-    .maybeSingle()
+  let data: Record<string, unknown> | null = null
+  let error: { code?: string; message: string } | null = null
+  {
+    const first = await supabase
+      .from('profiles')
+      .select('id, school_id, role, full_name, email, phone, is_active, digest_channel, student_id')
+      .eq('id', userId)
+      .maybeSingle()
+    data = first.data as Record<string, unknown> | null
+    error = first.error
+    if (error && /student_id/i.test(error.message)) {
+      const retry = await supabase
+        .from('profiles')
+        .select('id, school_id, role, full_name, email, phone, is_active, digest_channel')
+        .eq('id', userId)
+        .maybeSingle()
+      data = retry.data as Record<string, unknown> | null
+      error = retry.error
+    }
+  }
 
   if (error) {
     // 42P01 = relation does not exist: the migration was never pushed.
@@ -66,7 +81,7 @@ async function fetchProfile(userId: string, attempt = 0): Promise<ProfileResult>
     }
   }
 
-  return { profile: data as Profile, problem: null }
+  return { profile: data as unknown as Profile, problem: null }
 }
 
 async function fetchSchool(schoolId: string): Promise<School | null> {
@@ -90,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async (s: Session | null) => {
-    if (!s?.user) {
+    if (!isSupabaseConfigured || !s?.user) {
       setProfile(null)
       setSchool(null)
       setProblem(null)
@@ -106,6 +121,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true
+
+    if (!isSupabaseConfigured) {
+      setLoading(false)
+      return
+    }
 
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return
@@ -134,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [load])
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut()
+    if (isSupabaseConfigured) await supabase.auth.signOut()
     setProfile(null)
     setSchool(null)
     setProblem(null)

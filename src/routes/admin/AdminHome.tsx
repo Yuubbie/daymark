@@ -8,6 +8,8 @@ import {
   classesMissingLessonToday,
   createTerm,
   getCurrentTerm,
+  listUpcomingBirthdays,
+  type BirthdayRow,
   type TermRow,
 } from '../../lib/queries'
 
@@ -17,19 +19,22 @@ export default function AdminHome() {
   const [sum, setSum] = useState<Awaited<ReturnType<typeof adminSummary>> | null>(null)
   const [term, setTerm] = useState<TermRow | null>(null)
   const [missing, setMissing] = useState<Record<string, unknown>[]>([])
+  const [birthdays, setBirthdays] = useState<BirthdayRow[]>([])
   const [termOpen, setTermOpen] = useState(false)
 
   async function load() {
     setLoading(true)
     try {
-      const [s, t, m] = await Promise.all([
+      const [s, t, m, b] = await Promise.all([
         adminSummary(),
         getCurrentTerm(),
         classesMissingLessonToday(),
+        listUpcomingBirthdays().catch(() => [] as BirthdayRow[]),
       ])
       setSum(s)
       setTerm(t)
       setMissing(m.filter((r) => r.missing_today))
+      setBirthdays(b)
     } finally {
       setLoading(false)
     }
@@ -98,6 +103,53 @@ export default function AdminHome() {
             </Panel>
           )}
 
+          <Panel title="Jump">
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                to="/teacher"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Morning</div>
+                <div className="text-[14px] font-semibold mt-1">Take register</div>
+              </Link>
+              <Link
+                to="/admin/classes"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Setup</div>
+                <div className="text-[14px] font-semibold mt-1">Classes</div>
+              </Link>
+              <Link
+                to="/admin/flagged"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Watch</div>
+                <div className="text-[14px] font-semibold mt-1">Flagged pupils</div>
+              </Link>
+              <Link
+                to="/admin/fees"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Money</div>
+                <div className="text-[14px] font-semibold mt-1">Fees</div>
+              </Link>
+              <Link
+                to="/cbt/exams"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">CBT</div>
+                <div className="text-[14px] font-semibold mt-1">Papers</div>
+              </Link>
+              <Link
+                to="/cbt/marking"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Results</div>
+                <div className="text-[14px] font-semibold mt-1">Approve</div>
+              </Link>
+            </div>
+          </Panel>
+
           <Panel title="Today">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
               <Stat value={sum?.students ?? 0} label="Students" />
@@ -112,6 +164,31 @@ export default function AdminHome() {
               </p>
             )}
           </Panel>
+
+          {birthdays.length > 0 && (
+            <Panel title="Birthdays this month">
+              <div className="divide-y divide-rule -my-3">
+                {birthdays.map((b) => (
+                  <Row
+                    key={b.student_id}
+                    left={
+                      <>
+                        <div className="text-[14px] font-semibold">
+                          {b.first_name} {b.last_name}
+                        </div>
+                        <div className="text-[12px] text-ink-faint">{b.class_name ?? ''}</div>
+                      </>
+                    }
+                    right={
+                      <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-brass">
+                        {b.this_year_birthday}
+                      </span>
+                    }
+                  />
+                ))}
+              </div>
+            </Panel>
+          )}
 
           <Panel title="Not posted today">
             {missing.length === 0 ? (

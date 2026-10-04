@@ -26,6 +26,7 @@ import {
   listOpenCodes,
   listStudents,
   listTeachers,
+  setFeeCleared,
   type StudentRow,
 } from '../../lib/queries'
 import { parseStudentSheet, type ParsedStudent } from '../../lib/importStudents'
@@ -199,6 +200,18 @@ export default function ClassDetail() {
                   }
                   right={
                     <div className="flex items-center gap-2">
+                      <button
+                        onClick={() =>
+                          void setFeeCleared(s.id, !s.fee_cleared)
+                            .then(() => load())
+                            .catch((e) => setCodeError((e as Error).message))
+                        }
+                        className={`font-mono text-[11px] uppercase tracking-[0.1em] ${
+                          s.fee_cleared ? 'text-present' : 'text-absent'
+                        }`}
+                      >
+                        {s.fee_cleared ? 'Fees ok' : 'Fees due'}
+                      </button>
                       <button
                         onClick={() =>
                           setPhotoStudent({ id: s.id, name: `${s.first_name} ${s.last_name}` })

@@ -42,7 +42,7 @@ export default function Classes() {
           <Spinner />
         ) : rows.length === 0 ? (
           <Empty
-            line="No classes yet. Create one for each class in the school, for example JSS 1A."
+            line="No classes yet. Name them the way your school does: Year 1 Rugby, Year 1 Gold, JSS 1A."
             action={<Button onClick={() => setOpen(true)}>Create the first class</Button>}
           />
         ) : (
@@ -127,14 +127,15 @@ function NewClassModal({
         <Field
           label="Class name"
           required
-          placeholder="JSS 1A"
+          placeholder="Year 1 Rugby"
+          hint="Use the name your school actually calls the class."
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
         <Field
           label="Level"
-          placeholder="JSS 1"
-          hint="Optional. Used for grouping in reports."
+          placeholder="Year 1"
+          hint="Optional grouping, for example Year 1 or JSS 1."
           value={level}
           onChange={(e) => setLevel(e.target.value)}
         />

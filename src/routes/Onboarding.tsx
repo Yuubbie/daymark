@@ -153,7 +153,7 @@ export default function Onboarding() {
         >
           <div>
             <span className="eyebrow">Set up your school</span>
-            <h2 className="text-[22px] mt-1.5">Name the school. You'll be its admin.</h2>
+            <h2 className="text-[22px] mt-1.5">Name the school. You will be its proprietor.</h2>
           </div>
           <Field
             label="School name"
