@@ -61,7 +61,7 @@ export default function SubscriptionGate({ schoolId, role, schoolEmail, children
 
   // Expired: what's shown depends on who's looking. Only the school admin
   // is meant to see or use the payment screen.
-  if (role !== "admin") {
+  if (role !== "admin" && role !== "proprietor") {
     return <BlockedForNonAdmin />;
   }
 

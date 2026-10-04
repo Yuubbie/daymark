@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Wordmark } from '../components/Logo'
 import { AttendanceSummary, RegisterLegend, RegisterStrip } from '../components/RegisterStrip'
 import { Button, Field, Modal } from '../components/ui'
+import { CARE_DISPLAY, CARE_URL } from '../components/BrandCredit'
 import {
   attendancePct,
   demoMarks,
@@ -547,9 +548,9 @@ export default function Marketing() {
             <Link to="/signup" className="hover:text-ink">
               Create a school
             </Link>
-            <Link to="/demo" className="hover:text-ink">
-              Live demo
-            </Link>
+            <a href={CARE_URL} target="_blank" rel="noreferrer" className="hover:text-ink">
+              WhatsApp {CARE_DISPLAY}
+            </a>
           </div>
         </div>
       </footer>

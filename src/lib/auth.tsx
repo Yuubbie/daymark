@@ -32,11 +32,26 @@ type ProfileResult = { profile: Profile | null; problem: string | null }
  * up we surface why rather than spinning forever.
  */
 async function fetchProfile(userId: string, attempt = 0): Promise<ProfileResult> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, school_id, role, full_name, email, phone, is_active, digest_channel')
-    .eq('id', userId)
-    .maybeSingle()
+  let data: Record<string, unknown> | null = null
+  let error: { code?: string; message: string } | null = null
+  {
+    const first = await supabase
+      .from('profiles')
+      .select('id, school_id, role, full_name, email, phone, is_active, digest_channel, student_id')
+      .eq('id', userId)
+      .maybeSingle()
+    data = first.data as Record<string, unknown> | null
+    error = first.error
+    if (error && /student_id/i.test(error.message)) {
+      const retry = await supabase
+        .from('profiles')
+        .select('id, school_id, role, full_name, email, phone, is_active, digest_channel')
+        .eq('id', userId)
+        .maybeSingle()
+      data = retry.data as Record<string, unknown> | null
+      error = retry.error
+    }
+  }
 
   if (error) {
     // 42P01 = relation does not exist: the migration was never pushed.
@@ -66,7 +81,7 @@ async function fetchProfile(userId: string, attempt = 0): Promise<ProfileResult>
     }
   }
 
-  return { profile: data as Profile, problem: null }
+  return { profile: data as unknown as Profile, problem: null }
 }
 
 async function fetchSchool(schoolId: string): Promise<School | null> {

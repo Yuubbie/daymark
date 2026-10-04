@@ -32,30 +32,41 @@ type Item = {
   mobile?: boolean
 }
 
+const STAFF_NAV: Item[] = [
+  { to: '/admin', label: 'Today', Icon: IconToday },
+  { to: '/teacher', label: 'Register', Icon: IconRegister },
+  { to: '/teacher/lesson', label: 'Lesson', Icon: IconLesson },
+  { to: '/admin/flagged', label: 'Flagged', Icon: IconFlag },
+  { to: '/cbt/bank', label: 'Bank', Icon: IconLesson, mobile: false },
+  { to: '/cbt/exams', label: 'CBT', Icon: IconLesson },
+  { to: '/cbt/marking', label: 'Marking', Icon: IconFlag, mobile: false },
+  { to: '/admin/classes', label: 'Classes', Icon: IconClass, mobile: false },
+  { to: '/admin/teachers', label: 'Teachers', Icon: IconClass, mobile: false },
+  { to: '/admin/fees', label: 'Fees', Icon: IconClass, mobile: false },
+  { to: '/admin/timetable', label: 'Timetable', Icon: IconLesson, mobile: false },
+  { to: '/admin/notices', label: 'Notices', Icon: IconNotice, mobile: false },
+]
+
 const NAV: Record<string, Item[]> = {
-  admin: [
-    { to: '/admin', label: 'Today', Icon: IconToday },
-    { to: '/teacher', label: 'Register', Icon: IconRegister },
-    { to: '/teacher/lesson', label: 'Lesson', Icon: IconLesson },
-    { to: '/admin/flagged', label: 'Flagged', Icon: IconFlag },
-    { to: '/teacher/assessments', label: 'Assessments', Icon: IconLesson, mobile: false },
-    { to: '/admin/classes', label: 'Classes', Icon: IconClass, mobile: false },
-    { to: '/admin/teachers', label: 'Teachers', Icon: IconClass, mobile: false },
-    { to: '/admin/fees', label: 'Fees', Icon: IconClass, mobile: false },
-    { to: '/admin/notices', label: 'Notices', Icon: IconNotice, mobile: false },
-  ],
+  proprietor: STAFF_NAV,
+  admin: STAFF_NAV,
   teacher: [
     { to: '/teacher', label: 'Register', Icon: IconRegister },
     { to: '/teacher/lesson', label: 'Lesson', Icon: IconLesson },
-    { to: '/teacher/assessments', label: 'Assessments', Icon: IconLesson },
+    { to: '/cbt/bank', label: 'Bank', Icon: IconLesson, mobile: false },
+    { to: '/cbt/exams', label: 'CBT', Icon: IconLesson },
+    { to: '/cbt/marking', label: 'Marking', Icon: IconFlag, mobile: false },
   ],
   parent: [
     { to: '/parent', label: 'Today', Icon: IconToday },
     { to: '/parent/homework', label: 'Homework', Icon: IconHomework },
     { to: '/parent/assessments', label: 'Assessments', Icon: IconHomework },
-     { to: '/parent/notices', label: 'Notices', Icon: IconNotice, mobile: false },
-     { to: '/parent/fees', label: 'Fees', Icon: IconClass },
+    { to: '/parent/notices', label: 'Notices', Icon: IconNotice, mobile: false },
+    { to: '/parent/fees', label: 'Fees', Icon: IconClass },
     { to: '/parent/settings', label: 'Settings', Icon: IconSettings, mobile: false },
+  ],
+  student: [
+    { to: '/student', label: 'Desk', Icon: IconToday },
   ],
 }
 
@@ -65,7 +76,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation()
   const items = NAV[profile?.role ?? 'parent'] ?? []
   const settingsPath = items.find((i) => i.label === 'Settings')?.to
-  const homes = ['/admin', '/teacher', '/parent']
+  const homes = ['/admin', '/teacher', '/parent', '/student']
   const showBack = !homes.includes(location.pathname)
 
   async function out() {

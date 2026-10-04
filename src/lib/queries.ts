@@ -18,6 +18,7 @@ export type StudentRow = {
   admission_number: string | null
   class_id: string | null
   linked_parents: number
+  fee_cleared: boolean
 }
 
 export type TermRow = {
@@ -85,7 +86,7 @@ export async function getClass(id: string) {
 export async function listStudents(classId: string): Promise<StudentRow[]> {
   const { data, error } = await supabase
     .from('students')
-    .select('id, first_name, last_name, admission_number, class_id, parent_student_links(count)')
+    .select('id, first_name, last_name, admission_number, class_id, fee_cleared, parent_student_links(count)')
     .eq('class_id', classId)
     .eq('is_active', true)
     .order('last_name')
@@ -97,6 +98,7 @@ export async function listStudents(classId: string): Promise<StudentRow[]> {
     admission_number: (s.admission_number as string) ?? null,
     class_id: (s.class_id as string) ?? null,
     linked_parents: (s.parent_student_links as { count: number }[])?.[0]?.count ?? 0,
+    fee_cleared: (s.fee_cleared as boolean) ?? true,
   }))
 }
 
@@ -166,11 +168,21 @@ export async function listOpenCodes(studentIds: string[]) {
 export async function listTeachers() {
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, full_name, email, role')
+    .select('id, full_name, email, role, is_active')
     .eq('role', 'teacher')
     .order('full_name')
   if (error) throw error
   return data ?? []
+}
+
+export async function removeTeacher(profileId: string) {
+  const { error } = await supabase.rpc('remove_school_member', { p_profile_id: profileId })
+  if (error) throw error
+}
+
+export async function reactivateTeacher(profileId: string) {
+  const { error } = await supabase.rpc('reactivate_school_member', { p_profile_id: profileId })
+  if (error) throw error
 }
 
 export async function listInvites() {
@@ -344,6 +356,31 @@ export async function parentsForStudents(
  * Nigerian numbers arrive as 08031234567, 2348031234567, or +234 803 123 4567.
  * WhatsApp needs digits only, in international form.
  */
+export type BirthdayRow = {
+  student_id: string
+  first_name: string
+  last_name: string
+  class_name: string | null
+  this_year_birthday: string
+}
+
+export async function listUpcomingBirthdays(): Promise<BirthdayRow[]> {
+  const { data, error } = await supabase
+    .from('upcoming_birthdays')
+    .select('student_id, first_name, last_name, class_name, this_year_birthday')
+    .order('this_year_birthday')
+  if (error) throw error
+  return (data ?? []) as BirthdayRow[]
+}
+
+export async function setFeeCleared(studentId: string, cleared: boolean) {
+  const { error } = await supabase.rpc('set_student_fee_cleared', {
+    p_student_id: studentId,
+    p_cleared: cleared,
+  })
+  if (error) throw error
+}
+
 export function toIntlDigits(raw: string | null): string | null {
   if (!raw) return null
   const d = raw.replace(/\D/g, '')

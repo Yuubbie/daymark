@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { AuthProvider, useAuth } from './lib/auth'
 import { Button, Spinner } from './components/ui'
 import { Wordmark } from './components/Logo'
-import type { Role } from './lib/types'
+import { ROLE_HOME, type Role } from './lib/types'
 
 import Login from './routes/Login'
 import Signup from './routes/Signup'
@@ -29,6 +29,14 @@ import Diagnostics from './routes/Diagnostics'
 import SubscriptionGate from './components/SubscriptionGate'
 import Marketing from './routes/Marketing'
 import DemoApp from './routes/demo/DemoApp'
+import QuestionBank from './routes/cbt/QuestionBank'
+import Exams from './routes/cbt/Exams'
+import Marking from './routes/cbt/Marking'
+import SitExam from './routes/cbt/SitExam'
+import StudentHome from './routes/student/StudentHome'
+import StudentSit from './routes/student/StudentSit'
+import Timetable from './routes/admin/Timetable'
+import { WhatsAppCare } from './components/BrandCredit'
 
 /** Shown when we have a session but cannot resolve a profile. Never spin forever. */
 function Blocked({ problem }: { problem: string }) {
@@ -62,12 +70,7 @@ function Landing() {
   if (!profile) return <Spinner />
   if (!profile.school_id) return <Navigate to="/welcome" replace />
 
-  const home: Record<Role, string> = {
-    admin: '/admin',
-    teacher: '/teacher',
-    parent: '/parent',
-  }
-  return <Navigate to={home[profile.role]} replace />
+  return <Navigate to={ROLE_HOME[profile.role]} replace />
 }
 
 function Protected({ roles, children }: { roles: Role[]; children: ReactNode }) {
@@ -110,6 +113,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/demo" element={<DemoApp />} />
+          <Route path="/sit/:token" element={<SitExam />} />
           <Route path="/preview" element={<Preview />} />
           <Route path="/diagnostics" element={<Diagnostics />} />
 
@@ -125,7 +129,7 @@ export default function App() {
           <Route
             path="/admin"
             element={
-              <Protected roles={['admin']}>
+              <Protected roles={['admin', 'proprietor']}>
                 <AdminHome />
               </Protected>
             }
@@ -133,7 +137,7 @@ export default function App() {
           <Route
             path="/admin/classes"
             element={
-              <Protected roles={['admin']}>
+              <Protected roles={['admin', 'proprietor']}>
                 <Classes />
               </Protected>
             }
@@ -141,7 +145,7 @@ export default function App() {
           <Route
             path="/admin/classes/:id"
             element={
-              <Protected roles={['admin']}>
+              <Protected roles={['admin', 'proprietor']}>
                 <ClassDetail />
               </Protected>
             }
@@ -149,7 +153,7 @@ export default function App() {
           <Route
             path="/admin/flagged"
             element={
-              <Protected roles={['admin']}>
+              <Protected roles={['admin', 'proprietor']}>
                 <Flagged />
               </Protected>
             }
@@ -157,7 +161,7 @@ export default function App() {
           <Route
             path="/admin/teachers"
             element={
-              <Protected roles={['admin']}>
+              <Protected roles={['admin', 'proprietor']}>
                 <Teachers />
               </Protected>
             }
@@ -165,7 +169,7 @@ export default function App() {
           <Route
             path="/teacher"
             element={
-              <Protected roles={['teacher', 'admin']}>
+              <Protected roles={['teacher', 'admin', 'proprietor']}>
                 <Register />
               </Protected>
             }
@@ -173,7 +177,7 @@ export default function App() {
           <Route
             path="/teacher/lesson"
             element={
-              <Protected roles={['teacher', 'admin']}>
+              <Protected roles={['teacher', 'admin', 'proprietor']}>
                 <Lesson />
               </Protected>
             }
@@ -221,8 +225,48 @@ export default function App() {
           <Route
             path="/teacher/assessments"
             element={
-              <Protected roles={['teacher', 'admin']}>
+              <Protected roles={['teacher', 'admin', 'proprietor']}>
                 <TeacherAssessmentsRoute />
+              </Protected>
+            }
+          />
+          <Route
+            path="/cbt/bank"
+            element={
+              <Protected roles={['teacher', 'admin', 'proprietor']}>
+                <QuestionBank />
+              </Protected>
+            }
+          />
+          <Route
+            path="/cbt/exams"
+            element={
+              <Protected roles={['teacher', 'admin', 'proprietor']}>
+                <Exams />
+              </Protected>
+            }
+          />
+          <Route
+            path="/cbt/marking"
+            element={
+              <Protected roles={['teacher', 'admin', 'proprietor']}>
+                <Marking />
+              </Protected>
+            }
+          />
+          <Route
+            path="/student"
+            element={
+              <Protected roles={['student']}>
+                <StudentHome />
+              </Protected>
+            }
+          />
+          <Route
+            path="/student/sit/:examId"
+            element={
+              <Protected roles={['student']}>
+                <StudentSit />
               </Protected>
             }
           />
@@ -237,7 +281,7 @@ export default function App() {
           <Route
             path="/admin/notices"
             element={
-              <Protected roles={['admin']}>
+              <Protected roles={['admin', 'proprietor']}>
                 <AdminNotices />
               </Protected>
             }
@@ -245,14 +289,23 @@ export default function App() {
           <Route
             path="/admin/fees"
             element={
-              <Protected roles={['admin']}>
+              <Protected roles={['admin', 'proprietor']}>
                 <AdminFees />
+              </Protected>
+            }
+          />
+          <Route
+            path="/admin/timetable"
+            element={
+              <Protected roles={['admin', 'proprietor']}>
+                <Timetable />
               </Protected>
             }
           />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <WhatsAppCare />
       </AuthProvider>
     </BrowserRouter>
   )

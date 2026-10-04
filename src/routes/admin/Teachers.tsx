@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { AppShell } from '../../components/AppShell'
 import { Alert, Button, Empty, Field, Modal, Panel, Row, Spinner } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
-import { inviteTeacher, listInvites, listTeachers } from '../../lib/queries'
+import { inviteTeacher, listInvites, listTeachers, reactivateTeacher, removeTeacher } from '../../lib/queries'
 
 export default function Teachers() {
   const { profile } = useAuth()
@@ -50,8 +50,37 @@ export default function Teachers() {
                   left={
                     <>
                       <div className="text-[15px]">{(t.full_name as string) ?? 'Teacher'}</div>
-                      <div className="text-[12px] text-ink-faint">{t.email as string}</div>
+                      <div className="text-[12px] text-ink-faint">
+                        {t.email as string}
+                        {t.is_active === false ? ' · left the school' : ''}
+                      </div>
                     </>
+                  }
+                  right={
+                    t.is_active === false ? (
+                      <button
+                        className="text-[12px] underline"
+                        onClick={() =>
+                          void reactivateTeacher(t.id as string)
+                            .then(() => load())
+                            .catch((e) => alert((e as Error).message))
+                        }
+                      >
+                        Restore
+                      </button>
+                    ) : (
+                      <button
+                        className="text-[12px] underline text-absent"
+                        onClick={() => {
+                          if (!confirm('Remove this teacher from the school? They lose access immediately.')) return
+                          void removeTeacher(t.id as string)
+                            .then(() => load())
+                            .catch((e) => alert((e as Error).message))
+                        }}
+                      >
+                        Remove
+                      </button>
+                    )
                   }
                 />
               ))}

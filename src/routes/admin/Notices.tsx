@@ -60,11 +60,12 @@ export default function AdminNotices() {
           {rows.map((n) => (
             <Panel key={n.id}>
               <div className="flex items-baseline gap-2">
-                <span className="eyebrow">
-                  {n.class_id
-                    ? classes.find((c) => c.id === n.class_id)?.name ?? 'Class'
-                    : 'Whole school'}
-                </span>
+                 <span className="eyebrow">
+                   {n.audience && n.audience !== 'all' ? n.audience + ' · ' : ''}
+                   {n.class_id
+                     ? classes.find((c) => c.id === n.class_id)?.name ?? 'Class'
+                     : 'Whole school'}
+                 </span>
                 <span className="tnum text-[11px] text-ink-faint ml-auto">
                   {n.published_at.slice(0, 10)}
                 </span>
@@ -109,6 +110,7 @@ function PostModal({
   onSaved: () => void
 }) {
   const [classId, setClassId] = useState('')
+  const [audience, setAudience] = useState('all')
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -118,7 +120,7 @@ function PostModal({
     setError(null)
     if (!title.trim() || !body.trim()) return setError('A notice needs a title and a message.')
     setBusy(true)
-    const { error } = await postNotice(schoolId, classId || null, title, body, userId)
+    const { error } = await postNotice(schoolId, classId || null, title, body, userId, audience)
     setBusy(false)
     if (error) return setError(error.message)
     setTitle('')
@@ -145,12 +147,27 @@ function PostModal({
             className="w-full h-11 px-3 bg-surface border border-rule-strong rounded-md
                        text-[15px] text-ink focus:border-brass"
           >
-            <option value="">Every parent in the school</option>
+            <option value="">Whole school</option>
             {classes.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name} only
               </option>
             ))}
+          </select>
+        </label>
+        <label className="block">
+          <span className="eyebrow block mb-1.5">Audience</span>
+          <select
+            value={audience}
+            onChange={(e) => setAudience(e.target.value)}
+            className="w-full h-11 px-3 bg-surface border border-rule-strong rounded-md
+                       text-[15px] text-ink focus:border-brass"
+          >
+            <option value="all">Everyone</option>
+            <option value="staff">Staff</option>
+            <option value="teachers">Teachers only</option>
+            <option value="parents">Parents</option>
+            <option value="students">Students</option>
           </select>
         </label>
 

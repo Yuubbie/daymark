@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AppShell } from '../../components/AppShell'
-import { Button, Empty, Panel, Spinner } from '../../components/ui'
+import { Button, Empty, Modal, Panel, Spinner } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
 import {
   defaultClass,
@@ -46,6 +46,7 @@ export default function Register() {
   const [stale, setStale] = useState(false)
   const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'queued'>('idle')
   const [pending, setPending] = useState(queueSize())
+  const [nudge, setNudge] = useState(false)
   const dirty = useRef<Map<string, AttendanceStatus>>(new Map())
   const timer = useRef<number | null>(null)
 
@@ -143,6 +144,20 @@ export default function Register() {
 
   const marked = students.filter((s) => s.status !== null).length
   const cls = classes.find((c) => c.id === classId)
+
+  useEffect(() => {
+    if (loading || students.length === 0) return
+    if (date !== todayISO()) return
+    if (marked === students.length) return
+    const key = `daymark.attendance.nudge.${date}`
+    try {
+      if (sessionStorage.getItem(key)) return
+      sessionStorage.setItem(key, '1')
+    } catch {
+      /* ignore */
+    }
+    setNudge(true)
+  }, [loading, students.length, marked, date])
 
   return (
     <AppShell>
@@ -271,6 +286,17 @@ export default function Register() {
           )}
         </>
       )}
+
+      <Modal open={nudge} onClose={() => setNudge(false)} title="Morning register">
+        <p className="text-[15px] text-ink-soft leading-relaxed">
+          The register for today is still open. Mark the class now so parents see who was in.
+        </p>
+        <div className="mt-5">
+          <Button full onClick={() => setNudge(false)}>
+            Mark attendance
+          </Button>
+        </div>
+      </Modal>
     </AppShell>
   )
 }
