@@ -11,7 +11,7 @@ import { Alert, Button, Field } from '../components/ui'
  * land here, the invite trigger attaches them at signup.
  */
 export default function Onboarding() {
-  const { refresh } = useAuth()
+  const { refresh, signOut } = useAuth()
   const navigate = useNavigate()
   const [tab, setTab] = useState<'parent' | 'school'>('parent')
   const [code, setCode] = useState('')
@@ -142,6 +142,13 @@ export default function Onboarding() {
           <Button type="submit" full loading={busy}>
             Link my child
           </Button>
+          <button
+            type="button"
+            className="w-full text-center text-[12px] text-ink-faint hover:text-ink underline"
+            onClick={() => void signOut().then(() => navigate('/login', { replace: true }))}
+          >
+            Sign out
+          </button>
         </form>
       ) : (
         <form
@@ -171,6 +178,13 @@ export default function Onboarding() {
           <Button type="submit" full loading={busy}>
             Create school
           </Button>
+          <button
+            type="button"
+            className="w-full text-center text-[12px] text-ink-faint hover:text-ink underline"
+            onClick={() => void signOut().then(() => navigate('/login', { replace: true }))}
+          >
+            Sign out
+          </button>
         </form>
       )}
     </AuthLayout>

@@ -1,11 +1,12 @@
+import { Link, useNavigate } from 'react-router-dom'
 import { AttendanceSummary, RegisterLegend } from '../components/RegisterStrip'
 import { Lockup, Mark, Wordmark } from '../components/Logo'
 import { Alert, Button, Empty, Field, Panel, StatusPill } from '../components/ui'
+import { useAuth } from '../lib/auth'
 import type { AttendanceMark, AttendanceStatus } from '../lib/types'
 
 /**
- * /preview, the design system on one page. Not linked from the app.
- * Delete before the pilot, or keep it behind an admin flag.
+ * /preview, the design system on one page. Admin and proprietor only.
  */
 
 function fakeTerm(seed: number, days = 55): AttendanceMark[] {
@@ -33,6 +34,8 @@ const SWATCHES: [string, string][] = [
 ]
 
 export default function Preview() {
+  const { signOut } = useAuth()
+  const navigate = useNavigate()
   const ada = fakeTerm(7)
   const bola = fakeTerm(23)
 
@@ -40,7 +43,21 @@ export default function Preview() {
     <div className="min-h-dvh bg-paper">
       <header className="bg-ink text-ink-invert">
         <div className="mx-auto max-w-2xl px-4 py-8">
-          <Wordmark size="lg" className="text-ink-invert mb-5" />
+          <div className="flex items-start justify-between gap-3 mb-5">
+            <Wordmark size="lg" className="text-ink-invert" />
+            <div className="flex gap-3">
+              <Link to="/" className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-invert/60 hover:text-ink-invert">
+                App
+              </Link>
+              <button
+                type="button"
+                className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-invert/60 hover:text-ink-invert"
+                onClick={() => void signOut().then(() => navigate('/login', { replace: true }))}
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
           <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-invert/55">
             Design system
           </span>

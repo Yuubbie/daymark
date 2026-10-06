@@ -108,7 +108,7 @@ export default function SitExam({ examId }: { examId?: string }) {
     setSubmitting(true)
     setError(null)
     try {
-      const r = await submitAttempt(attemptId, answers)
+      const r = await submitAttempt(attemptId, answers, token)
       setResult(r)
     } catch (e) {
       setError((e as Error).message)

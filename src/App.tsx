@@ -36,6 +36,9 @@ import SitExam from './routes/cbt/SitExam'
 import StudentHome from './routes/student/StudentHome'
 import StudentSit from './routes/student/StudentSit'
 import Timetable from './routes/admin/Timetable'
+import TeacherTimetable from './routes/teacher/Timetable'
+import TeacherNotices from './routes/teacher/Notices'
+import Account from './routes/Account'
 import { WhatsAppCare } from './components/BrandCredit'
 
 /** Shown when we have a session but cannot resolve a profile. Never spin forever. */
@@ -52,7 +55,14 @@ function Blocked({ problem }: { problem: string }) {
           <Link to="/diagnostics">
             <Button>Run diagnostics</Button>
           </Link>
-          <Button variant="secondary" onClick={() => void signOut()}>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              void signOut().then(() => {
+                window.location.assign("/login");
+              });
+            }}
+          >
             Sign out
           </Button>
         </div>
@@ -104,6 +114,14 @@ function RequireSession({ children }: { children: ReactNode }) {
   return <>{children}</>
 }
 
+/** Signed in, including blocked accounts that still need diagnostics. */
+function SignedIn({ children }: { children: ReactNode }) {
+  const { session, loading } = useAuth()
+  if (loading) return <Spinner />
+  if (!session) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -114,8 +132,22 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/demo" element={<DemoApp />} />
           <Route path="/sit/:token" element={<SitExam />} />
-          <Route path="/preview" element={<Preview />} />
-          <Route path="/diagnostics" element={<Diagnostics />} />
+          <Route
+            path="/preview"
+            element={
+              <Protected roles={['admin', 'proprietor']}>
+                <Preview />
+              </Protected>
+            }
+          />
+          <Route
+            path="/diagnostics"
+            element={
+              <SignedIn>
+                <Diagnostics />
+              </SignedIn>
+            }
+          />
 
           <Route
             path="/welcome"
@@ -299,6 +331,30 @@ export default function App() {
             element={
               <Protected roles={['admin', 'proprietor']}>
                 <Timetable />
+              </Protected>
+            }
+          />
+          <Route
+            path="/teacher/timetable"
+            element={
+              <Protected roles={['teacher']}>
+                <TeacherTimetable />
+              </Protected>
+            }
+          />
+          <Route
+            path="/teacher/notices"
+            element={
+              <Protected roles={['teacher']}>
+                <TeacherNotices />
+              </Protected>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <Protected roles={['proprietor', 'admin', 'teacher', 'parent', 'student']}>
+                <Account />
               </Protected>
             }
           />

@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { Wordmark } from '../components/Logo'
 import { Button, Panel } from '../components/ui'
+import { useAuth } from '../lib/auth'
 
 /* ---------------------------------------------------------------------------
    /diagnostics
 
-   Answers "why is nothing working" without opening the console. Checks the
-   env, the connection, every table, every RPC, and the signup trigger.
-   Unauthenticated on purpose. Delete before the pilot.
+    Answers "why is nothing working" without opening the console. Checks the
+    env, the connection, every table, every RPC, and the signup trigger.
+    Signed-in only.
 --------------------------------------------------------------------------- */
 
 type State = 'pending' | 'pass' | 'fail' | 'warn'
@@ -33,6 +34,8 @@ const TABLES = [
 const RPCS = ['create_school_and_admin', 'generate_claim_code', 'redeem_claim_code']
 
 export default function Diagnostics() {
+  const { signOut } = useAuth()
+  const navigate = useNavigate()
   const [checks, setChecks] = useState<Check[]>([])
   const [running, setRunning] = useState(false)
 
@@ -219,13 +222,19 @@ export default function Diagnostics() {
               <li className="py-3 text-[13px] text-ink-faint">Running...</li>
             )}
           </ul>
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <Button variant="secondary" onClick={() => void run()} loading={running}>
               Run again
             </Button>
             <Link to="/">
               <Button variant="ghost">Back to app</Button>
             </Link>
+            <Button
+              variant="ghost"
+              onClick={() => void signOut().then(() => navigate('/login', { replace: true }))}
+            >
+              Sign out
+            </Button>
           </div>
         </Panel>
 

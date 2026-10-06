@@ -11,6 +11,7 @@ import {
   IconNotice,
   IconRegister,
   IconSettings,
+  IconTimetable,
   IconToday,
 } from '../../components/Icons'
 import {
@@ -31,6 +32,10 @@ import {
   demoSubscription,
   demoTasks,
   demoTimetable,
+  demoWeek,
+  demoFeeClasses,
+  demoExams,
+  demoParentResults,
   studentAssignments,
   studentResults,
   type DemoRole,
@@ -40,7 +45,7 @@ import type { AttendanceStatus } from '../../lib/types'
 
 type Tab = string
 
-const NAV: Record<DemoRole, { to: Tab; label: string; Icon: typeof IconToday }[]> = {
+const NAV: Record<DemoRole, { to: Tab; label: string; Icon: typeof IconToday; mobile?: boolean }[]> = {
   proprietor: [
     { to: 'overview', label: 'Overview', Icon: IconToday },
     { to: 'finance', label: 'Finance', Icon: IconClass },
@@ -50,20 +55,25 @@ const NAV: Record<DemoRole, { to: Tab; label: string; Icon: typeof IconToday }[]
   admin: [
     { to: 'today', label: 'Today', Icon: IconToday },
     { to: 'flagged', label: 'Flagged', Icon: IconFlag },
-    { to: 'classes', label: 'Classes', Icon: IconClass },
-    { to: 'tasks', label: 'Tasks', Icon: IconHomework },
-    { to: 'notices', label: 'Notices', Icon: IconNotice },
+    { to: 'classes', label: 'Classes', Icon: IconClass, mobile: false },
+    { to: 'timetable', label: 'Timetable', Icon: IconTimetable },
+    { to: 'fees', label: 'Fees', Icon: IconClass },
+    { to: 'cbt', label: 'CBT', Icon: IconLesson, mobile: false },
+    { to: 'tasks', label: 'Tasks', Icon: IconHomework, mobile: false },
+    { to: 'notices', label: 'Notices', Icon: IconNotice, mobile: false },
   ],
   teacher: [
     { to: 'register', label: 'Register', Icon: IconRegister },
     { to: 'lesson', label: 'Lesson', Icon: IconLesson },
-    { to: 'class', label: 'Class', Icon: IconClass },
+    { to: 'timetable', label: 'Timetable', Icon: IconTimetable },
     { to: 'results', label: 'Results', Icon: IconHomework },
+    { to: 'notices', label: 'Notices', Icon: IconNotice, mobile: false },
   ],
   parent: [
     { to: 'today', label: 'Today', Icon: IconToday },
     { to: 'homework', label: 'Homework', Icon: IconHomework },
-    { to: 'notices', label: 'Notices', Icon: IconNotice },
+    { to: 'assessments', label: 'Assessments', Icon: IconHomework },
+    { to: 'notices', label: 'Notices', Icon: IconNotice, mobile: false },
     { to: 'fees', label: 'Fees', Icon: IconClass },
   ],
   student: [
@@ -120,14 +130,20 @@ export default function DemoApp() {
       {role === 'admin' && tab === 'today' && <AdminToday />}
       {role === 'admin' && tab === 'flagged' && <AdminFlagged />}
       {role === 'admin' && tab === 'classes' && <AdminClasses />}
+      {role === 'admin' && tab === 'timetable' && <AdminTimetable />}
+      {role === 'admin' && tab === 'fees' && <AdminFees />}
+      {role === 'admin' && tab === 'cbt' && <AdminCbt />}
       {role === 'admin' && tab === 'tasks' && <AdminTasks />}
       {role === 'admin' && tab === 'notices' && <NoticesPanel admin />}
       {role === 'teacher' && tab === 'register' && <TeacherRegister />}
       {role === 'teacher' && tab === 'lesson' && <TeacherLesson />}
+      {role === 'teacher' && tab === 'timetable' && <TeacherTimetable />}
       {role === 'teacher' && tab === 'class' && <TeacherClass />}
       {role === 'teacher' && tab === 'results' && <TeacherResults />}
+      {role === 'teacher' && tab === 'notices' && <NoticesPanel />}
       {role === 'parent' && tab === 'today' && <ParentToday />}
       {role === 'parent' && tab === 'homework' && <ParentHomework />}
+      {role === 'parent' && tab === 'assessments' && <ParentAssessments />}
       {role === 'parent' && tab === 'notices' && <NoticesPanel />}
       {role === 'parent' && tab === 'fees' && <ParentFees />}
       {role === 'student' && tab === 'today' && <StudentToday />}
@@ -399,7 +415,7 @@ function DemoShell({
 
       <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-surface border-t border-rule z-10">
         <div className="flex pb-[env(safe-area-inset-bottom)]">
-          {items.map(({ to, label, Icon }) => (
+          {items.filter((i) => i.mobile !== false).map(({ to, label, Icon }) => (
             <button
               key={to}
               onClick={() => onTab(to)}
@@ -548,9 +564,26 @@ function ProprietorFinance() {
 
 function ProprietorPeople() {
   const s = demoSchool
+  const [invited, setInvited] = useState(false)
   return (
     <div className="space-y-4">
       <Head eyebrow="Proprietor" title="People" sub="Staff and families" />
+      <Panel title="Day-to-day administrator">
+        {invited ? (
+          <p className="text-[14px] text-ink-soft">
+            Invite sent to Mrs. Grace Eze. She signs up with that email and runs the school day. You stay proprietor.
+          </p>
+        ) : (
+          <>
+            <p className="text-[14px] text-ink-soft">
+              You own the school. Appoint an admin to run classes, fees and the register.
+            </p>
+            <div className="mt-4">
+              <Button onClick={() => setInvited(true)}>Invite admin</Button>
+            </div>
+          </>
+        )}
+      </Panel>
       <Panel title="Staff">
         <div className="grid grid-cols-3 gap-5">
           <Metric value={s.staff} label="Total" />
@@ -784,6 +817,112 @@ function AdminClasses() {
   )
 }
 
+function AdminTimetable() {
+  const [day, setDay] = useState(demoWeek[0].day)
+  const [added, setAdded] = useState(false)
+  const week = demoWeek.find((d) => d.day === day) ?? demoWeek[0]
+  return (
+    <div>
+      <Head eyebrow="Admin" title="Timetable" sub="JSS 1A · this week" />
+      <div className="mt-4 flex gap-2 overflow-x-auto">
+        {demoWeek.map((d) => (
+          <button
+            key={d.day}
+            onClick={() => setDay(d.day)}
+            className={`h-9 px-3 rounded-md text-[13px] font-semibold shrink-0 ${
+              day === d.day ? 'bg-ink text-ink-invert' : 'bg-surface border border-rule'
+            }`}
+          >
+            {d.day}
+          </button>
+        ))}
+      </div>
+      <Panel className="mt-4" title={day}>
+        <div className="divide-y divide-rule -my-3">
+          {week.slots.map((s) => (
+            <div key={s.time} className="flex items-center py-3">
+              <span className="tnum text-[13px] text-ink-faint w-14">{s.time}</span>
+              <span className="text-[14px] font-semibold">{s.subject}</span>
+            </div>
+          ))}
+        </div>
+      </Panel>
+      <div className="mt-4">
+        {added ? (
+          <Panel title="Period added">
+            <p className="text-[14px] text-ink-soft">Friday 11:20 Clubs is on the week. Admin still sees every class.</p>
+          </Panel>
+        ) : (
+          <Button full onClick={() => setAdded(true)}>
+            Add period
+          </Button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function AdminFees() {
+  const billed = demoFeeClasses.reduce((s, c) => s + c.billed, 0)
+  const collected = demoFeeClasses.reduce((s, c) => s + c.collected, 0)
+  const uncleared = demoFeeClasses.reduce((s, c) => s + c.uncleared, 0)
+  return (
+    <div>
+      <Head eyebrow="Admin" title="Fees" sub={DEMO_TERM_CONST} />
+      <Panel className="mt-4" title="This term">
+        <div className="grid grid-cols-3 gap-4">
+          <Metric value={`N${(billed / 1e6).toFixed(1)}m`} label="Billed" />
+          <Metric value={`N${(collected / 1e6).toFixed(1)}m`} label="Collected" />
+          <Metric value={uncleared} label="Uncleared" />
+        </div>
+      </Panel>
+      <Panel className="mt-4" title="By class">
+        <div className="divide-y divide-rule -my-3">
+          {demoFeeClasses.map((c) => (
+            <div key={c.name} className="flex items-center py-3">
+              <div>
+                <div className="text-[14px] font-semibold">{c.name}</div>
+                <div className="eyebrow mt-0.5">{c.uncleared} uncleared</div>
+              </div>
+              <span className="ml-auto tnum text-[13px]">
+                {Math.round((c.collected / c.billed) * 100)}%
+              </span>
+            </div>
+          ))}
+        </div>
+      </Panel>
+      <p className="mt-3 text-[12px] text-ink-faint">
+        Unpaid families stay locked out of CBT and results until fees are marked cleared.
+      </p>
+    </div>
+  )
+}
+
+function AdminCbt() {
+  return (
+    <div>
+      <Head eyebrow="Admin" title="CBT" sub="Assessments and exams" />
+      <Panel className="mt-4" title="This term">
+        <div className="divide-y divide-rule -my-3">
+          {demoExams.map((e) => (
+            <div key={e.title} className="flex items-center py-3">
+              <div>
+                <div className="text-[14px] font-semibold">{e.title}</div>
+                <div className="eyebrow mt-0.5">
+                  {e.klass} · {e.duration} min
+                </div>
+              </div>
+              <span className="ml-auto tnum text-[13px] text-ink-faint">
+                {e.status === 'published' ? `${e.sitters} sitting` : e.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      </Panel>
+    </div>
+  )
+}
+
 function AdminTasks() {
   const [tasks, setTasks] = useState(demoTasks)
   return (
@@ -962,6 +1101,38 @@ function TeacherLesson() {
           </Button>
         </form>
       )}
+    </div>
+  )
+}
+
+function TeacherTimetable() {
+  const [added, setAdded] = useState(false)
+  return (
+    <div>
+      <Head eyebrow="Teacher" title="Your timetable" sub="JSS 1A · this week" />
+      <Panel className="mt-4" title="Today">
+        <div className="divide-y divide-rule -my-3">
+          {demoTimetable.map((s) => (
+            <div key={s.time} className="flex items-center py-3">
+              <span className="tnum text-[13px] text-ink-faint w-14">{s.time}</span>
+              <span className="text-[14px] font-semibold">{s.subject}</span>
+            </div>
+          ))}
+        </div>
+      </Panel>
+      <div className="mt-4">
+        {added ? (
+          <Panel title="Period added">
+            <p className="text-[14px] text-ink-soft">
+              Extra lesson is on your week. Admin still sees the full class timetable.
+            </p>
+          </Panel>
+        ) : (
+          <Button full onClick={() => setAdded(true)}>
+            Add period
+          </Button>
+        )}
+      </div>
     </div>
   )
 }
@@ -1155,6 +1326,39 @@ function ParentHomework() {
           )}
         </Panel>
       </div>
+    </div>
+  )
+}
+
+function ParentAssessments() {
+  const unpaid = demoFees.due > 0
+  return (
+    <div>
+      <Head eyebrow="Parent" title="Assessments" sub="Adaeze Okonkwo · JSS 1A" />
+      {unpaid ? (
+        <Panel className="mt-4" title="Results locked">
+          <Empty line="Fees are outstanding. Results stay locked until the school marks this child as cleared." />
+          <p className="mt-3 text-[13px] text-ink-soft">
+            Balance N{demoFees.due.toLocaleString()}. Pay from Fees, or wait for the bursar.
+          </p>
+        </Panel>
+      ) : (
+        <Panel className="mt-4" title="Approved results">
+          <div className="divide-y divide-rule -my-3">
+            {demoParentResults.map((r) => (
+              <div key={r.title} className="flex items-center py-3">
+                <div>
+                  <div className="text-[14px] font-semibold">{r.title}</div>
+                  <div className="eyebrow mt-0.5">{r.subject}</div>
+                </div>
+                <span className="ml-auto tnum text-[14px] font-semibold">
+                  {r.score == null ? '—' : `${r.score} / ${r.total}`}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
     </div>
   )
 }

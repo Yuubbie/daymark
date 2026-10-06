@@ -7,17 +7,8 @@
 // SETUP REQUIRED IN SUPABASE (one-time, do this before using this component):
 // 1. Storage → Create bucket named "student-photos", set it to PUBLIC
 //    (report cards need to display the image without an auth token).
-// 2. Add a storage policy allowing authenticated users (teachers) to
-//    INSERT into that bucket, e.g.:
-//
-//    create policy "teachers upload student photos"
-//      on storage.objects for insert
-//      to authenticated
-//      with check (bucket_id = 'student-photos');
-//
-//    create policy "anyone can view student photos"
-//      on storage.objects for select
-//      using (bucket_id = 'student-photos');
+// 2. Insert is staff-only (see APPLY_RUN4.sql). Public SELECT stays for
+//    report cards.
 //
 // ASSUMPTIONS TO ADJUST:
 // - Supabase client imported from '../lib/supabase' as `supabase`.

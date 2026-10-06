@@ -2,8 +2,11 @@ import type { JSX } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { useAuth } from '../lib/auth'
+import { ROLE_HOME } from '../lib/types'
 import { Wordmark } from './Logo'
 import {
+  IconAccount,
+  IconBack,
   IconClass,
   IconFlag,
   IconHomework,
@@ -12,6 +15,7 @@ import {
   IconRegister,
   IconSettings,
   IconSignOut,
+  IconTimetable,
   IconToday,
 } from './Icons'
 
@@ -35,16 +39,17 @@ type Item = {
 const STAFF_NAV: Item[] = [
   { to: '/admin', label: 'Today', Icon: IconToday },
   { to: '/teacher', label: 'Register', Icon: IconRegister },
-  { to: '/teacher/lesson', label: 'Lesson', Icon: IconLesson },
-  { to: '/admin/flagged', label: 'Flagged', Icon: IconFlag },
+  { to: '/teacher/lesson', label: 'Lesson', Icon: IconLesson, mobile: false },
+  { to: '/admin/timetable', label: 'Timetable', Icon: IconTimetable },
+  { to: '/admin/flagged', label: 'Flagged', Icon: IconFlag, mobile: false },
   { to: '/cbt/bank', label: 'Bank', Icon: IconLesson, mobile: false },
   { to: '/cbt/exams', label: 'CBT', Icon: IconLesson },
   { to: '/cbt/marking', label: 'Marking', Icon: IconFlag, mobile: false },
   { to: '/admin/classes', label: 'Classes', Icon: IconClass, mobile: false },
-  { to: '/admin/teachers', label: 'Teachers', Icon: IconClass, mobile: false },
+  { to: '/admin/teachers', label: 'People', Icon: IconClass, mobile: false },
   { to: '/admin/fees', label: 'Fees', Icon: IconClass, mobile: false },
-  { to: '/admin/timetable', label: 'Timetable', Icon: IconLesson, mobile: false },
   { to: '/admin/notices', label: 'Notices', Icon: IconNotice, mobile: false },
+  { to: '/account', label: 'Account', Icon: IconAccount, mobile: false },
 ]
 
 const NAV: Record<string, Item[]> = {
@@ -53,9 +58,12 @@ const NAV: Record<string, Item[]> = {
   teacher: [
     { to: '/teacher', label: 'Register', Icon: IconRegister },
     { to: '/teacher/lesson', label: 'Lesson', Icon: IconLesson },
-    { to: '/cbt/bank', label: 'Bank', Icon: IconLesson, mobile: false },
+    { to: '/teacher/timetable', label: 'Timetable', Icon: IconTimetable },
     { to: '/cbt/exams', label: 'CBT', Icon: IconLesson },
+    { to: '/cbt/bank', label: 'Bank', Icon: IconLesson, mobile: false },
     { to: '/cbt/marking', label: 'Marking', Icon: IconFlag, mobile: false },
+    { to: '/teacher/notices', label: 'Notices', Icon: IconNotice, mobile: false },
+    { to: '/account', label: 'Account', Icon: IconAccount, mobile: false },
   ],
   parent: [
     { to: '/parent', label: 'Today', Icon: IconToday },
@@ -64,10 +72,27 @@ const NAV: Record<string, Item[]> = {
     { to: '/parent/notices', label: 'Notices', Icon: IconNotice, mobile: false },
     { to: '/parent/fees', label: 'Fees', Icon: IconClass },
     { to: '/parent/settings', label: 'Settings', Icon: IconSettings, mobile: false },
+    { to: '/account', label: 'Account', Icon: IconAccount, mobile: false },
   ],
   student: [
     { to: '/student', label: 'Desk', Icon: IconToday },
+    { to: '/account', label: 'Account', Icon: IconAccount },
   ],
+}
+
+const HOMES = ['/admin', '/teacher', '/parent', '/student']
+
+function parentOf(path: string, role: string | undefined): string {
+  if (HOMES.includes(path) || path === '/account') {
+    return ROLE_HOME[(role as keyof typeof ROLE_HOME) ?? 'parent'] ?? '/admin'
+  }
+  if (path.startsWith('/admin/classes/')) return '/admin/classes'
+  if (path.startsWith('/admin/')) return '/admin'
+  if (path.startsWith('/teacher/')) return '/teacher'
+  if (path.startsWith('/cbt/')) return role === 'teacher' ? '/teacher' : '/admin'
+  if (path.startsWith('/parent/')) return '/parent'
+  if (path.startsWith('/student/')) return '/student'
+  return ROLE_HOME[(role as keyof typeof ROLE_HOME) ?? 'parent'] ?? '/'
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -75,9 +100,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const location = useLocation()
   const items = NAV[profile?.role ?? 'parent'] ?? []
-  const settingsPath = items.find((i) => i.label === 'Settings')?.to
-  const homes = ['/admin', '/teacher', '/parent', '/student']
-  const showBack = !homes.includes(location.pathname)
+  const home = ROLE_HOME[profile?.role ?? 'parent'] ?? '/admin'
+  const showBack = location.pathname !== home
+  const backTo = parentOf(location.pathname, profile?.role)
 
   async function out() {
     await signOut()
@@ -102,7 +127,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        <nav className="flex-1 px-3 space-y-0.5">
+        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
           {items.map(({ to, label, Icon }) => (
             <NavLink
               key={to}
@@ -139,10 +164,20 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* ---------- Phone top bar ---------- */}
       <header className="lg:hidden sticky top-0 z-10 bg-ink text-ink-invert">
-        <div className="px-4 h-14 flex items-center gap-3">
-          <Wordmark size="xs" className="text-ink-invert shrink-0" />
+        <div className="px-4 h-14 flex items-center gap-2">
+          {showBack ? (
+            <button
+              onClick={() => navigate(backTo)}
+              className="p-2 -ml-2 text-ink-invert hover:text-brass transition-colors"
+              aria-label="Back"
+            >
+              <IconBack />
+            </button>
+          ) : (
+            <Wordmark size="xs" className="text-ink-invert shrink-0" />
+          )}
           <span className="h-5 w-px bg-ink-invert/20 shrink-0" />
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="text-[13px] font-semibold leading-tight truncate">
               {school?.name ?? ''}
             </div>
@@ -150,18 +185,16 @@ export function AppShell({ children }: { children: ReactNode }) {
               {profile?.role}
             </div>
           </div>
-          {settingsPath && (
-            <NavLink
-              to={settingsPath}
-              className="ml-auto p-2 text-ink-invert/55 hover:text-brass transition-colors"
-              aria-label="Settings"
-            >
-              <IconSettings />
-            </NavLink>
-          )}
+          <NavLink
+            to="/account"
+            className="p-2 text-ink-invert/80 hover:text-brass transition-colors"
+            aria-label="Account"
+          >
+            <IconAccount />
+          </NavLink>
           <button
             onClick={out}
-            className={`p-2 -mr-2 text-ink-invert/55 hover:text-brass transition-colors ${settingsPath ? '' : 'ml-auto'}`}
+            className="p-2 -mr-2 text-ink-invert/80 hover:text-brass transition-colors"
             aria-label="Sign out"
           >
             <IconSignOut />
@@ -174,10 +207,11 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto w-full max-w-3xl px-4 lg:px-10 py-5 lg:py-10 pb-24 lg:pb-12">
           {showBack && (
             <button
-              onClick={() => navigate(-1)}
-              className="mb-4 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint hover:text-ink transition-colors"
+              onClick={() => navigate(backTo)}
+              className="mb-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint hover:text-ink transition-colors"
             >
-              &larr; Back
+              <IconBack className="h-3.5 w-3.5" />
+              Back
             </button>
           )}
           {children}
