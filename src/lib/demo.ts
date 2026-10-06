@@ -303,3 +303,88 @@ export const demoSubscription = {
     { id: 'INV-0001', date: '1 Sep 2026', amount: 0, status: 'Trial' },
   ],
 }
+
+export const demoWeek = [
+  { day: 'Mon', slots: demoTimetable },
+  {
+    day: 'Tue',
+    slots: [
+      { time: '08:00', subject: 'Assembly' },
+      { time: '08:30', subject: 'English Language' },
+      { time: '09:20', subject: 'Mathematics' },
+      { time: '10:10', subject: 'Break' },
+      { time: '10:30', subject: 'Yoruba' },
+      { time: '11:20', subject: 'Basic Science' },
+      { time: '12:10', subject: 'PHE' },
+      { time: '13:00', subject: 'Closing' },
+    ],
+  },
+  {
+    day: 'Wed',
+    slots: [
+      { time: '08:00', subject: 'Assembly' },
+      { time: '08:30', subject: 'Basic Science' },
+      { time: '09:20', subject: 'Social Studies' },
+      { time: '10:10', subject: 'Break' },
+      { time: '10:30', subject: 'Mathematics' },
+      { time: '11:20', subject: 'English Language' },
+      { time: '12:10', subject: 'Civic Education' },
+      { time: '13:00', subject: 'Closing' },
+    ],
+  },
+  { day: 'Thu', slots: demoTimetable },
+  {
+    day: 'Fri',
+    slots: [
+      { time: '08:00', subject: 'Assembly' },
+      { time: '08:30', subject: 'Mathematics' },
+      { time: '09:20', subject: 'Computer Studies' },
+      { time: '10:10', subject: 'Break' },
+      { time: '10:30', subject: 'English Language' },
+      { time: '11:20', subject: 'Clubs' },
+      { time: '12:10', subject: 'Closing' },
+    ],
+  },
+]
+
+export const demoFeeClasses = [
+  { name: 'JSS 1A', billed: 3840000, collected: 3686400, uncleared: 2 },
+  { name: 'JSS 1B', billed: 3600000, collected: 3240000, uncleared: 4 },
+  { name: 'JSS 2A', billed: 3720000, collected: 3273600, uncleared: 5 },
+  { name: 'JSS 2B', billed: 3360000, collected: 2688000, uncleared: 8 },
+  { name: 'Primary 4A', billed: 2880000, collected: 2592000, uncleared: 6 },
+  { name: 'Primary 4B', billed: 2720000, collected: 2584000, uncleared: 3 },
+]
+
+export const demoExams = [
+  {
+    title: 'JSS 1 Mathematics CA 2',
+    subject: 'Mathematics',
+    klass: 'JSS 1A',
+    status: 'published' as const,
+    sitters: 28,
+    duration: 45,
+  },
+  {
+    title: 'English comprehension',
+    subject: 'English Language',
+    klass: 'JSS 1A',
+    status: 'draft' as const,
+    sitters: 0,
+    duration: 40,
+  },
+  {
+    title: 'Basic Science mid-term',
+    subject: 'Basic Science',
+    klass: 'JSS 1',
+    status: 'closed' as const,
+    sitters: 62,
+    duration: 50,
+  },
+]
+
+export const demoParentResults = [
+  { subject: 'Mathematics', title: 'CA 2', score: 28, total: 30, status: 'approved' as const },
+  { subject: 'English Language', title: 'Comprehension', score: 16, total: 20, status: 'approved' as const },
+  { subject: 'Basic Science', title: 'Mid-term', score: null, total: 40, status: 'pending' as const },
+]

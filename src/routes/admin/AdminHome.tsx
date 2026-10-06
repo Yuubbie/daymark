@@ -50,7 +50,9 @@ export default function AdminHome() {
     month: 'long',
   })
 
-  const setupDone = Boolean(term) && (sum?.classes ?? 0) > 0 && (sum?.students ?? 0) > 0
+  const needsAdmin = profile?.role === 'proprietor' && (sum?.admins ?? 0) === 0
+  const setupDone =
+    !needsAdmin && Boolean(term) && (sum?.classes ?? 0) > 0 && (sum?.students ?? 0) > 0
 
   return (
     <AppShell>
@@ -66,9 +68,22 @@ export default function AdminHome() {
           {!setupDone && (
             <Panel title="Get set up">
               <ol className="space-y-3">
+                {profile?.role === 'proprietor' && (
+                  <SetupStep
+                    done={!needsAdmin}
+                    n={1}
+                    title="Appoint an administrator"
+                    body="You own the school. They run the day: classes, fees, the register."
+                    action={
+                      <Link to="/admin/teachers">
+                        <Button variant="secondary">{needsAdmin ? 'Invite admin' : 'Staff'}</Button>
+                      </Link>
+                    }
+                  />
+                )}
                 <SetupStep
                   done={Boolean(term)}
-                  n={1}
+                  n={profile?.role === 'proprietor' ? 2 : 1}
                   title="Set the current term"
                   body="Attendance and reports are measured against it."
                   action={
@@ -79,7 +94,7 @@ export default function AdminHome() {
                 />
                 <SetupStep
                   done={(sum?.classes ?? 0) > 0}
-                  n={2}
+                  n={profile?.role === 'proprietor' ? 3 : 2}
                   title="Create your classes"
                   body="One per class, for example JSS 1A."
                   action={
@@ -90,7 +105,7 @@ export default function AdminHome() {
                 />
                 <SetupStep
                   done={(sum?.students ?? 0) > 0}
-                  n={3}
+                  n={profile?.role === 'proprietor' ? 4 : 3}
                   title="Add students"
                   body="Paste a whole class list at once, then hand parents their codes."
                   action={
@@ -120,6 +135,13 @@ export default function AdminHome() {
                 <div className="text-[14px] font-semibold mt-1">Classes</div>
               </Link>
               <Link
+                to="/admin/teachers"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Staff</div>
+                <div className="text-[14px] font-semibold mt-1">People</div>
+              </Link>
+              <Link
                 to="/admin/flagged"
                 className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
               >
@@ -132,6 +154,13 @@ export default function AdminHome() {
               >
                 <div className="eyebrow">Money</div>
                 <div className="text-[14px] font-semibold mt-1">Fees</div>
+              </Link>
+              <Link
+                to="/admin/timetable"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Week</div>
+                <div className="text-[14px] font-semibold mt-1">Timetable</div>
               </Link>
               <Link
                 to="/cbt/exams"

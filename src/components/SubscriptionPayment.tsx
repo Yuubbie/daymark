@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { Button, Panel, Stat, Alert, Spinner } from "./ui";
+import { useAuth } from "../lib/auth";
 
 // --- Per-school pricing (Sep 2026 model change) ---
 // Pricing is no longer computed from student count. Each school is charged
@@ -56,6 +58,8 @@ export default function SubscriptionPayment({
   schoolEmail,
   onPaymentVerified,
 }: Props) {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   const [status, setStatus] = useState<Status>("loading");
   const [priceNaira, setPriceNaira] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -65,16 +69,8 @@ export default function SubscriptionPayment({
 
     async function init() {
       try {
-        const { data, error } = await supabase
-          .from("schools")
-          .select("price_naira")
-          .eq("id", schoolId)
-          .single();
-
-        if (error) throw error;
         if (cancelled) return;
-
-        setPriceNaira(data?.price_naira ?? DEFAULT_MINIMUM_PRICE_NAIRA);
+        setPriceNaira(DEFAULT_MINIMUM_PRICE_NAIRA);
         await loadPaystackScript();
         if (cancelled) return;
 
@@ -176,10 +172,17 @@ export default function SubscriptionPayment({
         )}
 
         {priceNaira === null ? (
-          <div className="mt-6">
+          <div className="mt-6 space-y-3">
             <Button full onClick={() => window.location.reload()}>
               Try again
             </Button>
+            <button
+              type="button"
+              className="w-full text-center text-[12px] text-ink-faint hover:text-ink underline"
+              onClick={() => void signOut().then(() => navigate("/login", { replace: true }))}
+            >
+              Sign out
+            </button>
           </div>
         ) : (
           <>
@@ -192,7 +195,7 @@ export default function SubscriptionPayment({
               </div>
             </Panel>
 
-            <div className="mt-6">
+            <div className="mt-6 space-y-3">
               <Button
                 full
                 onClick={handlePay}
@@ -203,6 +206,13 @@ export default function SubscriptionPayment({
                 {(status === "ready" || status === "error") &&
                   `Pay ₦${amount.toLocaleString("en-NG")}`}
               </Button>
+              <button
+                type="button"
+                className="w-full text-center text-[12px] text-ink-faint hover:text-ink underline"
+                onClick={() => void signOut().then(() => navigate("/login", { replace: true }))}
+              >
+                Sign out
+              </button>
             </div>
           </>
         )}

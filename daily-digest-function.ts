@@ -129,10 +129,10 @@ async function sendPush(parentId: string, title: string, body: string) {
 }
 
 Deno.serve(async (req) => {
-  // Optional shared-secret check so this can't be triggered by a stranger
-  // who finds the URL. pg_cron sends this header; set CRON_SECRET to match.
+  // Shared-secret check so this can't be triggered by a stranger who finds
+  // the URL. pg_cron sends this header; CRON_SECRET must be set.
   const cronSecret = Deno.env.get('CRON_SECRET')
-  if (cronSecret && req.headers.get('x-cron-secret') !== cronSecret) {
+  if (!cronSecret || req.headers.get('x-cron-secret') !== cronSecret) {
     return new Response('unauthorized', { status: 401 })
   }
 

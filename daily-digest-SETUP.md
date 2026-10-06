@@ -34,20 +34,20 @@ touches your existing attendance, lessons, or auth logic.
 
 ## 2. Add your VAPID key locally
 
-I generated a real key pair for you — use it directly, no need to generate
-your own:
+Generate a new VAPID key pair. Do not reuse any key that was previously
+committed to this repo.
 
 ```
-VITE_VAPID_PUBLIC_KEY=BEAGOLRe-WTscu1eljgBPhA2A9v6yRIhtL4Vw1mXNp2DNerwXa8KwCssynnx-CMusIXjMFdFUpHj3SQ5YWNxVrY
+npx web-push generate-vapid-keys
 ```
 
-Add that line to `.env.local` (alongside your existing Supabase lines), then
-also add it to **Vercel → Project Settings → Environment Variables** so the
-deployed site has it too. Keep the matching **private** key for step 4 —
-don't put the private key in `.env.local` or anywhere client-side, it only
-ever goes into the Edge Function's secrets.
+Put the **public** key in `.env.local` as `VITE_VAPID_PUBLIC_KEY`, and also
+in **Vercel → Project Settings → Environment Variables**. Keep the matching
+**private** key for step 4 — don't put the private key in `.env.local` or
+anywhere client-side, it only ever goes into the Edge Function's secrets.
 
-Private key (Edge Function secret, step 4): `0dndBzPbgneqsdorJ5hlZEs-RosAR7G1tTObPYTWTzU`
+If a private key was ever pasted into git or chat, rotate it now and update
+the Edge Function secrets.
 
 ## 3. Push the migration
 
@@ -72,10 +72,10 @@ for **Secrets** (or **Manage secrets**):
 
 | Secret | Value |
 |---|---|
-| `VAPID_PUBLIC_KEY` | `BEAGOLRe-WTscu1eljgBPhA2A9v6yRIhtL4Vw1mXNp2DNerwXa8KwCssynnx-CMusIXjMFdFUpHj3SQ5YWNxVrY` |
-| `VAPID_PRIVATE_KEY` | `0dndBzPbgneqsdorJ5hlZEs-RosAR7G1tTObPYTWTzU` |
+| `VAPID_PUBLIC_KEY` | the public key from `npx web-push generate-vapid-keys` |
+| `VAPID_PRIVATE_KEY` | the matching private key — never commit this |
 | `VAPID_SUBJECT` | `mailto:` + whatever email you want linked to your push identity |
-| `CRON_SECRET` | make up any random string, e.g. `openssl rand -hex 16` output, or just mash the keyboard |
+| `CRON_SECRET` | make up any random string, e.g. `openssl rand -hex 16` output |
 
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set automatically by
 Supabase for every Edge Function — you don't add those yourself.

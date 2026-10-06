@@ -90,3 +90,23 @@ export const IconBell = (p: P) => (
   </S>
 )
 
+export const IconAccount = (p: P) => (
+  <S {...p}>
+    <circle cx="12" cy="8" r="3.2" />
+    <path d="M5 19.5a7 7 0 0 1 14 0" />
+  </S>
+)
+
+export const IconBack = (p: P) => (
+  <S {...p}>
+    <path d="M15 5 8 12l7 7" />
+  </S>
+)
+
+export const IconTimetable = (p: P) => (
+  <S {...p}>
+    <rect x="3" y="5" width="18" height="16" rx="2" />
+    <path d="M3 10h18M8 3v4M16 3v4M8 14h3M13 14h3M8 17h8" />
+  </S>
+)
+

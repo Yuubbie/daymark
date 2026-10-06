@@ -226,10 +226,15 @@ export async function startStudent(examId: string) {
   return data as string
 }
 
-export async function submitAttempt(attemptId: string, answers: Record<string, unknown>) {
+export async function submitAttempt(
+  attemptId: string,
+  answers: Record<string, unknown>,
+  token?: string,
+) {
   const { data, error } = await supabase.rpc('submit_linked_attempt', {
     p_attempt_id: attemptId,
     p_answers: answers,
+    p_token: token || null,
   })
   if (error) throw error
   const row = Array.isArray(data) ? data[0] : data

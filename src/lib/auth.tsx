@@ -155,9 +155,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     if (isSupabaseConfigured) await supabase.auth.signOut()
+    setSession(null)
     setProfile(null)
     setSchool(null)
     setProblem(null)
+    setLoading(false)
   }, [])
 
   const value = useMemo(

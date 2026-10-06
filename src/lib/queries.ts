@@ -175,6 +175,26 @@ export async function listTeachers() {
   return data ?? []
 }
 
+export async function listStaff() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name, email, role, is_active')
+    .in('role', ['proprietor', 'admin', 'teacher'])
+    .order('full_name')
+  if (error) throw error
+  return data ?? []
+}
+
+export async function countAdmins() {
+  const { count, error } = await supabase
+    .from('profiles')
+    .select('*', { head: true, count: 'exact' })
+    .eq('role', 'admin')
+    .eq('is_active', true)
+  if (error) throw error
+  return count ?? 0
+}
+
 export async function removeTeacher(profileId: string) {
   const { error } = await supabase.rpc('remove_school_member', { p_profile_id: profileId })
   if (error) throw error
@@ -194,17 +214,28 @@ export async function listInvites() {
   return data ?? []
 }
 
+export async function inviteStaff(
+  schoolId: string,
+  email: string,
+  fullName: string,
+  role: 'teacher' | 'admin' = 'teacher',
+) {
+  const { data: u } = await supabase.auth.getUser()
+  return supabase.from('invites').insert({
+    school_id: schoolId,
+    email: email.trim().toLowerCase(),
+    full_name: fullName.trim() || null,
+    role,
+    created_by: u.user?.id ?? null,
+  })
+}
+
 export async function inviteTeacher(
   schoolId: string,
   email: string,
   fullName: string,
 ) {
-  return supabase.from('invites').insert({
-    school_id: schoolId,
-    email: email.trim().toLowerCase(),
-    full_name: fullName.trim() || null,
-    role: 'teacher',
-  })
+  return inviteStaff(schoolId, email, fullName, 'teacher')
 }
 
 export async function assignTeacher(
@@ -249,12 +280,19 @@ export async function adminSummary() {
       ((s.parent_student_links as { count: number }[])?.[0]?.count ?? 0) === 0,
   ).length
 
+  const admins = await supabase
+    .from('profiles')
+    .select('*', { head: true, count: 'exact' })
+    .eq('role', 'admin')
+    .eq('is_active', true)
+
   return {
     students: students.count ?? 0,
     classes: classes.count ?? 0,
     attendanceToday: attendance.count ?? 0,
     lessonsToday: lessons.count ?? 0,
     studentsWithoutParent: noParent,
+    admins: admins.count ?? 0,
   }
 }
 
@@ -371,6 +409,80 @@ export async function listUpcomingBirthdays(): Promise<BirthdayRow[]> {
     .order('this_year_birthday')
   if (error) throw error
   return (data ?? []) as BirthdayRow[]
+}
+
+export type TimetableSlot = {
+  id: string
+  class_id: string
+  day_of_week: number
+  period: number
+  start_time: string
+  end_time: string
+  subject: string
+  teacher_id: string | null
+  room: string | null
+  class_name?: string | null
+}
+
+export async function listTimetableForClass(classId: string): Promise<TimetableSlot[]> {
+  const { data, error } = await supabase
+    .from('timetable_slots')
+    .select('id, class_id, day_of_week, period, start_time, end_time, subject, teacher_id, room')
+    .eq('class_id', classId)
+    .order('day_of_week')
+    .order('period')
+  if (error) throw error
+  return (data ?? []) as TimetableSlot[]
+}
+
+export async function insertTimetableSlot(row: {
+  schoolId: string
+  classId: string
+  dayOfWeek: number
+  period: number
+  start: string
+  end: string
+  subject: string
+  teacherId: string | null
+  room: string | null
+}) {
+  const { error } = await supabase.from('timetable_slots').insert({
+    school_id: row.schoolId,
+    class_id: row.classId,
+    day_of_week: row.dayOfWeek,
+    period: row.period,
+    start_time: row.start,
+    end_time: row.end,
+    subject: row.subject,
+    teacher_id: row.teacherId,
+    room: row.room,
+  })
+  if (error) throw error
+}
+
+export async function listTimetableForTeacher(teacherId: string): Promise<TimetableSlot[]> {
+  const { data, error } = await supabase
+    .from('timetable_slots')
+    .select('id, class_id, day_of_week, period, start_time, end_time, subject, teacher_id, room, classes(name)')
+    .eq('teacher_id', teacherId)
+    .order('day_of_week')
+    .order('period')
+  if (error) throw error
+  return (data ?? []).map((r: Record<string, unknown>) => {
+    const cls = r.classes as { name?: string } | null
+    return {
+      id: r.id as string,
+      class_id: r.class_id as string,
+      day_of_week: r.day_of_week as number,
+      period: r.period as number,
+      start_time: r.start_time as string,
+      end_time: r.end_time as string,
+      subject: r.subject as string,
+      teacher_id: (r.teacher_id as string) ?? null,
+      room: (r.room as string) ?? null,
+      class_name: cls?.name ?? null,
+    }
+  })
 }
 
 export async function setFeeCleared(studentId: string, cleared: boolean) {
