@@ -113,6 +113,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
     const { profile: p, problem: prob } = await fetchProfile(s.user.id)
+    if (p && p.is_active === false) {
+      await supabase.auth.signOut()
+      setSession(null)
+      setProfile(null)
+      setSchool(null)
+      setProblem('This account was removed from the school.')
+      setLoading(false)
+      return
+    }
     setProfile(p)
     setProblem(prob)
     setSchool(p?.school_id ? await fetchSchool(p.school_id) : null)

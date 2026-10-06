@@ -13,6 +13,10 @@ export default function Signup() {
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
 
+  function redirectTo() {
+    return `${window.location.origin}/`
+  }
+
   async function submit() {
     setError(null)
     if (!isSupabaseConfigured) {
@@ -22,18 +26,31 @@ export default function Signup() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName } },
+      options: {
+        data: { full_name: fullName },
+        emailRedirectTo: redirectTo(),
+      },
     })
     setBusy(false)
     if (error) return setError(error.message)
 
-    // Supabase confirms email by default, which returns a user but no session.
-    // Without this branch the screen looks like it did nothing.
     if (!data.session) {
       setSent(true)
       return
     }
     navigate('/')
+  }
+
+  async function resend() {
+    setError(null)
+    setBusy(true)
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: redirectTo() },
+    })
+    setBusy(false)
+    if (error) return setError(error.message)
   }
 
   return (
@@ -54,13 +71,17 @@ export default function Signup() {
         <div className="mb-5 border border-rule-strong bg-brass-wash rounded-md p-4">
           <p className="text-[14px] text-ink font-semibold">Check your email.</p>
           <p className="mt-1.5 text-[13px] text-ink-soft leading-relaxed">
-            Your account was created but needs confirming before you can sign in. Open the
-            link we sent to {email}.
+            We sent a confirmation link to {email}. Open it, then sign in. Check spam if it
+            is not in the inbox within a minute.
           </p>
-          <p className="mt-2.5 text-[12px] text-ink-faint leading-relaxed">
-            Building and want to skip this? In Supabase go to Authentication, Sign In /
-            Providers, Email, and turn off Confirm email.
-          </p>
+          <button
+            type="button"
+            className="mt-3 text-[12px] underline text-ink"
+            onClick={() => void resend()}
+            disabled={busy}
+          >
+            Resend the email
+          </button>
         </div>
       )}
 

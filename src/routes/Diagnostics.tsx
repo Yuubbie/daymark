@@ -74,10 +74,10 @@ export default function Diagnostics() {
       push({
         name: 'Environment variables',
         state: 'warn',
-        detail: `URL looks unusual: ${url}. Expected https://<ref>.supabase.co with no trailing path.`,
+        detail: 'URL looks unusual. Expected https://<ref>.supabase.co with no trailing path.',
       })
     } else {
-      push({ name: 'Environment variables', state: 'pass', detail: url })
+      push({ name: 'Environment variables', state: 'pass', detail: 'Supabase URL is set.' })
     }
 
     // 2. Key shape
@@ -87,7 +87,7 @@ export default function Diagnostics() {
       name: 'Anon key format',
       state: looksJwt || looksNewKey ? 'pass' : 'fail',
       detail: looksJwt || looksNewKey
-        ? `${key.slice(0, 12)}... (${key.length} chars)`
+        ? 'Anon key shape looks correct.'
         : 'This does not look like an anon key. Do not use the service_role or a database password here.',
     })
 

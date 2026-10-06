@@ -238,6 +238,14 @@ export async function inviteTeacher(
   return inviteStaff(schoolId, email, fullName, 'teacher')
 }
 
+export async function inviteStudentLogin(studentId: string, email: string) {
+  const { error } = await supabase.rpc('invite_student_login', {
+    p_student_id: studentId,
+    p_email: email.trim().toLowerCase(),
+  })
+  if (error) throw error
+}
+
 export async function assignTeacher(
   schoolId: string,
   classId: string,

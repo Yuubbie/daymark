@@ -18,6 +18,7 @@
 
 import { useState, useRef } from "react";
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../lib/auth';
 
 const MAX_FILE_SIZE_MB = 5;
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -33,6 +34,7 @@ export default function StudentPhotoUpload({
   currentPhotoUrl,
   onUploaded,
 }: StudentPhotoUploadProps) {
+  const { profile } = useAuth();
   const [preview, setPreview] = useState<string | null>(currentPhotoUrl ?? null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,8 +67,14 @@ export default function StudentPhotoUpload({
     const localPreviewUrl = URL.createObjectURL(file);
     setPreview(localPreviewUrl);
 
-    const ext = file.name.split(".").pop();
-    const path = `${studentId}/${Date.now()}.${ext}`;
+    const schoolId = profile?.school_id;
+    if (!schoolId) {
+      setUploading(false);
+      setError("Your account is not attached to a school.");
+      return;
+    }
+    const ext = (file.name.split(".").pop() || "jpg").replace(/[^a-z0-9]/gi, "");
+    const path = `${schoolId}/${studentId}/${Date.now()}.${ext}`;
 
     const { error: uploadErr } = await supabase.storage
       .from("student-photos")

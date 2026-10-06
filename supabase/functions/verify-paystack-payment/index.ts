@@ -86,11 +86,14 @@ serve(async (req) => {
 
     const { data: existing } = await supabase
       .from('payments')
-      .select('id, status')
+      .select('id, status, school_id')
       .eq('reference', reference)
       .maybeSingle()
 
     if (existing?.status === 'success') {
+      if (existing.school_id !== schoolId) {
+        return json({ error: 'This payment belongs to another school.' }, 409)
+      }
       return json({ success: true, message: 'Already verified.' })
     }
 
@@ -113,7 +116,7 @@ serve(async (req) => {
     }
 
     const metaSchool = verifyData.data?.metadata?.school_id
-    if (metaSchool && metaSchool !== schoolId) {
+    if (!metaSchool || metaSchool !== schoolId) {
       return json({ success: false, error: 'Payment does not belong to this school.' })
     }
 

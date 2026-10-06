@@ -22,6 +22,7 @@ import {
   generateClaimCode,
   generateClaimCodesForClass,
   getClass,
+  inviteStudentLogin,
   listClassTeachers,
   listOpenCodes,
   listStudents,
@@ -46,6 +47,7 @@ export default function ClassDetail() {
   const [codeError, setCodeError] = useState<string | null>(null)
   const [bulkBusy, setBulkBusy] = useState(false)
   const [photoStudent, setPhotoStudent] = useState<{ id: string; name: string } | null>(null)
+  const [loginStudent, setLoginStudent] = useState<{ id: string; name: string } | null>(null)
   const [removeStudent, setRemoveStudent] = useState<{ id: string; name: string } | null>(null)
   const [removeBusy, setRemoveBusy] = useState(false)
   const [removeError, setRemoveError] = useState<string | null>(null)
@@ -220,6 +222,14 @@ export default function ClassDetail() {
                       >
                         Photo
                       </button>
+                      <button
+                        onClick={() =>
+                          setLoginStudent({ id: s.id, name: `${s.first_name} ${s.last_name}` })
+                        }
+                        className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint hover:text-ink"
+                      >
+                        Login
+                      </button>
                       {codes[s.id] ? (
                         <CodeChip code={codes[s.id]} />
                       ) : s.linked_parents > 0 ? (
@@ -331,6 +341,15 @@ export default function ClassDetail() {
         onClose={() => setPhotoStudent(null)}
       />
 
+      <InviteStudentLoginModal
+        student={loginStudent}
+        onClose={() => setLoginStudent(null)}
+        onSaved={() => {
+          setLoginStudent(null)
+          void load()
+        }}
+      />
+
       <Modal
         open={!!removeStudent}
         onClose={() => {
@@ -414,6 +433,68 @@ function PhotoModal({
           onUploaded={(url) => setCurrentUrl(url)}
         />
       )}
+    </Modal>
+  )
+}
+
+function InviteStudentLoginModal({
+  student,
+  onClose,
+  onSaved,
+}: {
+  student: { id: string; name: string } | null
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const [email, setEmail] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    if (student) {
+      setEmail('')
+      setError(null)
+    }
+  }, [student])
+
+  async function save() {
+    if (!student) return
+    setError(null)
+    setBusy(true)
+    try {
+      await inviteStudentLogin(student.id, email)
+      onSaved()
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <Modal open={!!student} onClose={onClose} title={student ? `Login for ${student.name}` : 'Student login'}>
+      <form
+        className="space-y-3.5"
+        onSubmit={(e) => {
+          e.preventDefault()
+          void save()
+        }}
+      >
+        {error && <Alert>{error}</Alert>}
+        <p className="text-[13px] text-ink-soft">
+          They sign up at Daymaark with this exact email and land on their own desk. This is not the parent claim code.
+        </p>
+        <Field
+          label="Student email"
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <Button type="submit" full loading={busy}>
+          Invite to sign up
+        </Button>
+      </form>
     </Modal>
   )
 }

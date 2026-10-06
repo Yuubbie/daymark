@@ -19,7 +19,14 @@ export default function Login() {
     setBusy(true)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     setBusy(false)
-    if (error) return setError(error.message)
+    if (error) {
+      if (/confirm|not confirmed/i.test(error.message)) {
+        return setError(
+          'This email is not confirmed yet. Open the link we sent, or go to Create an account and use Resend the email.',
+        )
+      }
+      return setError(error.message)
+    }
     navigate('/')
   }
 
