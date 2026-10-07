@@ -1,5 +1,5 @@
 // Edge Function: verifies a Paystack payment server-side and, only if
-// genuinely confirmed, activates the school's annual subscription.
+// genuinely confirmed, activates the school's term subscription.
 //
 // The browser callback is never trusted. This function:
 //   1. Requires a signed-in admin/proprietor JWT
@@ -15,7 +15,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
 
-const ANNUAL_AMOUNT_KOBO = 20000000
+const TERM_AMOUNT_KOBO = 20000000
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -108,10 +108,10 @@ serve(async (req) => {
     }
 
     const amountKobo: number = verifyData.data.amount
-    if (typeof amountKobo !== 'number' || amountKobo < ANNUAL_AMOUNT_KOBO) {
+    if (typeof amountKobo !== 'number' || amountKobo < TERM_AMOUNT_KOBO) {
       return json({
         success: false,
-        error: `Amount paid is less than the required N200,000 annual fee.`,
+        error: `Amount paid is less than the required N200,000 term fee.`,
       })
     }
 

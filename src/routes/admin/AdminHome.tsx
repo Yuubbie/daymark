@@ -103,18 +103,24 @@ export default function AdminHome() {
                     </Link>
                   }
                 />
-                <SetupStep
-                  done={(sum?.students ?? 0) > 0}
-                  n={profile?.role === 'proprietor' ? 4 : 3}
-                  title="Add students"
-                  body="Paste a whole class list at once, then hand parents their codes."
-                  action={
-                    <Link to="/admin/classes">
-                      <Button variant="secondary">Add</Button>
-                    </Link>
-                  }
-                />
-              </ol>
+                  <SetupStep
+                    done={(sum?.students ?? 0) > 0}
+                    n={profile?.role === 'proprietor' ? 4 : 3}
+                    title="Add students"
+                    body="Paste a whole class list at once, then hand parents their codes."
+                    action={
+                      <Link to="/admin/classes">
+                        <Button variant="secondary">Add</Button>
+                      </Link>
+                    }
+                  />
+                </ol>
+                <p className="mt-4 text-[12px] text-ink-faint">
+                  <a href="/setup.html" className="underline">
+                    Printable setup brief
+                  </a>
+                  {' — proprietor, admin, classes, parents, student login.'}
+                </p>
             </Panel>
           )}
 

@@ -16,6 +16,8 @@ import {
 } from '../../components/Icons'
 import {
   PLAN,
+  DEMO_CLASS,
+  DEMO_SCHOOL,
   adminClasses,
   attendancePct,
   demoAdmin,
@@ -77,7 +79,7 @@ const NAV: Record<DemoRole, { to: Tab; label: string; Icon: typeof IconToday; mo
     { to: 'fees', label: 'Fees', Icon: IconClass },
   ],
   student: [
-    { to: 'today', label: 'Today', Icon: IconToday },
+    { to: 'today', label: 'Desk', Icon: IconToday },
     { to: 'assignments', label: 'Homework', Icon: IconHomework },
     { to: 'results', label: 'Results', Icon: IconClass },
   ],
@@ -88,7 +90,7 @@ const ROLE_META: Record<DemoRole, { title: string; blurb: string; name: string }
   admin: { title: 'Admin', blurb: 'Day to day running. Who posted, who slipped.', name: 'Mrs. Grace Eze' },
   teacher: { title: 'Teacher', blurb: 'Register, lessons, results.', name: 'Mr. Emeka Okafor' },
   parent: { title: 'Parent', blurb: 'Your child, the same day.', name: 'Ngozi Okonkwo' },
-  student: { title: 'Student', blurb: 'Assignments and your scores.', name: 'Adaeze Okonkwo' },
+  student: { title: 'Student', blurb: 'Sit tests and exams on your own login.', name: 'Adaeze Okonkwo' },
 }
 
 const ORDER: DemoRole[] = ['proprietor', 'admin', 'teacher', 'parent', 'student']
@@ -96,7 +98,10 @@ const ORDER: DemoRole[] = ['proprietor', 'admin', 'teacher', 'parent', 'student'
 export default function DemoApp() {
   const [params] = useSearchParams()
   const preset = (params.get('role') as DemoRole | null) ?? null
-  const [stage, setStage] = useState<'gate' | 'onboard' | 'app'>(preset ? 'onboard' : 'gate')
+  const walk = params.get('walk') === '1'
+  const [stage, setStage] = useState<'gate' | 'walk' | 'onboard' | 'app'>(
+    walk ? 'walk' : preset ? 'onboard' : 'gate',
+  )
   const [role, setRole] = useState<DemoRole>(preset ?? 'proprietor')
   const [tab, setTab] = useState<Tab>(firstTab(preset ?? 'proprietor'))
 
@@ -110,7 +115,16 @@ export default function DemoApp() {
     setStage('onboard')
   }
 
-  if (stage === 'gate') return <DemoGate onPick={enter} />
+  function finishWalk(r: DemoRole) {
+    setRole(r)
+    setTab(firstTab(r))
+    setStage('app')
+  }
+
+  if (stage === 'gate') return <DemoGate onPick={enter} onWalk={() => setStage('walk')} />
+  if (stage === 'walk') {
+    return <DemoWalk onDone={finishWalk} onBack={() => setStage('gate')} />
+  }
   if (stage === 'onboard') {
     return (
       <DemoOnboard
@@ -157,7 +171,7 @@ function DemoBanner({ onBilling }: { onBilling?: () => void }) {
   return (
     <div className="bg-brass-wash border-b border-brass/30 text-[12px] text-ink px-4 py-2 flex items-center justify-between gap-3">
       <span className="truncate">
-        Live demo · {demoSubscription.status === 'trial' ? `Trial, ${demoSubscription.daysLeft} days left` : 'Active'} · N200,000/year after 30 days
+        Live demo · {demoSubscription.status === 'trial' ? `Trial, ${demoSubscription.daysLeft} days left` : 'Active'} · N200,000/term after 30 days
       </span>
       <div className="flex items-center gap-3 shrink-0">
         {onBilling && (
@@ -173,7 +187,7 @@ function DemoBanner({ onBilling }: { onBilling?: () => void }) {
   )
 }
 
-function DemoGate({ onPick }: { onPick: (r: DemoRole) => void }) {
+function DemoGate({ onPick, onWalk }: { onPick: (r: DemoRole) => void; onWalk: () => void }) {
   return (
     <div className="min-h-dvh bg-paper">
       <DemoBanner />
@@ -181,13 +195,15 @@ function DemoGate({ onPick }: { onPick: (r: DemoRole) => void }) {
         <Wordmark size="md" />
         <span className="eyebrow block mt-8">Live demo</span>
         <h1 className="text-[32px] sm:text-[44px] mt-2 max-w-[20ch]">
-          One school. Five seats. Pick one.
+          Open the school in order
         </h1>
         <p className="mt-3 text-[15px] text-ink-soft max-w-[52ch] leading-relaxed">
-          {demoSubscription.status === 'trial'
-            ? `Greenfield Academy is on day ${30 - demoSubscription.daysLeft} of its 30-day trial. The whole platform is live: enrolment, register, results, fees and billing.`
-            : ''}
+          Proprietor names the school, appoints an admin, then term, classes, roster, teachers,
+          parent codes, student login. Walk that sequence, or jump a seat.
         </p>
+        <div className="mt-6">
+          <Button onClick={onWalk}>Walk the opening sequence</Button>
+        </div>
         <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {ORDER.map((r) => (
             <button
@@ -199,6 +215,104 @@ function DemoGate({ onPick }: { onPick: (r: DemoRole) => void }) {
               <div className="text-[14px] font-semibold mt-2">{ROLE_META[r].blurb}</div>
             </button>
           ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const WALK: {
+  who: string
+  title: string
+  body: string
+  enter?: DemoRole
+}[] = [
+  {
+    who: 'Proprietor',
+    title: 'Sign up and name the school',
+    body: 'Confirm the email. On Welcome choose I run a school and name it. You become proprietor — you own the school, you are not the day-to-day admin.',
+  },
+  {
+    who: 'Proprietor',
+    title: 'Appoint an administrator',
+    body: 'People → Invite admin. They sign up with that exact email. They run classes, fees and the register. You keep the executive seat.',
+    enter: 'proprietor',
+  },
+  {
+    who: 'Admin',
+    title: 'Set the term, then classes',
+    body: 'On the home board, set the current term. Attendance and reports hang off it. Then create classes — one per stream, for example JSS 1A.',
+    enter: 'admin',
+  },
+  {
+    who: 'Admin',
+    title: 'Add students — the roster',
+    body: 'Open a class and Add students. Paste names. This is the register, not a login. Parents and students still have their own doors.',
+  },
+  {
+    who: 'Admin or proprietor',
+    title: 'Invite teachers',
+    body: 'People → Invite teacher. They mark attendance, post lessons, and publish papers.',
+    enter: 'teacher',
+  },
+  {
+    who: 'Admin, then parent',
+    title: 'Hand parents their codes',
+    body: 'On the class page, generate claim codes and send them home. The parent signs up, chooses I\'m a parent, and enters the eight-character code once. Do not invite parents before the roster exists.',
+    enter: 'parent',
+  },
+  {
+    who: 'Admin, then student',
+    title: 'Give each student a login',
+    body: 'On the class page, open a student and tap Login. Enter their email. They sign up with that exact address and land on their desk. When a teacher publishes a test or exam, they tap Start. This is not the parent claim code.',
+    enter: 'student',
+  },
+]
+
+function DemoWalk({
+  onDone,
+  onBack,
+}: {
+  onDone: (r: DemoRole) => void
+  onBack: () => void
+}) {
+  const [i, setI] = useState(0)
+  const step = WALK[i]
+  const last = i >= WALK.length - 1
+  return (
+    <div className="min-h-dvh bg-paper">
+      <DemoBanner />
+      <div className="mx-auto max-w-md px-5 py-10">
+        <button onClick={onBack} className="eyebrow hover:text-ink">
+          All seats
+        </button>
+        <div className="mt-6 flex gap-1.5">
+          {WALK.map((s) => (
+            <span key={s.title} className={`h-1 flex-1 rounded-sm ${WALK.indexOf(s) <= i ? 'bg-brass' : 'bg-rule'}`} />
+          ))}
+        </div>
+        <p className="eyebrow mt-4">
+          {step.who} · step {i + 1} of {WALK.length}
+        </p>
+        <div className="mt-4">
+          <h2 className="text-[24px]">{step.title}</h2>
+          <p className="mt-3 text-[15px] text-ink-soft leading-relaxed">{step.body}</p>
+        </div>
+        <div className="mt-6 flex flex-col gap-2">
+          <Button
+            full
+            onClick={() => {
+              if (last) onDone(step.enter ?? 'student')
+              else setI((n) => n + 1)
+            }}
+          >
+            {last ? 'Enter the student desk' : 'Continue'}
+          </Button>
+          {step.enter && !last && (
+            <Button variant="secondary" full onClick={() => onDone(step.enter!)}>
+              Open the {step.enter} seat now
+            </Button>
+          )}
         </div>
       </div>
     </div>
@@ -239,7 +353,7 @@ function DemoOnboard({
     admin: ['You run the day to day.', 'Register coverage, classes, tasks and family communication.'],
     teacher: ['You teach JSS 1A.', 'Register, lesson posting and results entry.'],
     parent: ['You are Adaeze’s parent.', 'Attendance, lessons, homework and fees.'],
-    student: ['You are Adaeze, JSS 1A.', 'Assignments and your own results.'],
+    student: ['You are Adaeze, JSS 1A.', 'Sit published tests and exams on this login. Homework is separate.'],
   }
 
   return (
@@ -268,7 +382,7 @@ function DemoOnboard({
               next()
             }}
           >
-            <h2 className="text-[24px]">Enter the code.</h2>
+            <h2 className="text-[24px]">Enter the code</h2>
             <Field
               label="Claim code"
               mono
@@ -293,7 +407,7 @@ function DemoOnboard({
               next()
             }}
           >
-            <h2 className="text-[24px]">Name the school.</h2>
+            <h2 className="text-[24px]">Name the school</h2>
             <Field label="School name" required value={school} onChange={(e) => setSchool(e.target.value)} />
             <Button type="submit" full>
               Continue
@@ -306,7 +420,7 @@ function DemoOnboard({
             title={ROLE_META[role].name}
             body={
               role === 'student'
-                ? 'JSS 1A. Two assignments open, results published.'
+                ? 'JSS 1A. Sign up with the email the office invited. Open papers appear on your desk.'
                 : role === 'teacher'
                   ? 'Form teacher JSS 1A, Mathematics. Eight students in this morning’s register.'
                   : 'Head of administration. 248 students, 12 classes, 34 staff.'
@@ -319,7 +433,7 @@ function DemoOnboard({
             title="You are in."
             body={
               role === 'proprietor'
-                ? 'Greenfield Academy is on trial. Billing shows N200,000 for the year when the trial ends.'
+                ? 'Greenfield Academy is on trial. Billing shows N200,000 per term when the trial ends.'
                 : 'Everything you see is sample data for a real school day.'
             }
           />
@@ -651,7 +765,7 @@ function Billing() {
               <span className="text-[14px] font-semibold">Active</span>
             </div>
             <p className="mt-2 text-[14px] text-ink-soft">
-              Payment received. Greenfield Academy is covered to September 2027.
+              Payment received. Greenfield Academy is covered for this term.
             </p>
           </div>
         ) : (
@@ -679,7 +793,7 @@ function Billing() {
                   }, 900)
                 }}
               >
-                Pay N{b.price.toLocaleString()} for the year
+                Pay N{b.price.toLocaleString()} for the term
               </Button>
             </div>
           </div>
@@ -733,6 +847,26 @@ function AdminToday() {
     <div className="space-y-4">
       <Head eyebrow="Admin" title="Greenfield Academy" sub={DEMO_TERM_CONST} />
       <div className="space-y-4">
+        <Panel title="Get set up">
+          <ol className="space-y-3 text-[14px] text-ink-soft">
+            <li>
+              <span className="font-semibold text-ink">1. Appoint an administrator</span>
+              {' — proprietor does this on People. You run the day.'}
+            </li>
+            <li>
+              <span className="font-semibold text-ink">2. Set the current term</span>
+              {' — attendance and reports hang off it.'}
+            </li>
+            <li>
+              <span className="font-semibold text-ink">3. Create classes</span>
+              {' — one per stream, for example JSS 1A.'}
+            </li>
+            <li>
+              <span className="font-semibold text-ink">4. Add students</span>
+              {' — paste the roster, then parent codes and student Login.'}
+            </li>
+          </ol>
+        </Panel>
         <Panel title="Today">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
             <Metric value={demoAdmin.students} label="Students" />
@@ -1402,34 +1536,37 @@ function ParentFees() {
 =========================================================================== */
 
 function StudentToday() {
-  const pct = attendancePct(demoMarks) ?? 94
+  const open = demoExams.filter((e) => e.status === 'published')
   return (
     <div className="space-y-4">
-      <Head eyebrow="JSS 1A" title="Hi, Adaeze" sub={DEMO_TERM_CONST} />
-      <Panel title="My attendance">
-        <AttendanceSummary pct={pct} marks={demoMarks} caption="This term" />
-      </Panel>
-      <Panel title="Next period">
-        <div className="flex items-baseline justify-between">
-          <div>
-            <div className="eyebrow">11:20</div>
-            <div className="text-[18px] font-semibold mt-1">Social Studies</div>
-          </div>
-          <span className="eyebrow">Room 4</span>
-        </div>
-      </Panel>
-      <Panel title="Due soon">
-        <div className="divide-y divide-rule -my-3">
-          {studentAssignments.filter((a) => a.status === 'open').map((a) => (
-            <div key={a.id} className="flex items-center py-3">
-              <div>
-                <div className="text-[14px] font-semibold">{a.title}</div>
-                <div className="eyebrow mt-0.5">{a.subject}</div>
+      <Head
+        eyebrow={`${DEMO_SCHOOL} · ${DEMO_CLASS}`}
+        title="Adaeze Okonkwo"
+        sub="Sit tests and exams here when your teacher publishes them"
+      />
+      <Panel title="Tests">
+        {open.length === 0 ? (
+          <Empty line="No tests are open for your class yet" />
+        ) : (
+          <div className="divide-y divide-rule -my-3">
+            {open.map((e) => (
+              <div key={e.title} className="flex items-center py-3">
+                <div>
+                  <div className="text-[15px] font-semibold">{e.title}</div>
+                  <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-faint">
+                    Test · {e.subject} · {e.duration} min
+                  </div>
+                </div>
+                <span className="ml-auto font-mono text-[11px] uppercase tracking-[0.1em] underline">
+                  Start test
+                </span>
               </div>
-              <span className="ml-auto tnum text-[13px] text-late">Due {a.due}</span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
+      </Panel>
+      <Panel title="Exams">
+        <Empty line="No exams are open for your class yet" />
       </Panel>
     </div>
   )

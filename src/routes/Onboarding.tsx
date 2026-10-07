@@ -83,12 +83,12 @@ export default function Onboarding() {
     <AuthLayout
       headline={
         <>
-          One code.
+          One school
           <br />
-          Then you see it all.
+          or one child
         </>
       }
-      sub="Your school gives you an eight character code for each child. Enter it once and their day opens up."
+      sub="Parents enter the code the school gives them. If you run the school, name it here and you become proprietor."
     >
       <div className="flex border border-rule-strong rounded-md overflow-hidden mb-6">
         {(['parent', 'school'] as const).map((t) => (
@@ -118,7 +118,7 @@ export default function Onboarding() {
         >
           <div>
             <span className="eyebrow">Link your child</span>
-            <h2 className="text-[22px] mt-1.5">Enter the code your school gave you.</h2>
+            <h2 className="text-[22px] mt-1.5">Enter the code your school gave you</h2>
           </div>
           <Field
             label="Claim code"
@@ -160,7 +160,7 @@ export default function Onboarding() {
         >
           <div>
             <span className="eyebrow">Set up your school</span>
-            <h2 className="text-[22px] mt-1.5">Name the school. You will be its proprietor.</h2>
+            <h2 className="text-[22px] mt-1.5">Name the school — you will be its proprietor</h2>
           </div>
           <Field
             label="School name"

@@ -21,7 +21,7 @@ begin
     raise exception 'forbidden';
   end if;
 
-  select id, greatest(now(), coalesce(current_period_end, now())) + interval '1 year'
+  select id, greatest(now(), coalesce(current_period_end, now())) + interval '4 months'
     into v_sub_id, v_period_end
   from subscriptions
   where school_id = p_school_id
@@ -30,7 +30,7 @@ begin
 
   if v_sub_id is null then
     insert into subscriptions (school_id) values (p_school_id) returning id into v_sub_id;
-    v_period_end := now() + interval '1 year';
+    v_period_end := now() + interval '4 months';
   end if;
 
   update subscriptions
@@ -304,13 +304,17 @@ create or replace function protect_profile_role()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
   if new.role is distinct from old.role then
-    if old.role = 'proprietor' then
+    -- First school create: parent with no school becomes proprietor.
+    if old.school_id is null
+       and new.school_id is not null
+       and new.role = 'proprietor'
+       and old.role in ('parent', 'proprietor') then
+      null;
+    elsif old.role = 'proprietor' then
       raise exception 'the proprietor seat cannot be changed this way';
-    end if;
-    if new.role = 'proprietor' then
+    elsif new.role = 'proprietor' then
       raise exception 'cannot appoint another proprietor this way';
-    end if;
-    if not is_proprietor() and not is_admin() then
+    elsif not is_proprietor() and not is_admin() then
       raise exception 'cannot change roles';
     end if;
   end if;

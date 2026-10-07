@@ -59,17 +59,17 @@ export default function Signup() {
         <>
           Never wonder
           <br />
-          again.
+          again
         </>
       }
       sub="Parents link to a child with the code the school provides. Teachers are added by their school."
     >
       <span className="eyebrow">Create account</span>
-      <h2 className="text-[24px] mt-1.5 mb-6">Start with your name.</h2>
+      <h2 className="text-[24px] mt-1.5 mb-6">Start with your name</h2>
 
       {sent && (
         <div className="mb-5 border border-rule-strong bg-brass-wash rounded-md p-4">
-          <p className="text-[14px] text-ink font-semibold">Check your email.</p>
+          <p className="text-[14px] text-ink font-semibold">Check your email</p>
           <p className="mt-1.5 text-[13px] text-ink-soft leading-relaxed">
             We sent a confirmation link to {email}. Open it, then sign in. Check spam if it
             is not in the inbox within a minute.

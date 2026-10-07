@@ -49,7 +49,7 @@ function Blocked({ problem }: { problem: string }) {
       <div className="w-full max-w-[440px]">
         <Wordmark size="md" className="text-ink mb-7" />
         <span className="eyebrow">Setup incomplete</span>
-        <h1 className="text-[26px] mt-1.5">This account cannot load.</h1>
+        <h1 className="text-[26px] mt-1.5">This account cannot load</h1>
         <p className="mt-3 text-[14px] text-ink-soft leading-relaxed">{problem}</p>
         <div className="mt-6 flex flex-wrap gap-2">
           <Link to="/diagnostics">

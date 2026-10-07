@@ -15,11 +15,11 @@ admin, and it answers the one question every parent actually asks.
 
 | Role | Relationship |
 |---|---|
-| School (proprietor / admin) | Buyer. Pays per student, per term. |
+| School (proprietor / admin) | Buyer. Pays N200,000 per term for the whole school. |
 | Parent | Daily user. Free, included in the school's subscription. |
 | Teacher | Daily operator. Free, included. |
 
-Pricing anchor: N300 to N500 per student per term.
+Pricing: N200,000 per term after a 30-day trial. Unlimited students.
 
 ## Stack
 

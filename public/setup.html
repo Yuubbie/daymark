@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daymaark — How to set up your school</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f7f8f6;
+        --surface: #ffffff;
+        --ink: #143a2b;
+        --ink-soft: #4a5f55;
+        --ink-faint: #7c8b83;
+        --brass: #c9922b;
+        --rule: #dde2db;
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      h1, h2, h3 {
+        font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin: 0;
+      }
+      .eyebrow {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+      .wrap { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+      header { border-bottom: 1px solid var(--rule); padding-bottom: 28px; margin-bottom: 36px; }
+      .mark { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.03em; }
+      .mark span { color: var(--brass); }
+      h1 { font-size: 32px; margin-top: 10px; max-width: 16ch; }
+      .lede { margin: 14px 0 0; color: var(--ink-soft); max-width: 52ch; }
+      .toolbar { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px; }
+      button, a.btn {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: var(--paper);
+        height: 36px;
+        padding: 0 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+      }
+      a.btn.ghost, button.ghost {
+        background: transparent;
+        color: var(--ink);
+        border-color: var(--rule);
+      }
+      ol.steps { list-style: none; padding: 0; margin: 0; }
+      ol.steps > li {
+        background: var(--surface);
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        padding: 20px 22px;
+        margin-bottom: 12px;
+      }
+      .n {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        color: var(--brass);
+      }
+      h2 { font-size: 20px; margin: 4px 0 8px; }
+      p { margin: 0 0 8px; color: var(--ink-soft); }
+      p:last-child { margin-bottom: 0; }
+      strong { color: var(--ink); font-weight: 600; }
+      .who {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        margin-bottom: 6px;
+      }
+      aside {
+        margin-top: 28px;
+        border-top: 1px solid var(--rule);
+        padding-top: 24px;
+      }
+      aside h3 { font-size: 18px; margin-bottom: 8px; }
+      ul.notes { padding-left: 18px; color: var(--ink-soft); margin: 0; }
+      ul.notes li { margin-bottom: 6px; }
+      footer { margin-top: 36px; color: var(--ink-faint); font-size: 12px; }
+      footer a { color: var(--ink); }
+      @media print {
+        .toolbar { display: none; }
+        body { background: white; }
+        ol.steps > li { break-inside: avoid; }
+        a { color: inherit; text-decoration: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="mark">Dayma<span>a</span>rk</div>
+        <p class="eyebrow" style="margin-top: 18px">Proprietor brief</p>
+        <h1>How to open Daymaark for your school</h1>
+        <p class="lede">
+          You own the school. You appoint an administrator to run the day.
+          Parents do not join until classes and the roster exist.
+          Students sit tests on their own logins.
+        </p>
+        <div class="toolbar">
+          <button type="button" onclick="window.print()">Print or save as PDF</button>
+          <a class="btn ghost" href="https://daymark-eosin-five.vercel.app/signup">Open signup</a>
+        </div>
+      </header>
+
+      <ol class="steps">
+        <li>
+          <div class="n">01</div>
+          <div class="who">Proprietor</div>
+          <h2>Create the school</h2>
+          <p>
+            Go to <strong>daymark-eosin-five.vercel.app/signup</strong>.
+            Confirm the email, then on Welcome choose <strong>I run a school</strong> and name it.
+            You become proprietor. You are not the day-to-day admin.
+          </p>
+        </li>
+        <li>
+          <div class="n">02</div>
+          <div class="who">Proprietor</div>
+          <h2>Appoint an administrator</h2>
+          <p>
+            Open <strong>People</strong> and <strong>Invite admin</strong>.
+            They sign up with that exact email. They run classes, fees, and the register.
+            You keep the executive seat.
+          </p>
+        </li>
+        <li>
+          <div class="n">03</div>
+          <div class="who">Admin</div>
+          <h2>Set the term, then classes</h2>
+          <p>
+            On the home board, set the current term. Attendance and reports hang off it.
+            Then create classes — one per stream, for example JSS 1A.
+          </p>
+        </li>
+        <li>
+          <div class="n">04</div>
+          <div class="who">Admin</div>
+          <h2>Add students (the roster)</h2>
+          <p>
+            Open a class and <strong>Add students</strong>. Paste names.
+            This is the register, not a login. Parents and students still have their own doors.
+          </p>
+        </li>
+        <li>
+          <div class="n">05</div>
+          <div class="who">Admin or proprietor</div>
+          <h2>Invite teachers</h2>
+          <p>
+            People → <strong>Invite teacher</strong>. They mark attendance, post lessons, and publish papers.
+          </p>
+        </li>
+        <li>
+          <div class="n">06</div>
+          <div class="who">Admin, then parent</div>
+          <h2>Hand parents their codes</h2>
+          <p>
+            On the class page, generate claim codes and send them home.
+            The parent signs up, chooses <strong>I'm a parent</strong>, and enters the eight-character code once.
+            Do not invite parents before the roster exists.
+          </p>
+        </li>
+        <li>
+          <div class="n">07</div>
+          <div class="who">Admin, then student</div>
+          <h2>Give each student a login</h2>
+          <p>
+            On the class page, open a student and tap <strong>Login</strong>. Enter their email.
+            They sign up with that exact address and land on <strong>/student</strong>.
+            When a teacher publishes a test or exam, they tap Start. This is not the parent claim code.
+          </p>
+        </li>
+      </ol>
+
+      <aside>
+        <h3>Money and lockout</h3>
+        <ul class="notes">
+          <li>30 days free, then N200,000 a term for the whole school.</li>
+          <li>If a parent has not cleared fees, CBT and results stay locked for that family.</li>
+          <li>Teachers, parents, and students are not charged per seat.</li>
+        </ul>
+        <h3 style="margin-top: 20px">If something sticks</h3>
+        <p>
+          WhatsApp care:
+          <a href="https://wa.me/2347032352158?text=Hello%20Daymaark%2C%20I%20need%20help.">0703 235 2158</a>
+        </p>
+      </aside>
+
+      <footer>
+        Daymaark — every school day, marked. This page is yours to print or forward. No call required.
+      </footer>
+    </div>
+  </body>
+</html>
