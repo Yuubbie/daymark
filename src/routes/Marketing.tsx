@@ -551,6 +551,9 @@ export default function Marketing() {
             <a href="/setup.html" className="hover:text-ink">
               Setup brief
             </a>
+            <a href="/Daymaark-onboarding.txt" download="Daymaark-onboarding.txt" className="hover:text-ink">
+              Download guide
+            </a>
             <a href={CARE_URL} target="_blank" rel="noreferrer" className="hover:text-ink">
               WhatsApp {CARE_DISPLAY}
             </a>

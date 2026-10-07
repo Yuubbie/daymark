@@ -1,0 +1,133 @@
+DAYMAARK — HOW TO OPEN YOUR SCHOOL
+==================================
+Anyone can follow this. No call required.
+App: https://daymark-eosin-five.vercel.app
+Care (WhatsApp): 0703 235 2158
+
+Order matters. Do not skip ahead.
+Proprietor first, then admin, then term and classes,
+then the student roster, then teachers, then parents,
+then student logins.
+
+------------------------------------------------
+WHO DOES WHAT
+------------------------------------------------
+Proprietor  owns the school. Appoints the admin. Does not run the day.
+Admin       runs the day: term, classes, roster, fees, claim codes.
+Teacher     marks the register, posts lessons, publishes tests and exams.
+Parent      sees their child. Joins with a claim code after the roster exists.
+Student     sits tests and exams on their own login. Not the parent code.
+
+Parents do not join until classes and the roster exist.
+A name on the class list is not a login.
+
+------------------------------------------------
+1. PROPRIETOR — CREATE THE SCHOOL
+------------------------------------------------
+1. Open https://daymark-eosin-five.vercel.app/signup
+2. Enter your name, email and password.
+3. Open the confirmation email and confirm.
+4. You land on Welcome. Choose "I run a school".
+5. Type the school name. You become proprietor.
+
+If the confirmation email does not arrive, use Resend on the login screen.
+If you land on Welcome as a parent by mistake, switch to "I run a school".
+
+------------------------------------------------
+2. PROPRIETOR — APPOINT AN ADMINISTRATOR
+------------------------------------------------
+1. You are on the school home. Open People.
+2. Tap Invite admin.
+3. Enter their full name and the email they will use.
+4. They sign up at the same address, with that exact email.
+5. They run classes, fees and the register. You keep the executive seat.
+
+Do not try to make a second proprietor. There is one owner.
+
+------------------------------------------------
+3. ADMIN — SET THE TERM, THEN CLASSES
+------------------------------------------------
+1. Sign in with the invited email.
+2. On Get set up, set the current term (dates and name, e.g. First Term 2025/2026).
+3. Open Classes. Create one class per stream, e.g. JSS 1A.
+
+Attendance and reports hang off the current term. Set it before the register.
+
+------------------------------------------------
+4. ADMIN — ADD STUDENTS (THE ROSTER)
+------------------------------------------------
+1. Open a class.
+2. Tap Add students.
+3. Paste names (whole class list at once is fine).
+4. Save.
+
+This is the register, not a login.
+Parents still need a claim code.
+Students still need their own Login email.
+
+------------------------------------------------
+5. ADMIN OR PROPRIETOR — INVITE TEACHERS
+------------------------------------------------
+1. Open People.
+2. Tap Invite teacher.
+3. They sign up with that exact email.
+4. They mark attendance, post lessons, and publish papers.
+
+------------------------------------------------
+6. ADMIN, THEN PARENT — CLAIM CODES
+------------------------------------------------
+Do this only after the roster exists.
+
+1. Open the class page.
+2. Generate claim codes.
+3. Send each code home (print, WhatsApp, or the class CSV).
+4. The parent signs up at https://daymark-eosin-five.vercel.app/signup
+5. Confirms email.
+6. On Welcome they stay on "I'm a parent".
+7. They enter the eight-character code once.
+
+One code per child. A parent with two children enters two codes.
+
+------------------------------------------------
+7. ADMIN, THEN STUDENT — THEIR OWN LOGIN
+------------------------------------------------
+This is not the parent claim code.
+
+1. Open the class page.
+2. Open a student. Tap Login.
+3. Enter the student's email.
+4. They sign up with that exact email and confirm it.
+5. They land on their desk (/student).
+6. When a teacher publishes a test or exam, they tap Start.
+
+If they sign up with a different email, the desk will say
+the login is not linked. Invite the email they actually used.
+
+------------------------------------------------
+MONEY
+------------------------------------------------
+30 days free, then N200,000 per term for the whole school.
+Unlimited students. Parents, teachers and students are not charged per seat.
+If a family has not cleared fees, CBT and results stay locked for that family.
+
+------------------------------------------------
+IF SOMETHING STICKS
+------------------------------------------------
+No confirmation email     Login screen → resend. Check spam.
+Cannot create the school  You must choose "I run a school" on Welcome.
+Invite not working        They must sign up with the exact invited email.
+Parent code rejected      Codes are generated on the class page after students exist.
+Student desk empty        Ask the office to Invite Login with their email.
+Locked out of results     Fees uncleared, or the school trial/term has ended.
+
+WhatsApp care: 0703 235 2158
+
+------------------------------------------------
+TRY IT FIRST (NO ACCOUNT)
+------------------------------------------------
+Live demo: https://daymark-eosin-five.vercel.app/demo
+Walk the opening sequence, then switch seats:
+proprietor → admin → teacher → parent (code ADAEZE01) → student.
+
+Printable copy of this brief:
+https://daymark-eosin-five.vercel.app/setup.html

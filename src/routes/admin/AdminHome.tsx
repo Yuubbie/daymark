@@ -119,6 +119,10 @@ export default function AdminHome() {
                   <a href="/setup.html" className="underline">
                     Printable setup brief
                   </a>
+                  {' · '}
+                  <a href="/Daymaark-onboarding.txt" download="Daymaark-onboarding.txt" className="underline">
+                    Download
+                  </a>
                   {' — proprietor, admin, classes, parents, student login.'}
                 </p>
             </Panel>

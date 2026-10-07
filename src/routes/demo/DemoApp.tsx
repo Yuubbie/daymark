@@ -95,6 +95,13 @@ const ROLE_META: Record<DemoRole, { title: string; blurb: string; name: string }
 
 const ORDER: DemoRole[] = ['proprietor', 'admin', 'teacher', 'parent', 'student']
 
+const NEXT_ROLE: Partial<Record<DemoRole, DemoRole>> = {
+  proprietor: 'admin',
+  admin: 'teacher',
+  teacher: 'parent',
+  parent: 'student',
+}
+
 export default function DemoApp() {
   const [params] = useSearchParams()
   const preset = (params.get('role') as DemoRole | null) ?? null
@@ -104,18 +111,21 @@ export default function DemoApp() {
   )
   const [role, setRole] = useState<DemoRole>(preset ?? 'proprietor')
   const [tab, setTab] = useState<Tab>(firstTab(preset ?? 'proprietor'))
+  const [sitting, setSitting] = useState<string | null>(null)
 
   function firstTab(r: DemoRole) {
     return NAV[r][0].to
   }
 
   function enter(r: DemoRole) {
+    setSitting(null)
     setRole(r)
     setTab(firstTab(r))
     setStage('onboard')
   }
 
   function finishWalk(r: DemoRole) {
+    setSitting(null)
     setRole(r)
     setTab(firstTab(r))
     setStage('app')
@@ -135,8 +145,24 @@ export default function DemoApp() {
     )
   }
 
+  const nextRole = NEXT_ROLE[role]
+
   return (
-    <DemoShell role={role} tab={tab} onTab={setTab} onExit={() => setStage('gate')}>
+    <DemoShell
+      role={role}
+      tab={tab}
+      onTab={setTab}
+      onExit={() => setStage('gate')}
+      onNextSeat={
+        nextRole
+          ? () => {
+              setSitting(null)
+              setRole(nextRole)
+              setTab(firstTab(nextRole))
+            }
+          : undefined
+      }
+    >
       {role === 'proprietor' && tab === 'overview' && <ProprietorOverview />}
       {role === 'proprietor' && tab === 'finance' && <ProprietorFinance />}
       {role === 'proprietor' && tab === 'people' && <ProprietorPeople />}
@@ -160,9 +186,14 @@ export default function DemoApp() {
       {role === 'parent' && tab === 'assessments' && <ParentAssessments />}
       {role === 'parent' && tab === 'notices' && <NoticesPanel />}
       {role === 'parent' && tab === 'fees' && <ParentFees />}
-      {role === 'student' && tab === 'today' && <StudentToday />}
-      {role === 'student' && tab === 'assignments' && <StudentAssignments />}
-      {role === 'student' && tab === 'results' && <StudentResults />}
+      {role === 'student' && sitting && (
+        <StudentSit title={sitting} onDone={() => setSitting(null)} />
+      )}
+      {role === 'student' && !sitting && tab === 'today' && (
+        <StudentToday onStart={(title) => setSitting(title)} />
+      )}
+      {role === 'student' && !sitting && tab === 'assignments' && <StudentAssignments />}
+      {role === 'student' && !sitting && tab === 'results' && <StudentResults />}
     </DemoShell>
   )
 }
@@ -201,8 +232,11 @@ function DemoGate({ onPick, onWalk }: { onPick: (r: DemoRole) => void; onWalk: (
           Proprietor names the school, appoints an admin, then term, classes, roster, teachers,
           parent codes, student login. Walk that sequence, or jump a seat.
         </p>
-        <div className="mt-6">
+        <div className="mt-6 flex flex-wrap gap-2">
           <Button onClick={onWalk}>Walk the opening sequence</Button>
+          <Button variant="secondary" onClick={() => { window.location.href = '/setup.html' }}>
+            Download the setup guide
+          </Button>
         </div>
         <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {ORDER.map((r) => (
@@ -329,7 +363,7 @@ function DemoOnboard({
   onBack: () => void
 }) {
   const [step, setStep] = useState(0)
-  const [code, setCode] = useState('')
+  const [code, setCode] = useState('ADAEZE01')
   const [error, setError] = useState<string | null>(null)
   const [school, setSchool] = useState('Greenfield Academy')
 
@@ -337,6 +371,10 @@ function DemoOnboard({
 
   function next() {
     setError(null)
+    if (role === 'proprietor' && step === 1 && !school.trim()) {
+      setError('Name the school to continue.')
+      return
+    }
     if (role === 'parent' && step === 1 && code.trim().toUpperCase() !== 'ADAEZE01') {
       setError('Use the sample code ADAEZE01.')
       return
@@ -408,7 +446,13 @@ function DemoOnboard({
             }}
           >
             <h2 className="text-[24px]">Name the school</h2>
-            <Field label="School name" required value={school} onChange={(e) => setSchool(e.target.value)} />
+            <Field
+              label="School name"
+              required
+              value={school}
+              onChange={(e) => setSchool(e.target.value)}
+              error={error ?? undefined}
+            />
             <Button type="submit" full>
               Continue
             </Button>
@@ -465,15 +509,18 @@ function DemoShell({
   tab,
   onTab,
   onExit,
+  onNextSeat,
   children,
 }: {
   role: DemoRole
   tab: Tab
   onTab: (t: Tab) => void
   onExit: () => void
+  onNextSeat?: () => void
   children: ReactNode
 }) {
   const items = NAV[role]
+  const next = NEXT_ROLE[role]
   return (
     <div className="min-h-dvh bg-paper">
       <DemoBanner onBilling={role === 'proprietor' ? () => onTab('billing') : undefined} />
@@ -500,8 +547,13 @@ function DemoShell({
             </button>
           ))}
         </nav>
-        <div className="px-3 pb-5">
-          <button onClick={onExit} className="h-10 px-3 text-[14px] text-ink-invert/50 hover:text-ink-invert">
+        <div className="px-3 pb-5 space-y-1">
+          {onNextSeat && next && (
+            <button onClick={onNextSeat} className="h-10 px-3 w-full text-left text-[14px] text-brass hover:text-ink-invert">
+              Next: {ROLE_META[next].title}
+            </button>
+          )}
+          <button onClick={onExit} className="h-10 px-3 w-full text-left text-[14px] text-ink-invert/50 hover:text-ink-invert">
             Switch seat
           </button>
         </div>
@@ -517,9 +569,16 @@ function DemoShell({
               {ROLE_META[role].title}
             </div>
           </div>
-          <button onClick={onExit} className="ml-auto text-[11px] font-mono uppercase tracking-[0.1em] text-ink-invert/60">
-            Switch
-          </button>
+          <div className="ml-auto flex items-center gap-3">
+            {onNextSeat && next && (
+              <button onClick={onNextSeat} className="text-[11px] font-mono uppercase tracking-[0.1em] text-brass">
+                Next
+              </button>
+            )}
+            <button onClick={onExit} className="text-[11px] font-mono uppercase tracking-[0.1em] text-ink-invert/60">
+              Switch
+            </button>
+          </div>
         </div>
       </header>
 
@@ -1535,7 +1594,7 @@ function ParentFees() {
    STUDENT
 =========================================================================== */
 
-function StudentToday() {
+function StudentToday({ onStart }: { onStart: (title: string) => void }) {
   const open = demoExams.filter((e) => e.status === 'published')
   return (
     <div className="space-y-4">
@@ -1557,9 +1616,13 @@ function StudentToday() {
                     Test · {e.subject} · {e.duration} min
                   </div>
                 </div>
-                <span className="ml-auto font-mono text-[11px] uppercase tracking-[0.1em] underline">
+                <button
+                  type="button"
+                  onClick={() => onStart(e.title)}
+                  className="ml-auto font-mono text-[11px] uppercase tracking-[0.1em] underline"
+                >
                   Start test
-                </span>
+                </button>
               </div>
             ))}
           </div>
@@ -1567,6 +1630,56 @@ function StudentToday() {
       </Panel>
       <Panel title="Exams">
         <Empty line="No exams are open for your class yet" />
+      </Panel>
+    </div>
+  )
+}
+
+function StudentSit({ title, onDone }: { title: string; onDone: () => void }) {
+  const [choice, setChoice] = useState<string | null>(null)
+  const [done, setDone] = useState(false)
+  if (done) {
+    return (
+      <div className="space-y-4">
+        <Head eyebrow="Submitted" title={title} sub="Auto-marked so far" />
+        <Panel>
+          <p className="text-[15px] text-ink-soft">
+            Score so far: <span className="tnum font-semibold text-ink">1 / 1</span>
+          </p>
+          <p className="mt-2 text-[14px] text-ink-faint">
+            A teacher still has to mark any written parts. The proprietor approves before parents see it.
+          </p>
+          <div className="mt-4">
+            <Button onClick={onDone}>Back to desk</Button>
+          </div>
+        </Panel>
+      </div>
+    )
+  }
+  return (
+    <div className="space-y-4">
+      <Head eyebrow="Test" title={title} sub="Sample paper · untimed" />
+      <Panel title="Question 1">
+        <p className="text-[15px] font-semibold">What is 12 × 8?</p>
+        <div className="mt-3 space-y-2">
+          {['86', '96', '108', '88'].map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => setChoice(opt)}
+              className={`w-full text-left px-3 py-2 rounded-md border ${
+                choice === opt ? 'border-brass bg-brass-wash' : 'border-rule bg-surface'
+              }`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+        <div className="mt-4">
+          <Button full disabled={!choice} onClick={() => setDone(true)}>
+            Submit
+          </Button>
+        </div>
       </Panel>
     </div>
   )
