@@ -207,23 +207,63 @@ function SetPaperModal({
   const [opens, setOpens] = useState('')
   const [closes, setCloses] = useState('')
   const [instructions, setInstructions] = useState('')
-  const [bankId, setBankId] = useState(banks[0]?.id ?? '')
+  const [bankId, setBankId] = useState('')
   const [picked, setPicked] = useState<Set<string>>(new Set())
   const [qrows, setQrows] = useState<{ id: string; prompt: string; question_type: string; marks: number }[]>([])
   const [busy, setBusy] = useState(false)
+  const [loadingQs, setLoadingQs] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!bankId) return
+    if (!open) return
+    setError(null)
+    setPicked(new Set())
+    setQrows([])
+    const next = banks.some((b) => b.id === bankId) ? bankId : (banks[0]?.id ?? '')
+    setBankId(next)
+  }, [open, banks])
+
+  useEffect(() => {
+    if (!open || !bankId) {
+      setQrows([])
+      return
+    }
+    let cancelled = false
+    setLoadingQs(true)
     void listQuestions(bankId)
-      .then((qs) => setQrows(qs.map((q) => ({ id: q.id, prompt: q.prompt, question_type: q.question_type, marks: q.marks }))))
-      .catch((e) => setError((e as Error).message))
-  }, [bankId])
+      .then((qs) => {
+        if (cancelled) return
+        const rows = qs.map((q) => ({
+          id: q.id,
+          prompt: q.prompt,
+          question_type: q.question_type,
+          marks: q.marks,
+        }))
+        setQrows(rows)
+        setPicked(new Set(rows.map((q) => q.id)))
+      })
+      .catch((e) => {
+        if (!cancelled) setError((e as Error).message)
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingQs(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [open, bankId])
 
   async function save() {
     setError(null)
     if (!title.trim()) return setError('Name the paper.')
-    if (picked.size === 0) return setError('Pick at least one question from the bank.')
+    const ids = picked.size > 0 ? [...picked] : qrows.map((q) => q.id)
+    if (ids.length === 0) {
+      return setError(
+        qrows.length === 0
+          ? 'This bank has no questions yet. Add one in Bank, then come back.'
+          : 'Pick at least one question from the bank.',
+      )
+    }
     setBusy(true)
     try {
       const id = await createExam({
@@ -237,7 +277,7 @@ function SetPaperModal({
         opens_at: opens ? new Date(opens).toISOString() : null,
         closes_at: closes ? new Date(closes).toISOString() : null,
       })
-      await attachQuestions(id, [...picked])
+      await attachQuestions(id, ids)
       onSaved()
     } catch (e) {
       setError((e as Error).message)
@@ -295,8 +335,12 @@ function SetPaperModal({
           <select
             className="w-full h-11 px-3 bg-surface border border-rule-strong rounded-md"
             value={bankId}
-            onChange={(e) => setBankId(e.target.value)}
+            onChange={(e) => {
+              setBankId(e.target.value)
+              setPicked(new Set())
+            }}
           >
+            {banks.length === 0 && <option value="">No banks yet</option>}
             {banks.map((b) => (
               <option key={b.id} value={b.id}>
                 {b.title}
@@ -305,28 +349,41 @@ function SetPaperModal({
           </select>
         </label>
         <div className="max-h-48 overflow-y-auto border border-rule rounded-md divide-y divide-rule">
-          {qrows.map((q) => (
-            <label key={q.id} className="flex items-start gap-2 px-3 py-2 text-[13px]">
-              <input
-                type="checkbox"
-                className="mt-1"
-                checked={picked.has(q.id)}
-                onChange={(e) => {
-                  const next = new Set(picked)
-                  if (e.target.checked) next.add(q.id)
-                  else next.delete(q.id)
-                  setPicked(next)
-                }}
-              />
-              <span>
-                {q.prompt}
-                <span className="block font-mono text-[10px] uppercase text-ink-faint">
-                  {q.question_type} · {q.marks}
+          {loadingQs ? (
+            <p className="px-3 py-3 text-[13px] text-ink-faint">Loading questions</p>
+          ) : qrows.length === 0 ? (
+            <p className="px-3 py-3 text-[13px] text-ink-faint">
+              No questions in this bank. Open Bank, add at least one, then set the paper.
+            </p>
+          ) : (
+            qrows.map((q) => (
+              <label key={q.id} className="flex items-start gap-2 px-3 py-2 text-[13px]">
+                <input
+                  type="checkbox"
+                  className="mt-1"
+                  checked={picked.has(q.id)}
+                  onChange={(e) => {
+                    const next = new Set(picked)
+                    if (e.target.checked) next.add(q.id)
+                    else next.delete(q.id)
+                    setPicked(next)
+                  }}
+                />
+                <span>
+                  {q.prompt}
+                  <span className="block font-mono text-[10px] uppercase text-ink-faint">
+                    {q.question_type} · {q.marks} mark{q.marks === 1 ? '' : 's'}
+                  </span>
                 </span>
-              </span>
-            </label>
-          ))}
+              </label>
+            ))
+          )}
         </div>
+        {qrows.length > 0 && (
+          <p className="text-[12px] text-ink-faint">
+            {picked.size} of {qrows.length} selected. Untick any you want to leave out.
+          </p>
+        )}
         <Button type="submit" full loading={busy}>
           Save as draft
         </Button>
