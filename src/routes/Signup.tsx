@@ -14,7 +14,7 @@ export default function Signup() {
   const [busy, setBusy] = useState(false)
 
   function redirectTo() {
-    return `${window.location.origin}/`
+    return `${window.location.origin}/auth/callback`
   }
 
   async function submit() {
@@ -71,8 +71,8 @@ export default function Signup() {
         <div className="mb-5 border border-rule-strong bg-brass-wash rounded-md p-4">
           <p className="text-[14px] text-ink font-semibold">Check your email</p>
           <p className="mt-1.5 text-[13px] text-ink-soft leading-relaxed">
-            We sent a confirmation link to {email}. Open it, then sign in. Check spam if it
-            is not in the inbox within a minute.
+            We sent a confirmation link to {email}. Open it on this device — it signs you
+            in. Check spam if it is not in the inbox within a minute.
           </p>
           <button
             type="button"

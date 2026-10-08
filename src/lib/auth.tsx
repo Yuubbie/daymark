@@ -112,7 +112,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false)
       return
     }
-    const { profile: p, problem: prob } = await fetchProfile(s.user.id)
+    let { profile: p, problem: prob } = await fetchProfile(s.user.id)
+    if (p && !p.school_id) {
+      const { data: claimed } = await supabase.rpc('claim_pending_invite')
+      if (claimed) {
+        const again = await fetchProfile(s.user.id)
+        p = again.profile
+        prob = again.problem
+      }
+    }
     if (p && p.is_active === false) {
       await supabase.auth.signOut()
       setSession(null)

@@ -220,14 +220,34 @@ export async function inviteStaff(
   fullName: string,
   role: 'teacher' | 'admin' = 'teacher',
 ) {
+  const trimmed = email.trim().toLowerCase()
   const { data: u } = await supabase.auth.getUser()
-  return supabase.from('invites').insert({
+  const inserted = await supabase.from('invites').insert({
     school_id: schoolId,
-    email: email.trim().toLowerCase(),
+    email: trimmed,
     full_name: fullName.trim() || null,
     role,
     created_by: u.user?.id ?? null,
   })
+  if (inserted.error && !/duplicate key/i.test(inserted.error.message)) return inserted
+
+  const { data, error: sendErr } = await supabase.functions.invoke('send-invite', {
+    body: {
+      email: trimmed,
+      full_name: fullName.trim(),
+      redirect_to: `${window.location.origin}/auth/callback`,
+    },
+  })
+  if (sendErr) {
+    return {
+      ...inserted,
+      error: { message: sendErr.message || 'Could not send the invite email', details: '', hint: '', code: '' },
+    }
+  }
+  if (data && typeof data === 'object' && 'error' in data && data.error) {
+    return { ...inserted, error: { message: String(data.error), details: '', hint: '', code: '' } }
+  }
+  return { ...inserted, error: null }
 }
 
 export async function inviteTeacher(
@@ -238,12 +258,24 @@ export async function inviteTeacher(
   return inviteStaff(schoolId, email, fullName, 'teacher')
 }
 
-export async function inviteStudentLogin(studentId: string, email: string) {
+export async function inviteStudentLogin(
+  studentId: string,
+  email: string,
+  fullName?: string,
+) {
+  const trimmed = email.trim().toLowerCase()
   const { error } = await supabase.rpc('invite_student_login', {
     p_student_id: studentId,
-    p_email: email.trim().toLowerCase(),
+    p_email: trimmed,
   })
   if (error) throw error
+
+  const redirectTo = `${window.location.origin}/auth/callback`
+  const { data, error: sendErr } = await supabase.functions.invoke('send-invite', {
+    body: { email: trimmed, full_name: fullName ?? '', redirect_to: redirectTo },
+  })
+  if (sendErr) throw new Error(sendErr.message || 'Could not send the invite email')
+  if (data && data.error) throw new Error(data.error as string)
 }
 
 export async function assignTeacher(

@@ -462,7 +462,7 @@ function InviteStudentLoginModal({
     setError(null)
     setBusy(true)
     try {
-      await inviteStudentLogin(student.id, email)
+      await inviteStudentLogin(student.id, email, student.name)
       onSaved()
     } catch (e) {
       setError((e as Error).message)
@@ -482,7 +482,7 @@ function InviteStudentLoginModal({
       >
         {error && <Alert>{error}</Alert>}
         <p className="text-[13px] text-ink-soft">
-          They sign up at Daymaark with this exact email and land on their own desk. This is not the parent claim code.
+          We email them a confirmation link for this exact address. They open it, set a password if asked, and land on their desk. This is not the parent claim code.
         </p>
         <Field
           label="Student email"
@@ -492,7 +492,7 @@ function InviteStudentLoginModal({
           onChange={(e) => setEmail(e.target.value)}
         />
         <Button type="submit" full loading={busy}>
-          Invite to sign up
+          Send login email
         </Button>
       </form>
     </Modal>

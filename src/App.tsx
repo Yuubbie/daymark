@@ -39,6 +39,7 @@ import Timetable from './routes/admin/Timetable'
 import TeacherTimetable from './routes/teacher/Timetable'
 import TeacherNotices from './routes/teacher/Notices'
 import Account from './routes/Account'
+import AuthCallback from './routes/AuthCallback'
 import { WhatsAppCare } from './components/BrandCredit'
 
 /** Shown when we have a session but cannot resolve a profile. Never spin forever. */
@@ -130,6 +131,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/demo" element={<DemoApp />} />
           <Route path="/sit/:token" element={<SitExam />} />
           <Route
