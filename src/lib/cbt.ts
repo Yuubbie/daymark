@@ -103,9 +103,16 @@ export async function createBank(schoolId: string, title: string, subject: strin
 }
 
 export async function listQuestions(bankId: string): Promise<QuestionRow[]> {
+  const rpc = await supabase.rpc('list_bank_questions', { p_bank_id: bankId })
+  if (!rpc.error) {
+    const rows = rpc.data as QuestionRow[] | null
+    return Array.isArray(rows) ? rows : []
+  }
+  const missing = /could not find the function|schema cache/i.test(rpc.error.message)
+  if (!missing) throw rpc.error
   const { data, error } = await supabase
     .from('questions')
-    .select('id, bank_id, question_type, prompt, passage, options, answer_key, marks, tags')
+    .select('id, bank_id, question_type, prompt, passage, options, marks, tags')
     .eq('bank_id', bankId)
     .order('created_at', { ascending: false })
   if (error) throw error
@@ -182,6 +189,47 @@ export async function attachQuestions(examId: string, questionIds: string[]) {
   const rows = questionIds.map((id, i) => ({ exam_id: examId, question_id: id, position: i + 1 }))
   const { error } = await supabase.from('exam_questions').insert(rows)
   if (error) throw error
+}
+
+export async function createExamPaper(input: {
+  school_id: string
+  title: string
+  subject?: string
+  class_id?: string
+  kind: ExamKind
+  duration_minutes?: number
+  instructions?: string
+  opens_at?: string | null
+  closes_at?: string | null
+  question_ids: string[]
+}) {
+  const rpc = await supabase.rpc('create_exam_paper', {
+    p_title: input.title,
+    p_subject: input.subject?.trim() || null,
+    p_class_id: input.class_id || null,
+    p_kind: input.kind,
+    p_duration_minutes: input.duration_minutes || null,
+    p_instructions: input.instructions || null,
+    p_opens_at: input.opens_at || null,
+    p_closes_at: input.closes_at || null,
+    p_question_ids: input.question_ids,
+  })
+  if (!rpc.error) return rpc.data as string
+  const missing = /could not find the function|schema cache/i.test(rpc.error.message)
+  if (!missing) throw rpc.error
+  const id = await createExam({
+    school_id: input.school_id,
+    title: input.title,
+    subject: input.subject,
+    class_id: input.class_id,
+    kind: input.kind,
+    duration_minutes: input.duration_minutes,
+    instructions: input.instructions,
+    opens_at: input.opens_at,
+    closes_at: input.closes_at,
+  })
+  await attachQuestions(id, input.question_ids)
+  return id
 }
 
 export async function setExamStatus(examId: string, status: ExamStatus) {

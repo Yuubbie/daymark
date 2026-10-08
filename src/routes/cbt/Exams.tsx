@@ -4,8 +4,7 @@ import { Alert, Button, Empty, Field, Modal, Panel, Row, Spinner, TextArea } fro
 import { useAuth } from '../../lib/auth'
 import { listClasses, type ClassRow } from '../../lib/queries'
 import {
-  attachQuestions,
-  createExam,
+  createExamPaper,
   listBanks,
   listExams,
   listQuestions,
@@ -243,7 +242,13 @@ function SetPaperModal({
         setPicked(new Set(rows.map((q) => q.id)))
       })
       .catch((e) => {
-        if (!cancelled) setError((e as Error).message)
+        if (cancelled) return
+        const msg = (e as Error).message
+        setError(
+          /failed to fetch/i.test(msg)
+            ? 'Could not load questions. Paste APPLY_RUN9.sql in the Supabase SQL Editor, then try again.'
+            : msg,
+        )
       })
       .finally(() => {
         if (!cancelled) setLoadingQs(false)
@@ -266,7 +271,7 @@ function SetPaperModal({
     }
     setBusy(true)
     try {
-      const id = await createExam({
+      await createExamPaper({
         school_id: schoolId,
         title,
         subject,
@@ -276,8 +281,8 @@ function SetPaperModal({
         instructions,
         opens_at: opens ? new Date(opens).toISOString() : null,
         closes_at: closes ? new Date(closes).toISOString() : null,
+        question_ids: ids,
       })
-      await attachQuestions(id, ids)
       onSaved()
     } catch (e) {
       setError((e as Error).message)
