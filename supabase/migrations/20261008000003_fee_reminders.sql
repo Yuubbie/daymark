@@ -54,6 +54,8 @@ $$;
 
 grant execute on function list_fee_reminders() to authenticated;
 
+drop function if exists public.digest_payload_for_date(date);
+
 create or replace function digest_payload_for_date(p_date date default current_date)
 returns table (
   parent_id         uuid,
