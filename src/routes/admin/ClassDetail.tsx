@@ -214,6 +214,12 @@ export default function ClassDetail() {
                       >
                         {s.fee_cleared ? 'Fees ok' : 'Fees due'}
                       </button>
+                      <Link
+                        to={`/report/${s.id}`}
+                        className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint hover:text-ink"
+                      >
+                        Report
+                      </Link>
                       <button
                         onClick={() =>
                           setPhotoStudent({ id: s.id, name: `${s.first_name} ${s.last_name}` })

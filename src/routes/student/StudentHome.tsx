@@ -59,6 +59,16 @@ export default function StudentHome() {
         <Empty line="This login is not linked to a student yet. Ask the office to invite your email from the class page (Login)." />
       ) : (
         <div className="space-y-4">
+          {profile.student_id && (
+            <Panel title="This term">
+              <Link
+                to={`/report/${profile.student_id}`}
+                className="font-mono text-[11px] uppercase tracking-[0.1em] underline"
+              >
+                Open report card
+              </Link>
+            </Panel>
+          )}
           <PaperList title="Tests" empty="No tests are open for your class yet" rows={tests} />
           <PaperList title="Exams" empty="No exams are open for your class yet" rows={papers} />
         </div>

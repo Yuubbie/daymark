@@ -12,7 +12,7 @@ export function WhatsAppCare({ compact = false }: { compact?: boolean }) {
       className={
         compact
           ? 'inline-flex items-center gap-2 h-9 px-3 rounded-md bg-[#25D366] text-white text-[12px] font-semibold'
-          : 'fixed z-40 bottom-[4.5rem] lg:bottom-6 right-4 h-12 px-4 rounded-md bg-[#25D366] text-white text-[13px] font-semibold shadow-none flex items-center gap-2'
+          : 'fixed z-40 bottom-[4.5rem] lg:bottom-6 right-4 h-12 px-4 rounded-md bg-[#25D366] text-white text-[13px] font-semibold shadow-none flex items-center gap-2 print:hidden'
       }
     >
       <span aria-hidden className="tnum text-[14px]">

@@ -40,6 +40,7 @@ import TeacherTimetable from './routes/teacher/Timetable'
 import TeacherNotices from './routes/teacher/Notices'
 import Account from './routes/Account'
 import AuthCallback from './routes/AuthCallback'
+import TermReportPage from './routes/report/TermReportPage'
 import { WhatsAppCare } from './components/BrandCredit'
 
 /** Shown when we have a session but cannot resolve a profile. Never spin forever. */
@@ -309,6 +310,14 @@ export default function App() {
             element={
               <Protected roles={['parent']}>
                 <ParentAssessmentsRoute />
+              </Protected>
+            }
+          />
+          <Route
+            path="/report/:studentId"
+            element={
+              <Protected roles={['proprietor', 'admin', 'teacher', 'parent', 'student']}>
+                <TermReportPage />
               </Protected>
             }
           />

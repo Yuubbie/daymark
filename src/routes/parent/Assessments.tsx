@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { Empty, Panel, Row, Spinner } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
@@ -62,9 +63,9 @@ export default function ParentAssessmentsRoute() {
     <AppShell>
       <div className="mb-5">
         <span className="eyebrow">Results</span>
-        <h1 className="text-[26px] mt-1">Assessments</h1>
+        <h1 className="text-[26px] mt-1">Report card</h1>
         <p className="mt-2 text-[14px] text-ink-soft">
-          Only approved results for children whose fees are cleared appear here.
+          Term card with the register and approved papers. Fees must be cleared.
         </p>
       </div>
       {loading ? (
@@ -74,11 +75,31 @@ export default function ParentAssessmentsRoute() {
       ) : (
         <div className="space-y-4">
           {children.map((c) => (
-            <Panel key={c.id} title={`${c.first_name} ${c.last_name}`}>
+            <Panel
+              key={c.id}
+              title={`${c.first_name} ${c.last_name}`}
+              action={
+                c.fee_cleared ? (
+                  <Link
+                    to={`/report/${c.id}`}
+                    className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint hover:text-ink"
+                  >
+                    Open card
+                  </Link>
+                ) : undefined
+              }
+            >
               {!c.fee_cleared ? (
                 <Empty line="Fees are outstanding. Results stay locked until the school marks this child as cleared." />
               ) : (results[c.id] ?? []).length === 0 ? (
-                <Empty line="No approved results yet." />
+                <Empty
+                  line="No approved papers yet. Open the term card for attendance."
+                  action={
+                    <Link to={`/report/${c.id}`} className="font-mono text-[11px] uppercase tracking-[0.1em] underline">
+                      Open report
+                    </Link>
+                  }
+                />
               ) : (
                 <div className="divide-y divide-rule -my-3">
                   {(results[c.id] ?? []).map((r) => (

@@ -68,7 +68,7 @@ const NAV: Record<string, Item[]> = {
   parent: [
     { to: '/parent', label: 'Today', Icon: IconToday },
     { to: '/parent/homework', label: 'Homework', Icon: IconHomework },
-    { to: '/parent/assessments', label: 'Assessments', Icon: IconHomework },
+    { to: '/parent/assessments', label: 'Results', Icon: IconHomework },
     { to: '/parent/notices', label: 'Notices', Icon: IconNotice, mobile: false },
     { to: '/parent/fees', label: 'Fees', Icon: IconClass },
     { to: '/parent/settings', label: 'Settings', Icon: IconSettings, mobile: false },
@@ -92,6 +92,12 @@ function parentOf(path: string, role: string | undefined): string {
   if (path.startsWith('/cbt/')) return role === 'teacher' ? '/teacher' : '/admin'
   if (path.startsWith('/parent/')) return '/parent'
   if (path.startsWith('/student/')) return '/student'
+  if (path.startsWith('/report/')) {
+    if (role === 'parent') return '/parent/assessments'
+    if (role === 'student') return '/student'
+    if (role === 'teacher') return '/teacher'
+    return '/admin/classes'
+  }
   return ROLE_HOME[(role as keyof typeof ROLE_HOME) ?? 'parent'] ?? '/'
 }
 
@@ -208,7 +214,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           {showBack && (
             <button
               onClick={() => navigate(backTo)}
-              className="mb-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint hover:text-ink transition-colors"
+              className="mb-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint hover:text-ink transition-colors print:hidden"
             >
               <IconBack className="h-3.5 w-3.5" />
               Back

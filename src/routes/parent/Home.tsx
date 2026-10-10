@@ -222,7 +222,7 @@ export default function ParentHome() {
                 className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
               >
                 <div className="eyebrow">Results</div>
-                <div className="text-[14px] font-semibold mt-1">Assessments</div>
+                <div className="text-[14px] font-semibold mt-1">Report card</div>
               </Link>
             </div>
           </Panel>
