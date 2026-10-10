@@ -126,7 +126,7 @@ export default function ParentSettings() {
 
         <Panel title="Daily digest">
           <p className="text-[13px] text-ink-soft mb-3">
-            One summary a day for each child: attendance, what was taught, and any homework.
+            One summary a day for each child: attendance, what was taught, homework, and if fees are outstanding.
           </p>
           <div className="space-y-2">
             {(

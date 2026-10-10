@@ -3,6 +3,13 @@ import { AppShell } from '../../components/AppShell'
 import { Alert, Button, Empty, Field, Panel, Row, Spinner } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
+import {
+  feeReminderText,
+  listFeeReminders,
+  smsHref,
+  whatsappHref,
+  type FeeReminder,
+} from '../../lib/queries'
 
 type ClassRow = { id: string; name: string; level: string | null }
 
@@ -79,6 +86,7 @@ export default function AdminFees() {
   const [overrides, setOverrides] = useState<OverrideRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [reminders, setReminders] = useState<FeeReminder[]>([])
 
   // --- bank account / subaccount state ---
   const [subaccountCode, setSubaccountCode] = useState<string | null>(null)
@@ -216,6 +224,12 @@ export default function AdminFees() {
       return
     }
     setSubaccountCode(schoolRow?.paystack_subaccount_code ?? null)
+
+    try {
+      setReminders(await listFeeReminders())
+    } catch {
+      setReminders([])
+    }
 
     setLoading(false)
   }
@@ -473,6 +487,8 @@ export default function AdminFees() {
       )}
 
       <div className="space-y-4">
+        <FeeReminderPanel schoolName={school?.name ?? 'the school'} rows={reminders} />
+
         <Panel title="Bank account for fee payments">
           {subaccountCode ? (
             <div className="text-[13px] text-ink-soft leading-relaxed">
@@ -764,5 +780,59 @@ export default function AdminFees() {
         </Panel>
       </div>
     </AppShell>
+  )
+}
+
+function FeeReminderPanel({ schoolName, rows }: { schoolName: string; rows: FeeReminder[] }) {
+  return (
+    <Panel title="Remind parents">
+      {rows.length === 0 ? (
+        <Empty line="Every linked parent with an outstanding child will appear here. Mark Fees due on the class list first." />
+      ) : (
+        <div className="divide-y divide-rule -my-3">
+          {rows.map((r) => {
+            const msg = feeReminderText(schoolName, r.children)
+            const wa = whatsappHref(r.phone, msg)
+            const sms = smsHref(r.phone, msg)
+            const names = r.children
+              .map((c) => `${c.first_name} ${c.last_name}${c.class_name ? ` (${c.class_name})` : ''}`)
+              .join(', ')
+            return (
+              <Row
+                key={r.parent_id}
+                left={
+                  <>
+                    <div className="text-[15px] font-semibold">{r.parent_name}</div>
+                    <div className="text-[12px] text-ink-faint mt-0.5">{names}</div>
+                    {!r.phone && (
+                      <div className="text-[12px] text-absent mt-0.5">No phone on the parent account.</div>
+                    )}
+                  </>
+                }
+                right={
+                  <div className="flex gap-2">
+                    {wa ? (
+                      <a
+                        href={wa}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-mono text-[11px] uppercase tracking-[0.1em] underline"
+                      >
+                        WhatsApp
+                      </a>
+                    ) : null}
+                    {sms ? (
+                      <a href={sms} className="font-mono text-[11px] uppercase tracking-[0.1em] underline">
+                        SMS
+                      </a>
+                    ) : null}
+                  </div>
+                }
+              />
+            )
+          })}
+        </div>
+      )}
+    </Panel>
   )
 }

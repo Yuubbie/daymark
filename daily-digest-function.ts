@@ -23,6 +23,7 @@ interface DigestRow {
   student_name: string
   attendance_status: 'present' | 'absent' | 'late' | 'excused' | null
   lessons: { subject: string; topic: string; homework: string | null }[]
+  fee_cleared: boolean | null
 }
 
 const supabase = createClient(
@@ -60,6 +61,7 @@ function summarise(rows: DigestRow[]): string {
       if (att) parts.push(att)
       const homework = r.lessons.find((l) => l.homework)
       if (homework) parts.push(`homework: ${homework.subject}`)
+      if (r.fee_cleared === false) parts.push('fees outstanding')
       return parts.join(', ')
     })
     .join('. ')

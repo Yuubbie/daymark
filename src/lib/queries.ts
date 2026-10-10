@@ -533,6 +533,45 @@ export async function setFeeCleared(studentId: string, cleared: boolean) {
   if (error) throw error
 }
 
+export type FeeReminderChild = {
+  id: string
+  first_name: string
+  last_name: string
+  class_name: string | null
+}
+
+export type FeeReminder = {
+  parent_id: string
+  parent_name: string
+  phone: string | null
+  email: string | null
+  children: FeeReminderChild[]
+}
+
+export async function listFeeReminders(): Promise<FeeReminder[]> {
+  const { data, error } = await supabase.rpc('list_fee_reminders')
+  if (error) throw error
+  return Array.isArray(data) ? (data as FeeReminder[]) : []
+}
+
+export function feeReminderText(schoolName: string, children: FeeReminderChild[]) {
+  const names = children.map((c) => `${c.first_name} ${c.last_name}`).join(', ')
+  const who = children.length === 1 ? names : `your children (${names})`
+  return `Hello from ${schoolName}. Fees for ${who} are still outstanding. Results stay locked until they are cleared. Open Daymaark to see the statement.`
+}
+
+export function whatsappHref(phone: string | null, message: string) {
+  const intl = toIntlDigits(phone)
+  if (!intl) return null
+  return `https://wa.me/${intl}?text=${encodeURIComponent(message)}`
+}
+
+export function smsHref(phone: string | null, message: string) {
+  const intl = toIntlDigits(phone)
+  if (!intl) return null
+  return `sms:+${intl}?body=${encodeURIComponent(message)}`
+}
+
 export function toIntlDigits(raw: string | null): string | null {
   if (!raw) return null
   const d = raw.replace(/\D/g, '')
