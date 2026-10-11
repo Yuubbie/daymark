@@ -62,6 +62,19 @@ export function TermReportCard({ report }: { report: TermReport }) {
           <Mini n={att.absent} label="Absent" />
           <Mini n={att.excused} label="Excused" />
         </div>
+        {att.marks.some((m) => m.note) && (
+          <ul className="mt-4 pt-4 border-t border-rule space-y-1.5">
+            {att.marks
+              .filter((m) => m.note)
+              .map((m) => (
+                <li key={m.date} className="text-[13px] text-ink-soft">
+                  <span className="tnum text-[11px] text-ink-faint">{m.date}</span>
+                  {' · '}
+                  {m.note}
+                </li>
+              ))}
+          </ul>
+        )}
         <div className="mt-4">
           <RegisterLegend />
         </div>
@@ -106,7 +119,8 @@ export function TermReportCard({ report }: { report: TermReport }) {
 
       <p className="text-[12px] text-ink-faint print:block">
         Only approved CBT papers and the marked register for this term appear on this card.
-        Outstanding fees lock the parent view until the school clears them.
+        Register notes sit under attendance. Outstanding fees lock the parent view until the school
+        clears them.
       </p>
     </article>
   )

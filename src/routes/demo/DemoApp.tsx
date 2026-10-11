@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Wordmark } from '../../components/Logo'
 import { AttendanceSummary, RegisterLegend } from '../../components/RegisterStrip'
-import { Button, Empty, Field, Panel, StatusPill } from '../../components/ui'
+import { Button, Empty, Field, Modal, Panel, StatusPill, TextArea } from '../../components/ui'
 import {
   IconClass,
   IconFlag,
@@ -1192,6 +1192,8 @@ function NoticesPanel({ admin }: { admin?: boolean }) {
 function TeacherRegister() {
   const [rows, setRows] = useState<DemoStudent[]>(demoStudents)
   const [state, setState] = useState<'idle' | 'saved'>('idle')
+  const [noteFor, setNoteFor] = useState<DemoStudent | null>(null)
+  const [noteDraft, setNoteDraft] = useState('')
   const marked = rows.filter((s) => s.status).length
 
   function mark(id: string, status: AttendanceStatus) {
@@ -1200,6 +1202,18 @@ function TeacherRegister() {
   }
   function allPresent() {
     setRows((rs) => rs.map((r) => (r.status ? r : { ...r, status: 'present' })))
+    setState('saved')
+  }
+  function openNote(s: DemoStudent) {
+    if (!s.status) return
+    setNoteDraft(s.note ?? '')
+    setNoteFor(s)
+  }
+  function saveNote() {
+    if (!noteFor) return
+    const note = noteDraft.trim() || null
+    setRows((rs) => rs.map((r) => (r.id === noteFor.id ? { ...r, note } : r)))
+    setNoteFor(null)
     setState('saved')
   }
 
@@ -1231,28 +1245,65 @@ function TeacherRegister() {
         )}
         <div className="divide-y divide-rule -my-2">
           {rows.map((s) => (
-            <div key={s.id} className="flex items-center gap-3 py-2.5">
-              <span className="text-[15px] min-w-0 truncate">
-                {s.last_name}, {s.first_name}
-              </span>
-              <div className="ml-auto flex gap-1.5 shrink-0">
-                {OPTIONS.map((o) => {
-                  const on = s.status === o.key
-                  return (
-                    <button
-                      key={o.key}
-                      onClick={() => mark(s.id, o.key)}
-                      className={`h-10 w-10 rounded-md border font-mono text-[13px] font-semibold ${on ? o.cls : 'bg-surface border-rule-strong text-ink-faint'}`}
-                    >
-                      {o.label}
-                    </button>
-                  )
-                })}
+            <div key={s.id} className="py-2.5">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => openNote(s)}
+                  disabled={!s.status}
+                  className="text-left text-[15px] min-w-0 truncate disabled:cursor-default"
+                >
+                  {s.last_name}, {s.first_name}
+                </button>
+                <div className="ml-auto flex gap-1.5 shrink-0">
+                  {OPTIONS.map((o) => {
+                    const on = s.status === o.key
+                    return (
+                      <button
+                        key={o.key}
+                        onClick={() => mark(s.id, o.key)}
+                        className={`h-10 w-10 rounded-md border font-mono text-[13px] font-semibold ${on ? o.cls : 'bg-surface border-rule-strong text-ink-faint'}`}
+                      >
+                        {o.label}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
+              {s.note && (
+                <p className="mt-1 pr-[180px] text-[12px] text-ink-soft leading-snug">
+                  {s.note}
+                </p>
+              )}
             </div>
           ))}
         </div>
       </Panel>
+      <Modal
+        open={noteFor !== null}
+        onClose={() => setNoteFor(null)}
+        title={noteFor ? `${noteFor.last_name}, ${noteFor.first_name}` : 'Note'}
+      >
+        <p className="text-[13px] text-ink-soft leading-relaxed mb-3">
+          One line the parent will see. Mark first, then tap the name.
+        </p>
+        <TextArea
+          label="Note"
+          value={noteDraft}
+          onChange={(e) => setNoteDraft(e.target.value.slice(0, 140))}
+          maxLength={140}
+          rows={3}
+          hint={`${noteDraft.length} / 140`}
+        />
+        <div className="mt-4 flex gap-2">
+          <Button full onClick={saveNote}>
+            Save note
+          </Button>
+          <Button variant="secondary" onClick={() => setNoteFor(null)}>
+            Cancel
+          </Button>
+        </div>
+      </Modal>
     </div>
   )
 }
@@ -1416,6 +1467,16 @@ function ParentToday() {
       <Head eyebrow={today} title="Adaeze Okonkwo" sub="JSS 1A" />
       <Panel title={DEMO_TERM_CONST}>
         <AttendanceSummary pct={pct} marks={demoMarks} caption="48 school days" />
+        <p className="mt-3 text-[14px] text-ink leading-relaxed">
+          Today · Came after assembly
+        </p>
+        <ul className="mt-3 space-y-1.5">
+          <li className="text-[13px] text-ink-soft">
+            <span className="tnum text-[11px] text-ink-faint">Yesterday</span>
+            {' · '}
+            Fever, mother called
+          </li>
+        </ul>
         <div className="mt-4 pt-4 border-t border-rule">
           <RegisterLegend />
         </div>

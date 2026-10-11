@@ -21,6 +21,7 @@ export type DemoStudent = {
   last_name: string
   admission: string
   status: AttendanceStatus | null
+  note?: string | null
 }
 
 export type DemoLesson = {
@@ -67,11 +68,11 @@ export function attendancePct(marks: AttendanceMark[]) {
 export const demoStudents: DemoStudent[] = [
   { id: 's1', first_name: 'Adaeze', last_name: 'Okonkwo', admission: 'GFA-2401', status: 'present' },
   { id: 's2', first_name: 'Chinedu', last_name: 'Eze', admission: 'GFA-2402', status: 'present' },
-  { id: 's3', first_name: 'Bola', last_name: 'Adeyemi', admission: 'GFA-2403', status: 'late' },
+  { id: 's3', first_name: 'Bola', last_name: 'Adeyemi', admission: 'GFA-2403', status: 'late', note: 'Came after assembly' },
   { id: 's4', first_name: 'Fatima', last_name: 'Bello', admission: 'GFA-2404', status: 'present' },
   { id: 's5', first_name: 'Ibrahim', last_name: 'Sule', admission: 'GFA-2405', status: null },
   { id: 's6', first_name: 'Amaka', last_name: 'Nwosu', admission: 'GFA-2406', status: 'present' },
-  { id: 's7', first_name: 'Tunde', last_name: 'Balogun', admission: 'GFA-2407', status: 'absent' },
+  { id: 's7', first_name: 'Tunde', last_name: 'Balogun', admission: 'GFA-2407', status: 'absent', note: 'Fever, mother called' },
   { id: 's8', first_name: 'Zainab', last_name: 'Yusuf', admission: 'GFA-2408', status: 'present' },
 ]
 

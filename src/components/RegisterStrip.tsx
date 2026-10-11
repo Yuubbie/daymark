@@ -50,7 +50,7 @@ export function RegisterStrip({
           {week.map((m) => (
             <span
               key={m.date}
-              title={`${m.date}: ${m.status ?? 'not marked'}`}
+              title={`${m.date}: ${m.status ?? 'not marked'}${m.note ? ` — ${m.note}` : ''}`}
               className={`${h} ${w} rounded-[1.5px] ${FILL[m.status ?? 'unmarked']}`}
             />
           ))}

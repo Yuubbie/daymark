@@ -49,7 +49,7 @@ export async function childRegister(
 ): Promise<AttendanceMark[]> {
   let q = supabase
     .from('attendance')
-    .select('date, status')
+    .select('date, status, note')
     .eq('student_id', studentId)
     .order('date')
 
@@ -61,6 +61,7 @@ export async function childRegister(
   return (data ?? []).map((r) => ({
     date: r.date as string,
     status: r.status as AttendanceStatus,
+    note: (r.note as string | null) || null,
   }))
 }
 

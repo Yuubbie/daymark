@@ -49,6 +49,7 @@ export interface Student {
 export interface AttendanceMark {
   date: string
   status: AttendanceStatus | null
+  note?: string | null
 }
 
 export interface QuestionOption {

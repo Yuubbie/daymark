@@ -8,11 +8,14 @@ import {
 } from './offline'
 import type { AttendanceStatus, Role } from './types'
 
+export const NOTE_MAX = 140
+
 export type RegisterStudent = {
   id: string
   first_name: string
   last_name: string
   status: AttendanceStatus | null
+  note: string | null
 }
 
 export type TeachableClass = {
@@ -143,18 +146,28 @@ async function fetchRegister(classId: string, date: string): Promise<RegisterStu
       .eq('class_id', classId)
       .eq('is_active', true)
       .order('last_name'),
-    supabase.from('attendance').select('student_id, status').eq('class_id', classId).eq('date', date),
+    supabase
+      .from('attendance')
+      .select('student_id, status, note')
+      .eq('class_id', classId)
+      .eq('date', date),
   ])
   if (sErr) throw sErr
 
-  const byId: Record<string, AttendanceStatus> = {}
-  for (const m of marks ?? []) byId[m.student_id as string] = m.status as AttendanceStatus
+  const byId: Record<string, { status: AttendanceStatus; note: string | null }> = {}
+  for (const m of marks ?? []) {
+    byId[m.student_id as string] = {
+      status: m.status as AttendanceStatus,
+      note: (m.note as string | null) || null,
+    }
+  }
 
   return (students ?? []).map((s) => ({
     id: s.id as string,
     first_name: s.first_name as string,
     last_name: s.last_name as string,
-    status: byId[s.id as string] ?? null,
+    status: byId[s.id as string]?.status ?? null,
+    note: byId[s.id as string]?.note ?? null,
   }))
 }
 
@@ -177,16 +190,20 @@ export async function saveMarks(
   classId: string,
   date: string,
   markedBy: string,
-  marks: { student_id: string; status: AttendanceStatus }[],
+  marks: { student_id: string; status: AttendanceStatus; note?: string | null }[],
 ): Promise<'saved' | 'queued'> {
-  const rows = marks.map((m) => ({
-    school_id: schoolId,
-    class_id: classId,
-    student_id: m.student_id,
-    date,
-    status: m.status,
-    marked_by: markedBy,
-  }))
+  const rows = marks.map((m) => {
+    const note = (m.note ?? '').trim().slice(0, NOTE_MAX)
+    return {
+      school_id: schoolId,
+      class_id: classId,
+      student_id: m.student_id,
+      date,
+      status: m.status,
+      note: note || null,
+      marked_by: markedBy,
+    }
+  })
 
   if (!navigator.onLine) {
     enqueue({ table: 'attendance', rows, onConflict: 'student_id,date' })

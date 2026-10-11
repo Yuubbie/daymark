@@ -14,7 +14,7 @@ WHO DOES WHAT
 ------------------------------------------------
 Proprietor  owns the school. Appoints the admin. Does not run the day.
 Admin       runs the day: term, classes, roster, fees, claim codes.
-Teacher     marks the register, posts lessons, publishes tests and exams.
+Teacher     marks the register, one-line notes, posts lessons, publishes papers.
 Parent      sees their child. Joins with a claim code after the roster exists.
 Student     sits tests and exams on their own login. Not the parent code.
 

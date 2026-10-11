@@ -99,6 +99,11 @@ export default function ParentHome() {
 
   const child = kids.find((k) => k.id === active)
   const pct = attendancePct(marks)
+  const todayMark = marks.find((m) => m.date === todayISO())
+  const recentNotes = marks
+    .filter((m) => m.note && m.date !== todayISO())
+    .slice(-4)
+    .reverse()
   const todayLabel = new Date().toLocaleDateString('en-NG', {
     weekday: 'long',
     day: 'numeric',
@@ -162,6 +167,22 @@ export default function ParentHome() {
                   marks={marks}
                   caption={`${marks.length} school ${marks.length === 1 ? 'day' : 'days'}`}
                 />
+                {todayMark?.note && (
+                  <p className="mt-3 text-[14px] text-ink leading-relaxed">
+                    Today · {todayMark.note}
+                  </p>
+                )}
+                {recentNotes.length > 0 && (
+                  <ul className="mt-3 space-y-1.5">
+                    {recentNotes.map((m) => (
+                      <li key={m.date} className="text-[13px] text-ink-soft">
+                        <span className="tnum text-[11px] text-ink-faint">{m.date}</span>
+                        {' · '}
+                        {m.note}
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 <div className="mt-4 pt-4 border-t border-rule">
                   <RegisterLegend />
                 </div>

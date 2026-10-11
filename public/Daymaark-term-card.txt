@@ -1,0 +1,119 @@
+DAYMAARK — WHAT JUST LANDED
+===========================
+App: https://daymark-eosin-five.vercel.app
+Hard-refresh once (Ctrl+Shift+R) so you are not on an old tab.
+
+The school already marks the register and sits CBT.
+Until now those two never became one thing a parent could hold.
+That is the gap. The term card closes it.
+
+------------------------------------------------
+THE REVELATION
+------------------------------------------------
+A report card is not a new form teachers fill in December.
+It is the register line plus the papers the school already approved,
+on one sheet, with the child's name at the top.
+
+If fees are due, the parent cannot open it.
+That is the fee gate doing its job. Not a bug.
+
+WhatsApp reminders are not a bulk-SMS product.
+They are the office tapping one name on Fees and sending
+the note that was already true: fees outstanding, results locked.
+
+A behaviour book is not a new module.
+It is one line on the register, under the name,
+after the teacher has already tapped P, L, A or E.
+
+------------------------------------------------
+WHERE TO SEE THE TERM CARD
+------------------------------------------------
+Parent
+  1. Sign in as the parent.
+  2. Today → Report card (quick action),
+     or Results in the nav.
+  3. Open card next to the child.
+  4. Print if you want a paper copy.
+
+  If it says fees outstanding, the class list still has
+  that child as Fees due. Clear fees, then open again.
+
+Staff (admin / proprietor / teacher)
+  Classes → open the class → Report beside the student.
+
+Student
+  Desk → Open report card.
+
+What you should see
+  School, name, class, admission number, photo if uploaded.
+  Attendance strip for the current term, with present / late / absent / excused.
+  Any one-line notes the teacher tapped on the register sit under the strip.
+  Subjects rolled up from approved CBT papers only.
+  Drafts and unmarked papers do not appear.
+  Print hides the chrome. Use the browser print dialog.
+
+If the card is empty of marks
+  No papers have been approved yet, or no register days this term.
+  Publish a paper, mark it, approve the result, then reopen.
+
+------------------------------------------------
+WHERE TO SEE REGISTER NOTES
+------------------------------------------------
+Teacher
+  Register → mark P / L / A / E → tap the name → one line.
+  The parent sees it. 140 characters. Not a behaviour ledger.
+
+Parent
+  Today, under the attendance strip.
+  Term card, under Attendance.
+
+------------------------------------------------
+WHERE TO SEE FEE REMINDERS
+------------------------------------------------
+Paste APPLY_RUN11.sql first (the drop-first version).
+
+Admin → Fees → Remind parents.
+
+Each row is a linked parent whose child is Fees due.
+WhatsApp and SMS open with a prefilled note.
+No phone on the parent account = no buttons. Ask them
+to save a number under Settings.
+
+The daily digest (if already scheduled) now also says
+"fees outstanding" for that child.
+
+------------------------------------------------
+HOW TO APPLY IT IN A LIVE SCHOOL
+------------------------------------------------
+1. Set the current term. The card hangs off it.
+2. Mark the register. Those ticks become the strip.
+   Tap a name after the mark for one line the parent will see.
+3. Teachers set papers, students sit them, office approves.
+4. On the class list, Fees ok / Fees due is the lock.
+5. Parent opens the card. Print if the school wants a copy.
+6. If fees are due, Fees → Remind parents → WhatsApp.
+
+Do not invent CA1/CA2 boxes. The card only shows what
+already happened: days marked, papers approved.
+
+------------------------------------------------
+WHAT THIS IS NOT
+------------------------------------------------
+Not hostel, transport, library, payroll, or alumni.
+Not a second marking book.
+Not an auto-blast to every parent in the country.
+One school, one term, one child, one sheet.
+
+------------------------------------------------
+IF SOMETHING STICKS
+------------------------------------------------
+SQL 11 42P13          Paste the new APPLY_RUN11.sql (it drops first).
+Old looking app       Hard-refresh. Production is on main.
+Parent cannot open    Fees due on the class list.
+No subjects           Approve at least one CBT result.
+No WhatsApp button    Parent has no phone on Settings.
+Empty attendance      Mark the register for this term.
+Cannot add a note     Mark P/L/A/E first, then tap the name.
+Notes not on the card Paste APPLY_RUN12.sql, then hard-refresh.
+
+WhatsApp care: 0703 235 2158

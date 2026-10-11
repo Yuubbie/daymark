@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AppShell } from '../../components/AppShell'
-import { Button, Empty, Modal, Panel, Spinner } from '../../components/ui'
+import { Button, Empty, Modal, Panel, Spinner, TextArea } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
 import {
   defaultClass,
@@ -9,6 +9,7 @@ import {
   rememberClass,
   loadRegister,
   saveMarks,
+  NOTE_MAX,
   type RegisterStudent,
   type TeachableClass,
 } from '../../lib/attendance'
@@ -47,8 +48,10 @@ export default function Register() {
   const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'queued'>('idle')
   const [pending, setPending] = useState(queueSize())
   const [nudge, setNudge] = useState(false)
-  const dirty = useRef<Map<string, AttendanceStatus>>(new Map())
+  const dirty = useRef<Map<string, { status: AttendanceStatus; note: string | null }>>(new Map())
   const timer = useRef<number | null>(null)
+  const [noteFor, setNoteFor] = useState<RegisterStudent | null>(null)
+  const [noteDraft, setNoteDraft] = useState('')
 
   // Classes this person can mark
   useEffect(() => {
@@ -108,7 +111,11 @@ export default function Register() {
     if (timer.current) window.clearTimeout(timer.current)
     timer.current = window.setTimeout(async () => {
       if (dirty.current.size === 0) return
-      const batch = Array.from(dirty.current, ([student_id, status]) => ({ student_id, status }))
+      const batch = Array.from(dirty.current, ([student_id, v]) => ({
+        student_id,
+        status: v.status,
+        note: v.note,
+      }))
       dirty.current.clear()
       setState('saving')
       const result = await saveMarks(
@@ -125,20 +132,36 @@ export default function Register() {
   }, [classId, date, profile, session])
 
   function mark(studentId: string, status: AttendanceStatus) {
-    setStudents((rows) =>
-      rows.map((r) => (r.id === studentId ? { ...r, status } : r)),
-    )
-    dirty.current.set(studentId, status)
+    const current = students.find((r) => r.id === studentId)
+    setStudents((rows) => rows.map((r) => (r.id === studentId ? { ...r, status } : r)))
+    dirty.current.set(studentId, { status, note: current?.note ?? null })
     scheduleSave()
   }
 
   function markAllPresent() {
-    setStudents((rows) =>
-      rows.map((r) => {
-        if (r.status === null) dirty.current.set(r.id, 'present')
-        return r.status === null ? { ...r, status: 'present' as AttendanceStatus } : r
-      }),
-    )
+    const next = students.map((r) => {
+      if (r.status !== null) return r
+      dirty.current.set(r.id, { status: 'present', note: r.note })
+      return { ...r, status: 'present' as AttendanceStatus }
+    })
+    setStudents(next)
+    scheduleSave()
+  }
+
+  function openNote(s: RegisterStudent) {
+    if (s.status === null) return
+    setNoteDraft(s.note ?? '')
+    setNoteFor(s)
+  }
+
+  function saveNote() {
+    if (!noteFor) return
+    const current = students.find((r) => r.id === noteFor.id)
+    if (!current || current.status === null) return
+    const note = noteDraft.trim().slice(0, NOTE_MAX) || null
+    setStudents((rows) => rows.map((r) => (r.id === noteFor.id ? { ...r, note } : r)))
+    dirty.current.set(noteFor.id, { status: current.status, note })
+    setNoteFor(null)
     scheduleSave()
   }
 
@@ -247,33 +270,53 @@ export default function Register() {
 
                 <div className="divide-y divide-rule -my-2">
                   {students.map((s) => (
-                    <div key={s.id} className="flex items-center gap-3 py-2.5">
-                      <span className="text-[15px] min-w-0 truncate">
-                        {s.last_name}, {s.first_name}
-                      </span>
-                      <div className="ml-auto flex gap-1.5 shrink-0">
-                        {OPTIONS.map((o) => {
-                          const on = s.status === o.key
-                          return (
-                            <button
-                              key={o.key}
-                              onClick={() => mark(s.id, o.key)}
-                              aria-label={`${s.first_name} ${o.key}`}
-                              aria-pressed={on}
-                              className={`h-10 w-10 rounded-md border font-mono text-[13px] font-semibold
-                                transition-colors
-                                ${on
-                                  ? o.cls
-                                  : 'bg-surface border-rule-strong text-ink-faint hover:border-ink-faint'}`}
-                            >
-                              {o.label}
-                            </button>
-                          )
-                        })}
+                    <div key={s.id} className="py-2.5">
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => openNote(s)}
+                          disabled={s.status === null}
+                          className="text-left text-[15px] min-w-0 truncate disabled:cursor-default"
+                          aria-label={
+                            s.status === null
+                              ? `${s.first_name} ${s.last_name}`
+                              : `Note for ${s.first_name}`
+                          }
+                        >
+                          {s.last_name}, {s.first_name}
+                        </button>
+                        <div className="ml-auto flex gap-1.5 shrink-0">
+                          {OPTIONS.map((o) => {
+                            const on = s.status === o.key
+                            return (
+                              <button
+                                key={o.key}
+                                onClick={() => mark(s.id, o.key)}
+                                aria-label={`${s.first_name} ${o.key}`}
+                                aria-pressed={on}
+                                className={`h-10 w-10 rounded-md border font-mono text-[13px] font-semibold
+                                  transition-colors
+                                  ${on
+                                    ? o.cls
+                                    : 'bg-surface border-rule-strong text-ink-faint hover:border-ink-faint'}`}
+                              >
+                                {o.label}
+                              </button>
+                            )
+                          })}
+                        </div>
                       </div>
+                      {s.note && (
+                        <p className="mt-1 pr-[180px] text-[12px] text-ink-soft leading-snug">
+                          {s.note}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>
+                <p className="mt-3 pt-3 border-t border-rule text-[12px] text-ink-faint">
+                  Mark first. Tap a name for one line the parent will see.
+                </p>
               </>
             )}
           </Panel>
@@ -294,6 +337,32 @@ export default function Register() {
         <div className="mt-5">
           <Button full onClick={() => setNudge(false)}>
             Mark attendance
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        open={noteFor !== null}
+        onClose={() => setNoteFor(null)}
+        title={noteFor ? `${noteFor.last_name}, ${noteFor.first_name}` : 'Note'}
+      >
+        <p className="text-[13px] text-ink-soft leading-relaxed mb-3">
+          One line the parent will see. Mark first, then tap the name.
+        </p>
+        <TextArea
+          label="Note"
+          value={noteDraft}
+          onChange={(e) => setNoteDraft(e.target.value.slice(0, NOTE_MAX))}
+          maxLength={NOTE_MAX}
+          rows={3}
+          hint={`${noteDraft.length} / ${NOTE_MAX}`}
+        />
+        <div className="mt-4 flex gap-2">
+          <Button full onClick={saveNote}>
+            Save note
+          </Button>
+          <Button variant="secondary" onClick={() => setNoteFor(null)}>
+            Cancel
           </Button>
         </div>
       </Modal>

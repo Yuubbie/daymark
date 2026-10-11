@@ -51,6 +51,7 @@ export async function fetchTermReport(studentId: string, termId?: string): Promi
   const marks = (row.attendance?.marks ?? []).map((m) => ({
     date: m.date,
     status: (m.status ?? null) as AttendanceStatus | null,
+    note: (m.note ?? null) as string | null,
   }))
   return {
     ...row,
