@@ -103,6 +103,14 @@
   header, aside, nav { display: none !important; }
   main { padding: 0 !important; margin: 0 !important; }
   .report-sheet { break-inside: avoid; }
+  .class-reports .report-sheet {
+    break-after: page;
+    page-break-after: always;
+  }
+  .class-reports .report-sheet:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
   .id-sheet {
     display: grid;
     grid-template-columns: 1fr 1fr;

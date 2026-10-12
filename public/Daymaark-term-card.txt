@@ -104,6 +104,10 @@ Classes → open the class → Print ID cards.
 Print, cut, laminate. Two per row on A4.
 A missing photo is a blank square, not a blocked print.
 
+Classes → open the class → Print term cards.
+One sheet per child. Staff can print even if fees are due.
+The parent view still locks until fees are cleared.
+
 ------------------------------------------------
 HOW TO APPLY IT IN A LIVE SCHOOL
 ------------------------------------------------
@@ -140,5 +144,6 @@ Notes not on the card Paste APPLY_RUN12.sql, then hard-refresh.
 Apply form 404        Paste APPLY_RUN13.sql, then hard-refresh.
 No enrol button       Create a class first.
 No ID cards           Open the class, then Print ID cards.
+No class term cards   Open the class, then Print term cards.
 
 WhatsApp care: 0703 235 2158

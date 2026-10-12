@@ -87,8 +87,8 @@ function parentOf(path: string, role: string | undefined): string {
   if (HOMES.includes(path) || path === '/account') {
     return ROLE_HOME[(role as keyof typeof ROLE_HOME) ?? 'parent'] ?? '/admin'
   }
-  if (path.startsWith('/admin/classes/') && path.endsWith('/ids')) {
-    return path.replace(/\/ids$/, '')
+  if (path.startsWith('/admin/classes/') && (path.endsWith('/ids') || path.endsWith('/reports'))) {
+    return path.replace(/\/(ids|reports)$/, '')
   }
   if (path.startsWith('/admin/classes/')) return '/admin/classes'
   if (path.startsWith('/admin/')) return '/admin'

@@ -176,6 +176,9 @@ export default function ClassDetail() {
               <Link to={`/admin/classes/${id}/ids`}>
                 <Button variant="secondary">Print ID cards</Button>
               </Link>
+              <Link to={`/admin/classes/${id}/reports`}>
+                <Button variant="secondary">Print term cards</Button>
+              </Link>
             </div>
           )}
 
