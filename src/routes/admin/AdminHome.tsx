@@ -186,6 +186,13 @@ export default function AdminHome() {
                 <div className="eyebrow">Results</div>
                 <div className="text-[14px] font-semibold mt-1">Approve</div>
               </Link>
+              <Link
+                to="/admin/enquiries"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Intake</div>
+                <div className="text-[14px] font-semibold mt-1">Enquiries</div>
+              </Link>
             </div>
           </Panel>
 

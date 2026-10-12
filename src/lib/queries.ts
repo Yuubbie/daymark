@@ -19,6 +19,7 @@ export type StudentRow = {
   class_id: string | null
   linked_parents: number
   fee_cleared: boolean
+  photo_url: string | null
 }
 
 export type TermRow = {
@@ -86,10 +87,10 @@ export async function getClass(id: string) {
 export async function listStudents(classId: string): Promise<StudentRow[]> {
   const { data, error } = await supabase
     .from('students')
-    .select('id, first_name, last_name, admission_number, class_id, fee_cleared, parent_student_links(count)')
-    .eq('class_id', classId)
-    .eq('is_active', true)
-    .order('last_name')
+      .select('id, first_name, last_name, admission_number, class_id, fee_cleared, photo_url, parent_student_links(count)')
+      .eq('class_id', classId)
+      .eq('is_active', true)
+      .order('last_name')
   if (error) throw error
   return (data ?? []).map((s: Record<string, unknown>) => ({
     id: s.id as string,
@@ -99,6 +100,7 @@ export async function listStudents(classId: string): Promise<StudentRow[]> {
     class_id: (s.class_id as string) ?? null,
     linked_parents: (s.parent_student_links as { count: number }[])?.[0]?.count ?? 0,
     fee_cleared: (s.fee_cleared as boolean) ?? true,
+    photo_url: (s.photo_url as string) ?? null,
   }))
 }
 
@@ -579,4 +581,85 @@ export function toIntlDigits(raw: string | null): string | null {
   if (d.length === 13 && d.startsWith('234')) return d
   if (d.length === 10) return '234' + d
   return d.length >= 10 ? d : null
+}
+
+export type EnquiryStatus = 'new' | 'contacted' | 'offered' | 'enrolled' | 'declined'
+
+export type Enquiry = {
+  id: string
+  child_first: string
+  child_last: string
+  seeking_class: string | null
+  date_of_birth: string | null
+  gender: string | null
+  guardian_name: string
+  guardian_phone: string
+  guardian_email: string | null
+  note: string | null
+  status: EnquiryStatus
+  staff_note: string | null
+  student_id: string | null
+  created_at: string
+}
+
+export async function schoolForApply(slug: string): Promise<{ id: string; name: string; slug: string }> {
+  const { data, error } = await supabase.rpc('school_for_apply', { p_slug: slug })
+  if (error) throw error
+  return data as { id: string; name: string; slug: string }
+}
+
+export async function submitEnquiry(input: {
+  slug: string
+  childFirst: string
+  childLast: string
+  seekingClass: string
+  dateOfBirth: string
+  gender: string
+  guardianName: string
+  guardianPhone: string
+  guardianEmail: string
+  note: string
+}): Promise<string> {
+  const { data, error } = await supabase.rpc('submit_admission_enquiry', {
+    p_slug: input.slug,
+    p_child_first: input.childFirst,
+    p_child_last: input.childLast,
+    p_seeking_class: input.seekingClass || null,
+    p_date_of_birth: input.dateOfBirth || null,
+    p_gender: input.gender || null,
+    p_guardian_name: input.guardianName,
+    p_guardian_phone: input.guardianPhone,
+    p_guardian_email: input.guardianEmail || null,
+    p_note: input.note || null,
+  })
+  if (error) throw error
+  return data as string
+}
+
+export async function listEnquiries(): Promise<Enquiry[]> {
+  const { data, error } = await supabase.rpc('list_admission_enquiries')
+  if (error) throw error
+  return Array.isArray(data) ? (data as Enquiry[]) : []
+}
+
+export async function setEnquiryStatus(
+  enquiryId: string,
+  status: EnquiryStatus,
+  staffNote?: string | null,
+) {
+  const { error } = await supabase.rpc('set_enquiry_status', {
+    p_enquiry_id: enquiryId,
+    p_status: status,
+    p_staff_note: staffNote ?? null,
+  })
+  if (error) throw error
+}
+
+export async function enrolEnquiry(enquiryId: string, classId: string): Promise<string> {
+  const { data, error } = await supabase.rpc('enrol_enquiry', {
+    p_enquiry_id: enquiryId,
+    p_class_id: classId,
+  })
+  if (error) throw error
+  return data as string
 }

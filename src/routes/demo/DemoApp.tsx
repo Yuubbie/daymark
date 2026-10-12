@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Wordmark } from '../../components/Logo'
+import { StudentIdCard } from '../../components/StudentIdCard'
 import { AttendanceSummary, RegisterLegend } from '../../components/RegisterStrip'
 import { Button, Empty, Field, Modal, Panel, StatusPill, TextArea } from '../../components/ui'
 import {
@@ -18,6 +19,7 @@ import {
   PLAN,
   DEMO_CLASS,
   DEMO_SCHOOL,
+  DEMO_TERM,
   adminClasses,
   attendancePct,
   demoAdmin,
@@ -37,6 +39,7 @@ import {
   demoWeek,
   demoFeeClasses,
   demoExams,
+  demoEnquiries,
   demoParentResults,
   studentAssignments,
   studentResults,
@@ -60,6 +63,7 @@ const NAV: Record<DemoRole, { to: Tab; label: string; Icon: typeof IconToday; mo
     { to: 'classes', label: 'Classes', Icon: IconClass, mobile: false },
     { to: 'timetable', label: 'Timetable', Icon: IconTimetable },
     { to: 'fees', label: 'Fees', Icon: IconClass },
+    { to: 'enquiries', label: 'Apply', Icon: IconClass, mobile: false },
     { to: 'cbt', label: 'CBT', Icon: IconLesson, mobile: false },
     { to: 'tasks', label: 'Tasks', Icon: IconHomework, mobile: false },
     { to: 'notices', label: 'Notices', Icon: IconNotice, mobile: false },
@@ -172,6 +176,7 @@ export default function DemoApp() {
       {role === 'admin' && tab === 'classes' && <AdminClasses />}
       {role === 'admin' && tab === 'timetable' && <AdminTimetable />}
       {role === 'admin' && tab === 'fees' && <AdminFees />}
+      {role === 'admin' && tab === 'enquiries' && <AdminEnquiries />}
       {role === 'admin' && tab === 'cbt' && <AdminCbt />}
       {role === 'admin' && tab === 'tasks' && <AdminTasks />}
       {role === 'admin' && tab === 'notices' && <NoticesPanel admin />}
@@ -986,6 +991,38 @@ function AdminFlagged() {
 }
 
 function AdminClasses() {
+  const [showIds, setShowIds] = useState(false)
+  if (showIds) {
+    return (
+      <div>
+        <Head eyebrow="JSS 1A" title="Identity cards" sub="Print, cut, laminate" />
+        <p className="mt-3 text-[13px] text-ink-faint">
+          One card per child on the roster. Missing photo is a blank square.
+        </p>
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {demoStudents.map((s) => (
+            <StudentIdCard
+              key={s.id}
+              school={DEMO_SCHOOL}
+              className={DEMO_CLASS}
+              student={{
+                id: s.id,
+                first_name: s.first_name,
+                last_name: s.last_name,
+                admission_number: s.admission,
+              }}
+              term={DEMO_TERM}
+            />
+          ))}
+        </div>
+        <div className="mt-4">
+          <Button variant="secondary" onClick={() => setShowIds(false)}>
+            Back to classes
+          </Button>
+        </div>
+      </div>
+    )
+  }
   return (
     <div>
       <Head eyebrow="Admin" title="Classes" sub={`${adminClasses.length} active`} />
@@ -1006,6 +1043,11 @@ function AdminClasses() {
           ))}
         </div>
       </Panel>
+      <div className="mt-4">
+        <Button variant="secondary" onClick={() => setShowIds(true)}>
+          Print ID cards
+        </Button>
+      </div>
     </div>
   )
 }
@@ -1087,6 +1129,46 @@ function AdminFees() {
       <p className="mt-3 text-[12px] text-ink-faint">
         Unpaid families stay locked out of CBT and results until fees are marked cleared.
       </p>
+    </div>
+  )
+}
+
+function AdminEnquiries() {
+  return (
+    <div>
+      <Head eyebrow="Admin" title="Enquiries" sub="Public form, then the roster" />
+      <Panel className="mt-4" title="Public form">
+        <p className="text-[13px] text-ink-soft break-all">
+          daymark-eosin-five.vercel.app/apply/greenfield-academy
+        </p>
+        <p className="mt-2 text-[12px] text-ink-faint">
+          Share this. A parent fills it. No login.
+        </p>
+      </Panel>
+      <div className="mt-4 space-y-3">
+        {demoEnquiries.map((e) => (
+          <Panel key={e.id}>
+            <div className="flex items-baseline gap-3">
+              <div className="min-w-0">
+                <div className="text-[16px] font-semibold">{e.child}</div>
+                <div className="text-[12px] text-ink-faint">{e.seeking}</div>
+              </div>
+              <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.12em] text-ink-faint">
+                {e.status}
+              </span>
+            </div>
+            <div className="mt-3 text-[14px]">
+              {e.guardian}
+              <span className="tnum text-[12px] text-ink-faint ml-2">{e.phone}</span>
+            </div>
+            <p className="mt-2 text-[13px] text-ink-soft">{e.note}</p>
+            <div className="mt-3 pt-3 border-t border-rule flex flex-wrap gap-1.5">
+              <Button variant="secondary">WhatsApp</Button>
+              <Button>Enrol</Button>
+            </div>
+          </Panel>
+        ))}
+      </div>
     </div>
   )
 }

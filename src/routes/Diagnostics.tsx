@@ -29,9 +29,17 @@ const TABLES = [
   'attendance',
   'lessons',
   'announcements',
+  'admission_enquiries',
 ]
 
-const RPCS = ['create_school_and_admin', 'generate_claim_code', 'redeem_claim_code']
+const RPCS = [
+  'create_school_and_admin',
+  'generate_claim_code',
+  'redeem_claim_code',
+  'school_for_apply',
+  'submit_admission_enquiry',
+  'list_admission_enquiries',
+]
 
 export default function Diagnostics() {
   const { signOut } = useAuth()

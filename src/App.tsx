@@ -41,6 +41,9 @@ import TeacherNotices from './routes/teacher/Notices'
 import Account from './routes/Account'
 import AuthCallback from './routes/AuthCallback'
 import TermReportPage from './routes/report/TermReportPage'
+import Apply from './routes/apply/Apply'
+import Enquiries from './routes/admin/Enquiries'
+import ClassIds from './routes/admin/ClassIds'
 import { WhatsAppCare } from './components/BrandCredit'
 
 /** Shown when we have a session but cannot resolve a profile. Never spin forever. */
@@ -134,6 +137,7 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/demo" element={<DemoApp />} />
+          <Route path="/apply/:slug" element={<Apply />} />
           <Route path="/sit/:token" element={<SitExam />} />
           <Route
             path="/preview"
@@ -182,6 +186,14 @@ export default function App() {
             element={
               <Protected roles={['admin', 'proprietor']}>
                 <ClassDetail />
+              </Protected>
+            }
+          />
+          <Route
+            path="/admin/classes/:id/ids"
+            element={
+              <Protected roles={['admin', 'proprietor']}>
+                <ClassIds />
               </Protected>
             }
           />
@@ -334,6 +346,14 @@ export default function App() {
             element={
               <Protected roles={['admin', 'proprietor']}>
                 <AdminFees />
+              </Protected>
+            }
+          />
+          <Route
+            path="/admin/enquiries"
+            element={
+              <Protected roles={['admin', 'proprietor']}>
+                <Enquiries />
               </Protected>
             }
           />

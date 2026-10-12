@@ -103,4 +103,14 @@
   header, aside, nav { display: none !important; }
   main { padding: 0 !important; margin: 0 !important; }
   .report-sheet { break-inside: avoid; }
+  .id-sheet {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6mm;
+  }
+  .id-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #C3CCC2;
+  }
 }

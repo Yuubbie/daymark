@@ -48,6 +48,7 @@ const STAFF_NAV: Item[] = [
   { to: '/admin/classes', label: 'Classes', Icon: IconClass, mobile: false },
   { to: '/admin/teachers', label: 'People', Icon: IconClass, mobile: false },
   { to: '/admin/fees', label: 'Fees', Icon: IconClass, mobile: false },
+  { to: '/admin/enquiries', label: 'Apply', Icon: IconClass, mobile: false },
   { to: '/admin/notices', label: 'Notices', Icon: IconNotice, mobile: false },
   { to: '/account', label: 'Account', Icon: IconAccount, mobile: false },
 ]
@@ -85,6 +86,9 @@ const HOMES = ['/admin', '/teacher', '/parent', '/student']
 function parentOf(path: string, role: string | undefined): string {
   if (HOMES.includes(path) || path === '/account') {
     return ROLE_HOME[(role as keyof typeof ROLE_HOME) ?? 'parent'] ?? '/admin'
+  }
+  if (path.startsWith('/admin/classes/') && path.endsWith('/ids')) {
+    return path.replace(/\/ids$/, '')
   }
   if (path.startsWith('/admin/classes/')) return '/admin/classes'
   if (path.startsWith('/admin/')) return '/admin'

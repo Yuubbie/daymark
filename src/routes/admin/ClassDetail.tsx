@@ -161,8 +161,8 @@ export default function ClassDetail() {
             </div>
           )}
 
-          {students.length > 0 && (unlinkedStudents.length > 0 || Object.keys(codes).length > 0) && (
-            <div className="flex items-center gap-2.5 mb-3.5 pb-3.5 border-b border-rule">
+          {students.length > 0 && (
+            <div className="flex items-center gap-2.5 mb-3.5 pb-3.5 border-b border-rule flex-wrap">
               {unlinkedStudents.length > 0 && (
                 <Button variant="secondary" loading={bulkBusy} onClick={() => void makeCodesForClass()}>
                   Generate {unlinkedStudents.length} code{unlinkedStudents.length === 1 ? '' : 's'}
@@ -173,6 +173,9 @@ export default function ClassDetail() {
                   View / print codes
                 </Button>
               )}
+              <Link to={`/admin/classes/${id}/ids`}>
+                <Button variant="secondary">Print ID cards</Button>
+              </Link>
             </div>
           )}
 

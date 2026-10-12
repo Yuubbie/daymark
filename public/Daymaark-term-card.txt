@@ -83,6 +83,28 @@ The daily digest (if already scheduled) now also says
 "fees outstanding" for that child.
 
 ------------------------------------------------
+WHERE TO SEE ADMISSION ENQUIRIES
+------------------------------------------------
+Paste APPLY_RUN13.sql first.
+
+Admin → Apply (or Today → Enquiries).
+Copy the public form, send it on WhatsApp.
+A parent fills it with no login.
+You call, then Enrol onto a class.
+That puts the child on the roster.
+Parents still need a claim code. Students still need Login.
+
+------------------------------------------------
+WHERE TO PRINT IDENTITY CARDS
+------------------------------------------------
+No new SQL. The roster already has the name, class,
+admission number and photo.
+
+Classes → open the class → Print ID cards.
+Print, cut, laminate. Two per row on A4.
+A missing photo is a blank square, not a blocked print.
+
+------------------------------------------------
 HOW TO APPLY IT IN A LIVE SCHOOL
 ------------------------------------------------
 1. Set the current term. The card hangs off it.
@@ -115,5 +137,8 @@ No WhatsApp button    Parent has no phone on Settings.
 Empty attendance      Mark the register for this term.
 Cannot add a note     Mark P/L/A/E first, then tap the name.
 Notes not on the card Paste APPLY_RUN12.sql, then hard-refresh.
+Apply form 404        Paste APPLY_RUN13.sql, then hard-refresh.
+No enrol button       Create a class first.
+No ID cards           Open the class, then Print ID cards.
 
 WhatsApp care: 0703 235 2158

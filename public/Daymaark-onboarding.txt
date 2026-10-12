@@ -13,7 +13,7 @@ then student logins.
 WHO DOES WHAT
 ------------------------------------------------
 Proprietor  owns the school. Appoints the admin. Does not run the day.
-Admin       runs the day: term, classes, roster, fees, claim codes.
+Admin       runs the day: term, classes, roster, fees, enquiries, claim codes.
 Teacher     marks the register, one-line notes, posts lessons, publishes papers.
 Parent      sees their child. Joins with a claim code after the roster exists.
 Student     sits tests and exams on their own login. Not the parent code.
@@ -64,6 +64,7 @@ Attendance and reports hang off the current term. Set it before the register.
 This is the register, not a login.
 Parents still need a claim code.
 Students still need their own Login email.
+Print ID cards from the class page once the roster exists.
 
 ------------------------------------------------
 5. ADMIN OR PROPRIETOR — INVITE TEACHERS

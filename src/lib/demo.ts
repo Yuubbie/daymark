@@ -243,6 +243,27 @@ export const demoTasks = [
   { id: 't4', title: 'Order next term textbooks', who: 'Admin', due: 'Next week', done: false },
 ]
 
+export const demoEnquiries = [
+  {
+    id: 'e1',
+    child: 'Kemi Adewale',
+    seeking: 'JSS 1',
+    guardian: 'Mrs. Adewale',
+    phone: '0803 441 2291',
+    status: 'new' as const,
+    note: 'Transferring from a school in Ikeja.',
+  },
+  {
+    id: 'e2',
+    child: 'Yusuf Lawal',
+    seeking: 'Primary 4',
+    guardian: 'Mr. Lawal',
+    phone: '0802 118 4402',
+    status: 'contacted' as const,
+    note: 'Wants a place for next term.',
+  },
+]
+
 /* ---------------------------------------------------------------------------
    Proprietor surface
 --------------------------------------------------------------------------- */

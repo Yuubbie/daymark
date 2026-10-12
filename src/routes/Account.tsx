@@ -35,6 +35,19 @@ export default function Account() {
               left={<span className="text-[13px] text-ink-faint">School</span>}
               right={<span className="text-[14px]">{school?.name ?? '—'}</span>}
             />
+            {school?.slug && (profile?.role === 'admin' || profile?.role === 'proprietor') && (
+              <Row
+                left={<span className="text-[13px] text-ink-faint">Apply link</span>}
+                right={
+                  <a
+                    href={`/apply/${school.slug}`}
+                    className="text-[13px] underline underline-offset-4 decoration-brass"
+                  >
+                    /apply/{school.slug}
+                  </a>
+                }
+              />
+            )}
           </div>
         </Panel>
 
