@@ -124,7 +124,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* ---------- Desktop sidebar ---------- */}
       <aside
         className="hidden lg:flex fixed inset-y-0 left-0 w-[248px] bg-ink text-ink-invert
-                   flex-col z-20"
+                   flex-col z-20 print:hidden"
       >
         <div className="px-6 py-6">
           <Wordmark size="sm" className="text-ink-invert" />
@@ -173,7 +173,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* ---------- Phone top bar ---------- */}
-      <header className="lg:hidden sticky top-0 z-10 bg-ink text-ink-invert">
+      <header className="lg:hidden sticky top-0 z-10 bg-ink text-ink-invert print:hidden">
         <div className="px-4 h-14 flex items-center gap-2">
           {showBack ? (
             <button
@@ -229,7 +229,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </main>
 
       {/* ---------- Phone bottom nav ---------- */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-surface border-t border-rule z-10">
+      <nav className="lg:hidden print:hidden fixed bottom-0 inset-x-0 bg-surface border-t border-rule z-10">
         <div className="flex pb-[env(safe-area-inset-bottom)]">
           {items.filter((i) => i.mobile !== false).map(({ to, label, Icon }) => (
             <NavLink

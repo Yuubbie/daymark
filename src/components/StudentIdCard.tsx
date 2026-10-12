@@ -68,6 +68,61 @@ export function StudentIdCard({
   )
 }
 
+export function StudentIdCardBack({
+  school,
+  student,
+  term,
+}: {
+  school: string
+  student: IdStudent
+  term?: string | null
+}) {
+  return (
+    <article className="id-card id-card-back bg-surface text-ink overflow-hidden flex flex-col">
+      <header className="id-card-head bg-ink text-ink-invert px-[3.5mm] py-[2.2mm]">
+        <div className="font-display font-bold text-[9pt] leading-tight tracking-[-0.02em] truncate">
+          {school}
+        </div>
+      </header>
+      <div className="flex-1 flex flex-col px-[3.5mm] py-[2.4mm] min-h-0">
+        <p className="text-[7pt] text-ink-soft leading-snug">
+          If found, return to the school office. This card identifies the student named on the
+          front. It is not a login.
+        </p>
+        <div className="mt-auto">
+          <div className="font-mono text-[5.5pt] uppercase tracking-[0.14em] text-ink-faint">
+            Valid
+          </div>
+          <div className="text-[8pt] leading-tight">{term ?? 'Current term'}</div>
+          <div className="mt-[2.2mm] font-mono text-[5.5pt] uppercase tracking-[0.14em] text-ink-faint">
+            Bearer signature
+          </div>
+          <div className="id-sign-line" />
+        </div>
+      </div>
+      <footer className="id-card-foot px-[3.5mm] py-[1.6mm]">
+        <div className="tnum text-[8pt] tracking-[0.18em] text-center">
+          {student.admission_number ?? student.id.slice(0, 8).toUpperCase()}
+        </div>
+      </footer>
+    </article>
+  )
+}
+
+export function StudentIdPair(props: {
+  school: string
+  className: string
+  student: IdStudent
+  term?: string | null
+}) {
+  return (
+    <div className="id-pair">
+      <StudentIdCard {...props} />
+      <StudentIdCardBack school={props.school} student={props.student} term={props.term} />
+    </div>
+  )
+}
+
 export function ClaimSlip({
   school,
   student,

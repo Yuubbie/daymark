@@ -226,6 +226,12 @@ export default function ClassDetail() {
                       >
                         Report
                       </Link>
+                      <Link
+                        to={`/admin/classes/${id}/ids?student=${s.id}`}
+                        className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint hover:text-ink"
+                      >
+                        ID
+                      </Link>
                       <button
                         onClick={() =>
                           setPhotoStudent({ id: s.id, name: `${s.first_name} ${s.last_name}` })

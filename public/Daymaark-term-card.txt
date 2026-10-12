@@ -101,10 +101,11 @@ No new SQL. The roster already has the name, class,
 admission number and photo.
 
 Classes → open the class → Print ID cards.
-Credit-card size (85.6 x 54 mm). Eight fit on A4.
-Cut on the crop, then laminate.
+Or tap ID on one student for a single card.
+Credit-card size (85.6 x 54 mm). Front and back as a pair.
+Cut, fold, laminate.
 A missing photo is a blank square, not a blocked print.
-Back (top left) returns to the class.
+Class (top left) returns to the class.
 
 Classes → open the class → Print term cards.
 One sheet per child. Staff can print even if fees are due.

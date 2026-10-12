@@ -136,11 +136,29 @@
   border-top: 1px solid var(--color-rule);
   background: var(--color-brass-wash);
 }
+.id-sign-line {
+  margin-top: 1.2mm;
+  height: 8mm;
+  border-bottom: 1px solid var(--color-rule-strong);
+}
+.id-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6mm;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  align-items: start;
+}
+.id-sheet-pairs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
 @media print {
   @page { margin: 8mm; }
   body { background: #fff; }
-  header, aside, nav { display: none !important; }
+  aside, nav, .print-chrome { display: none !important; }
   main { padding: 0 !important; margin: 0 !important; }
   .report-sheet { break-inside: avoid; }
   .class-reports .report-sheet {
@@ -154,6 +172,12 @@
   .id-sheet {
     grid-template-columns: repeat(2, 85.6mm);
     gap: 6mm 8mm;
+    justify-content: center;
+  }
+  .id-sheet-pairs {
+    gap: 10mm;
+  }
+  .id-pair {
     justify-content: center;
   }
   .id-card {

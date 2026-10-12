@@ -24,7 +24,7 @@ export function PrintChrome({
 }) {
   return (
     <div className="min-h-dvh bg-paper">
-      <header className="print:hidden sticky top-0 z-10 border-b border-rule bg-surface">
+      <header className="print-chrome print:hidden sticky top-0 z-10 border-b border-rule bg-surface">
         <div className={`mx-auto ${max} px-4 h-14 flex items-center gap-3`}>
           <Link
             to={backTo}

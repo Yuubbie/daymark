@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Wordmark } from '../../components/Logo'
-import { StudentIdCard } from '../../components/StudentIdCard'
+import { StudentIdPair } from '../../components/StudentIdCard'
 import { AttendanceSummary, RegisterLegend } from '../../components/RegisterStrip'
 import { Button, Empty, Field, Modal, Panel, StatusPill, TextArea } from '../../components/ui'
 import {
@@ -1001,13 +1001,13 @@ function AdminClasses() {
         >
           Back
         </button>
-        <Head eyebrow="JSS 1A" title="Identity cards" sub="Credit-card size. Cut, laminate." />
+        <Head eyebrow="JSS 1A" title="Identity cards" sub="Credit-card size. Front and back." />
         <p className="mt-3 text-[13px] text-ink-faint">
-          85.6 by 54 millimetres. Eight fit on A4. A missing photo is a blank square.
+          85.6 by 54 millimetres. Cut, fold, laminate. A missing photo is a blank square.
         </p>
-        <div className="mt-4 id-sheet">
+        <div className="mt-4 id-sheet-pairs">
           {demoStudents.map((s) => (
-            <StudentIdCard
+            <StudentIdPair
               key={s.id}
               school={DEMO_SCHOOL}
               className={DEMO_CLASS}
