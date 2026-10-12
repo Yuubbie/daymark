@@ -995,11 +995,17 @@ function AdminClasses() {
   if (showIds) {
     return (
       <div>
-        <Head eyebrow="JSS 1A" title="Identity cards" sub="Print, cut, laminate" />
+        <button
+          onClick={() => setShowIds(false)}
+          className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink hover:text-brass"
+        >
+          Back
+        </button>
+        <Head eyebrow="JSS 1A" title="Identity cards" sub="Credit-card size. Cut, laminate." />
         <p className="mt-3 text-[13px] text-ink-faint">
-          One card per child on the roster. Missing photo is a blank square.
+          85.6 by 54 millimetres. Eight fit on A4. A missing photo is a blank square.
         </p>
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="mt-4 id-sheet">
           {demoStudents.map((s) => (
             <StudentIdCard
               key={s.id}
@@ -1014,11 +1020,6 @@ function AdminClasses() {
               term={DEMO_TERM}
             />
           ))}
-        </div>
-        <div className="mt-4">
-          <Button variant="secondary" onClick={() => setShowIds(false)}>
-            Back to classes
-          </Button>
         </div>
       </div>
     )

@@ -45,6 +45,7 @@ import Apply from './routes/apply/Apply'
 import Enquiries from './routes/admin/Enquiries'
 import ClassIds from './routes/admin/ClassIds'
 import ClassReports from './routes/admin/ClassReports'
+import ClassCodes from './routes/admin/ClassCodes'
 import { WhatsAppCare } from './components/BrandCredit'
 
 /** Shown when we have a session but cannot resolve a profile. Never spin forever. */
@@ -203,6 +204,14 @@ export default function App() {
             element={
               <Protected roles={['admin', 'proprietor']}>
                 <ClassReports />
+              </Protected>
+            }
+          />
+          <Route
+            path="/admin/classes/:id/codes"
+            element={
+              <Protected roles={['admin', 'proprietor']}>
+                <ClassCodes />
               </Protected>
             }
           />

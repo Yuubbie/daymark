@@ -98,7 +98,47 @@
   }
 }
 
+/* CR80: 85.6mm x 54mm. Screen preview, then print at true size. */
+.id-sheet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 85.6mm);
+  justify-content: start;
+  gap: 8px;
+}
+.id-card {
+  width: 85.6mm;
+  height: 54mm;
+  box-sizing: border-box;
+  border: 1px solid var(--color-rule-strong);
+  border-radius: 3mm;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.id-card-photo {
+  width: 22mm;
+  height: 28mm;
+  object-fit: cover;
+  border: 1px solid var(--color-rule);
+  border-radius: 1.2mm;
+  background: var(--color-surface-alt);
+  flex-shrink: 0;
+}
+.id-card-photo-empty {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--color-surface-alt),
+    var(--color-surface-alt) 4px,
+    var(--color-rule) 4px,
+    var(--color-rule) 5px
+  );
+}
+.id-card-foot {
+  border-top: 1px solid var(--color-rule);
+  background: var(--color-brass-wash);
+}
+
 @media print {
+  @page { margin: 8mm; }
   body { background: #fff; }
   header, aside, nav { display: none !important; }
   main { padding: 0 !important; margin: 0 !important; }
@@ -112,13 +152,12 @@
     page-break-after: auto;
   }
   .id-sheet {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6mm;
+    grid-template-columns: repeat(2, 85.6mm);
+    gap: 6mm 8mm;
+    justify-content: center;
   }
   .id-card {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    border: 1px solid #C3CCC2;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }

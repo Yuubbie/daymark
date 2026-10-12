@@ -1,3 +1,5 @@
+import { Mark } from './Logo'
+
 export type IdStudent = {
   id: string
   first_name: string
@@ -20,30 +22,82 @@ export function StudentIdCard({
   const name = `${student.first_name} ${student.last_name}`
 
   return (
-    <article className="id-card bg-surface border border-rule rounded-md overflow-hidden break-inside-avoid">
-      <div className="bg-ink text-ink-invert px-3 py-2">
-        <div className="font-display font-bold text-[13px] leading-tight tracking-[-0.02em] truncate">
-          {school}
+    <article className="id-card bg-surface text-ink overflow-hidden flex flex-col">
+      <header className="id-card-head bg-ink text-ink-invert flex items-center gap-[2mm] px-[3.5mm] py-[2.2mm]">
+        <Mark className="h-[11px] w-[15px] shrink-0 text-ink-invert" accent="text-brass" />
+        <div className="min-w-0 flex-1">
+          <div className="font-display font-bold text-[9pt] leading-tight tracking-[-0.02em] truncate">
+            {school}
+          </div>
+          <div className="font-mono text-[6pt] uppercase tracking-[0.16em] text-ink-invert/55 truncate">
+            Student identity card
+          </div>
+        </div>
+      </header>
+      <div className="flex-1 flex gap-[3.2mm] px-[3.5mm] py-[2.8mm] min-h-0">
+        {student.photo_url ? (
+          <img src={student.photo_url} alt="" className="id-card-photo" />
+        ) : (
+          <div className="id-card-photo id-card-photo-empty" />
+        )}
+        <div className="min-w-0 flex-1 flex flex-col justify-center">
+          <div className="font-display font-bold text-[11pt] leading-[1.15] tracking-[-0.03em] break-words">
+            {name}
+          </div>
+          <dl className="mt-[1.6mm] space-y-[0.8mm]">
+            <div>
+              <dt className="font-mono text-[5.5pt] uppercase tracking-[0.14em] text-ink-faint">Class</dt>
+              <dd className="text-[8pt] leading-tight truncate">{className || '—'}</dd>
+            </div>
+            <div>
+              <dt className="font-mono text-[5.5pt] uppercase tracking-[0.14em] text-ink-faint">Admission</dt>
+              <dd className="tnum text-[8pt] leading-tight tracking-[0.06em]">
+                {student.admission_number ?? '—'}
+              </dd>
+            </div>
+          </dl>
         </div>
       </div>
-      <div className="flex gap-3 p-3">
-        {student.photo_url ? (
-          <img
-            src={student.photo_url}
-            alt=""
-            className="h-[72px] w-[72px] rounded-md object-cover border border-rule shrink-0"
-          />
-        ) : (
-          <div className="h-[72px] w-[72px] rounded-md border border-rule bg-surface-alt shrink-0" />
-        )}
+      <footer className="id-card-foot flex items-baseline justify-between gap-[2mm] px-[3.5mm] py-[1.6mm]">
+        <span className="font-mono text-[6pt] uppercase tracking-[0.16em] text-brass-dark">Student</span>
+        <span className="font-mono text-[6pt] uppercase tracking-[0.12em] text-ink-faint truncate">
+          {term ?? 'Current term'}
+        </span>
+      </footer>
+    </article>
+  )
+}
+
+export function ClaimSlip({
+  school,
+  student,
+  code,
+}: {
+  school: string
+  student: string
+  code: string
+}) {
+  return (
+    <article className="id-card id-slip bg-surface text-ink overflow-hidden flex flex-col">
+      <header className="id-card-head bg-ink text-ink-invert flex items-center gap-[2mm] px-[3.5mm] py-[2.2mm]">
+        <Mark className="h-[11px] w-[15px] shrink-0 text-ink-invert" accent="text-brass" />
         <div className="min-w-0 flex-1">
-          <div className="text-[15px] font-semibold leading-tight truncate">{name}</div>
-          <div className="mt-1 text-[12px] text-ink-soft truncate">{className}</div>
-          <div className="mt-1.5 tnum text-[12px] tracking-[0.08em]">
-            {student.admission_number ?? 'No admission no.'}
+          <div className="font-display font-bold text-[9pt] leading-tight tracking-[-0.02em] truncate">
+            {school}
           </div>
-          {term && <div className="eyebrow mt-2 truncate">{term}</div>}
+          <div className="font-mono text-[6pt] uppercase tracking-[0.16em] text-ink-invert/55">
+            Parent claim code
+          </div>
         </div>
+      </header>
+      <div className="flex-1 flex flex-col justify-center px-[3.5mm] py-[2.5mm] min-h-0">
+        <div className="text-[10pt] font-semibold leading-tight">{student}</div>
+        <div className="mt-[2.2mm] font-mono text-[16pt] tracking-[0.18em] font-semibold leading-none">
+          {code}
+        </div>
+        <p className="mt-[2.4mm] text-[7pt] text-ink-soft leading-snug">
+          Parent signs up, then enters this code once. One code per child.
+        </p>
       </div>
     </article>
   )

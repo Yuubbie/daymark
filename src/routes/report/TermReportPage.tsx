@@ -42,11 +42,24 @@ export default function TermReportPage() {
           <span className="eyebrow">Report card</span>
           <h1 className="text-[26px] mt-1">This term</h1>
         </div>
-        {report && (
-          <Button variant="secondary" onClick={() => window.print()}>
-            Print
-          </Button>
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          {profile?.role === 'admin' || profile?.role === 'proprietor' ? (
+            report?.class?.id ? (
+              <Link to={`/admin/classes/${report.class.id}`}>
+                <Button variant="ghost">Class</Button>
+              </Link>
+            ) : (
+              <Link to="/admin/classes">
+                <Button variant="ghost">Classes</Button>
+              </Link>
+            )
+          ) : null}
+          {report && (
+            <Button variant="secondary" onClick={() => window.print()}>
+              Print
+            </Button>
+          )}
+        </div>
       </div>
 
       {loading ? (

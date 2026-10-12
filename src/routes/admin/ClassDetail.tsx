@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import {
   Alert,
@@ -34,6 +34,7 @@ import { parseStudentSheet, type ParsedStudent } from '../../lib/importStudents'
 
 export default function ClassDetail() {
   const { id = '' } = useParams()
+  const navigate = useNavigate()
   const { profile } = useAuth()
   const [cls, setCls] = useState<Record<string, unknown> | null>(null)
   const [students, setStudents] = useState<StudentRow[]>([])
@@ -41,7 +42,6 @@ export default function ClassDetail() {
   const [teachers, setTeachers] = useState<Record<string, unknown>[]>([])
   const [loading, setLoading] = useState(true)
   const [addOpen, setAddOpen] = useState(false)
-  const [sheetOpen, setSheetOpen] = useState(false)
   const [assignOpen, setAssignOpen] = useState(false)
   const [allTeachers, setAllTeachers] = useState<Record<string, unknown>[]>([])
   const [codeError, setCodeError] = useState<string | null>(null)
@@ -122,7 +122,7 @@ export default function ClassDetail() {
     if (failCount > 0) {
       setCodeError(`${failCount} of ${results.length} codes could not be generated.`)
     }
-    if (results.some((r) => r.code)) setSheetOpen(true)
+    if (results.some((r) => r.code)) navigate(`/admin/classes/${id}/codes`)
   }
 
   return (
@@ -169,9 +169,9 @@ export default function ClassDetail() {
                 </Button>
               )}
               {Object.keys(codes).length > 0 && (
-                <Button variant="secondary" onClick={() => setSheetOpen(true)}>
-                  View / print codes
-                </Button>
+                <Link to={`/admin/classes/${id}/codes`}>
+                  <Button variant="secondary">Print claim codes</Button>
+                </Link>
               )}
               <Link to={`/admin/classes/${id}/ids`}>
                 <Button variant="secondary">Print ID cards</Button>
@@ -325,15 +325,6 @@ export default function ClassDetail() {
           setAddOpen(false)
           void load()
         }}
-      />
-
-      <CodesSheetModal
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        className={(cls?.name as string) ?? ''}
-        rows={students
-          .filter((s) => codes[s.id])
-          .map((s) => ({ name: `${s.first_name} ${s.last_name}`, code: codes[s.id] }))}
       />
 
       <AssignTeacherModal
@@ -526,77 +517,6 @@ function CodeChip({ code }: { code: string }) {
     >
       {copied ? 'Copied' : code}
     </button>
-  )
-}
-
-/**
- * Print-friendly sheet of every generated code in this class, plus a CSV
- * export. This is the thing an admin actually hands to staff: cut into
- * slips, one per child, sent home. Without this, a bulk-generated batch of
- * 40 codes is just 40 rows nobody can act on.
- */
-function CodesSheetModal({
-  open,
-  onClose,
-  className,
-  rows,
-}: {
-  open: boolean
-  onClose: () => void
-  className: string
-  rows: { name: string; code: string }[]
-}) {
-  function downloadCsv() {
-    const header = 'Student,Claim Code\n'
-    const body = rows.map((r) => `"${r.name.replace(/"/g, '""')}",${r.code}`).join('\n')
-    const blob = new Blob([header + body], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${className || 'class'}-claim-codes.csv`.replace(/\s+/g, '-').toLowerCase()
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  return (
-    <Modal open={open} onClose={onClose} title={`${className} - claim codes`}>
-      <div className="flex items-center justify-between mb-3.5 print:hidden">
-        <p className="text-[13px] text-ink-faint">
-          {rows.length} code{rows.length === 1 ? '' : 's'}. Print this and cut into slips, or
-          export as a spreadsheet.
-        </p>
-        <div className="flex gap-2 shrink-0 ml-3">
-          <Button variant="secondary" onClick={downloadCsv}>
-            Export CSV
-          </Button>
-          <Button variant="secondary" onClick={() => window.print()}>
-            Print
-          </Button>
-        </div>
-      </div>
-      <div className="border border-rule rounded-md max-h-[50vh] overflow-y-auto print:max-h-none print:border-0">
-        <table className="w-full text-[13px]">
-          <thead className="print:table-header-group">
-            <tr className="border-b border-rule text-left">
-              <th className="py-2 px-3 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint">
-                Student
-              </th>
-              <th className="py-2 px-3 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint">
-                Code
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.code} className="border-b border-rule last:border-0 print:break-inside-avoid">
-                <td className="py-2 px-3">{r.name}</td>
-                <td className="py-2 px-3 font-mono tracking-[0.14em]">{r.code}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </Modal>
   )
 }
 
