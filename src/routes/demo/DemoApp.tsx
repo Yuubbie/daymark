@@ -1018,6 +1018,8 @@ function AdminClasses() {
                 admission_number: s.admission,
               }}
               term={DEMO_TERM}
+              address="12 Adeola Street, Ikeja"
+              phone="0803 441 2291"
             />
           ))}
         </div>

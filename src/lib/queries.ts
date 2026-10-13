@@ -663,3 +663,14 @@ export async function enrolEnquiry(enquiryId: string, classId: string): Promise<
   if (error) throw error
   return data as string
 }
+
+export async function updateSchoolContact(schoolId: string, address: string, phone: string) {
+  const { error } = await supabase
+    .from('schools')
+    .update({
+      address: address.trim() || null,
+      phone: phone.trim() || null,
+    })
+    .eq('id', schoolId)
+  if (error) throw error
+}

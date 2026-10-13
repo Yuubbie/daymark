@@ -1,9 +1,38 @@
+import { useEffect, useState } from 'react'
 import { AppShell } from '../components/AppShell'
-import { Button, Panel, Row } from '../components/ui'
+import { Alert, Button, Field, Panel, Row } from '../components/ui'
 import { useAuth } from '../lib/auth'
+import { updateSchoolContact } from '../lib/queries'
 
 export default function Account() {
-  const { profile, school, session, signOut } = useAuth()
+  const { profile, school, session, signOut, refresh } = useAuth()
+  const canEdit = profile?.role === 'admin' || profile?.role === 'proprietor'
+  const [address, setAddress] = useState(school?.address ?? '')
+  const [phone, setPhone] = useState(school?.phone ?? '')
+  const [busy, setBusy] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setAddress(school?.address ?? '')
+    setPhone(school?.phone ?? '')
+  }, [school?.address, school?.phone])
+
+  async function saveContact() {
+    if (!school) return
+    setBusy(true)
+    setError(null)
+    setNotice(null)
+    try {
+      await updateSchoolContact(school.id, address, phone)
+      await refresh()
+      setNotice('Saved. It prints on the back of every student ID.')
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <AppShell>
@@ -35,7 +64,7 @@ export default function Account() {
               left={<span className="text-[13px] text-ink-faint">School</span>}
               right={<span className="text-[14px]">{school?.name ?? '—'}</span>}
             />
-            {school?.slug && (profile?.role === 'admin' || profile?.role === 'proprietor') && (
+            {school?.slug && canEdit && (
               <Row
                 left={<span className="text-[13px] text-ink-faint">Apply link</span>}
                 right={
@@ -50,6 +79,41 @@ export default function Account() {
             )}
           </div>
         </Panel>
+
+        {canEdit && school && (
+          <Panel title="On the ID card">
+            <p className="text-[13px] text-ink-soft mb-3">
+              Address and phone print on the back. Leave blank and the card still says return to
+              the office.
+            </p>
+            {error && (
+              <div className="mb-3">
+                <Alert>{error}</Alert>
+              </div>
+            )}
+            {notice && !error && (
+              <p className="mb-3 text-[13px] text-present font-semibold">{notice}</p>
+            )}
+            <div className="space-y-3">
+              <Field
+                label="Address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="12 Adeola Street, Ikeja"
+              />
+              <Field
+                label="Phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="0803…"
+              />
+              <Button onClick={() => void saveContact()} loading={busy}>
+                Save
+              </Button>
+            </div>
+          </Panel>
+        )}
 
         <Button
           variant="secondary"

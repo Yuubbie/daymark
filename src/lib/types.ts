@@ -33,6 +33,8 @@ export interface School {
   name: string
   slug: string
   subscription_status: string
+  address: string | null
+  phone: string | null
 }
 
 export interface Student {

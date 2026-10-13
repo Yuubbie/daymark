@@ -72,11 +72,16 @@ export function StudentIdCardBack({
   school,
   student,
   term,
+  address,
+  phone,
 }: {
   school: string
   student: IdStudent
   term?: string | null
+  address?: string | null
+  phone?: string | null
 }) {
+  const found = [address, phone].filter(Boolean).join(' · ')
   return (
     <article className="id-card id-card-back bg-surface text-ink overflow-hidden flex flex-col">
       <header className="id-card-head bg-ink text-ink-invert px-[3.5mm] py-[2.2mm]">
@@ -86,8 +91,9 @@ export function StudentIdCardBack({
       </header>
       <div className="flex-1 flex flex-col px-[3.5mm] py-[2.4mm] min-h-0">
         <p className="text-[7pt] text-ink-soft leading-snug">
-          If found, return to the school office. This card identifies the student named on the
-          front. It is not a login.
+          If found, return to the school office
+          {found ? `. ${found}` : '.'} This card identifies the student named on the front. It is
+          not a login.
         </p>
         <div className="mt-auto">
           <div className="font-mono text-[5.5pt] uppercase tracking-[0.14em] text-ink-faint">
@@ -114,11 +120,19 @@ export function StudentIdPair(props: {
   className: string
   student: IdStudent
   term?: string | null
+  address?: string | null
+  phone?: string | null
 }) {
   return (
     <div className="id-pair">
       <StudentIdCard {...props} />
-      <StudentIdCardBack school={props.school} student={props.student} term={props.term} />
+      <StudentIdCardBack
+        school={props.school}
+        student={props.student}
+        term={props.term}
+        address={props.address}
+        phone={props.phone}
+      />
     </div>
   )
 }

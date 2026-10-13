@@ -71,6 +71,8 @@ export default function ClassIds() {
                 className={className}
                 student={s}
                 term={term?.name}
+                address={school?.address}
+                phone={school?.phone}
               />
             ))}
           </div>
