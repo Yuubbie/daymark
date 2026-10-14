@@ -85,6 +85,7 @@ export default function ClassCodes() {
                 school={schoolName}
                 student={`${s.first_name} ${s.last_name}`}
                 code={codes[s.id]}
+                logoUrl={school?.logo_url}
               />
             ))}
           </div>

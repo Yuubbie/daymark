@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { useAuth } from '../lib/auth'
 import { ROLE_HOME } from '../lib/types'
-import { Wordmark } from './Logo'
+import { SchoolBrand } from './SchoolBrand'
 import {
   IconAccount,
   IconBack,
@@ -127,11 +127,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                    flex-col z-20 print:hidden"
       >
         <div className="px-6 py-6">
-          <Wordmark size="sm" className="text-ink-invert" />
+          <SchoolBrand name={school?.name} logoUrl={school?.logo_url} size="sm" className="text-ink-invert" />
         </div>
 
         <div className="px-6 pb-5">
-          <div className="text-[13px] font-semibold truncate">{school?.name ?? ''}</div>
+          {school?.logo_url && (
+            <div className="text-[13px] font-semibold truncate">{school.name}</div>
+          )}
           <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-invert/45 mt-0.5">
             {profile?.role}
           </div>
@@ -184,7 +186,14 @@ export function AppShell({ children }: { children: ReactNode }) {
               <IconBack />
             </button>
           ) : (
-            <Wordmark size="xs" className="text-ink-invert shrink-0" />
+            school?.logo_url ? (
+              <SchoolBrand
+                name={school.name}
+                logoUrl={school.logo_url}
+                size="xs"
+                className="text-ink-invert shrink-0"
+              />
+            ) : null
           )}
           <span className="h-5 w-px bg-ink-invert/20 shrink-0" />
           <div className="min-w-0 flex-1">

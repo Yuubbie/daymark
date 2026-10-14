@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
 import { AuthLayout } from '../components/AuthLayout'
+import { CrestPicker } from '../components/SchoolLogoUpload'
 import { Alert, Button, Field } from '../components/ui'
+import { uploadSchoolCrest } from '../lib/queries'
+import { validateCrest } from '../lib/crest'
 
 /**
  * Reached when a signed in user has no school yet. Two doors: a parent
@@ -18,6 +21,8 @@ export default function Onboarding() {
   const [phone, setPhone] = useState('')
   const [schoolName, setSchoolName] = useState('')
   const [fullName, setFullName] = useState('')
+  const [crestFile, setCrestFile] = useState<File | null>(null)
+  const [crestPreview, setCrestPreview] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -57,17 +62,26 @@ export default function Onboarding() {
     navigate('/', { replace: true })
   }
 
+  function pickCrest(file: File) {
+    const invalid = validateCrest(file)
+    if (invalid) {
+      setError(invalid)
+      return
+    }
+    setError(null)
+    setCrestFile(file)
+    setCrestPreview(URL.createObjectURL(file))
+  }
+
   async function createSchool() {
     setError(null)
     setBusy(true)
-    const { error } = await supabase.rpc('create_school_and_admin', {
+    const { data, error } = await supabase.rpc('create_school_and_admin', {
       p_school_name: schoolName.trim(),
       p_full_name: fullName.trim(),
     })
-    setBusy(false)
     if (error) {
-      // The RPC is idempotent-hostile on purpose: a second submit after a
-      // successful first one lands here. The school exists, so just go in.
+      setBusy(false)
       if (/already belongs to a school/i.test(error.message)) {
         await refresh()
         navigate('/', { replace: true })
@@ -75,6 +89,14 @@ export default function Onboarding() {
       }
       return setError(error.message)
     }
+    if (crestFile && data) {
+      try {
+        await uploadSchoolCrest(data as string, crestFile)
+      } catch {
+        /* School exists; crest can be added later on Account. */
+      }
+    }
+    setBusy(false)
     await refresh()
     navigate('/', { replace: true })
   }
@@ -161,6 +183,10 @@ export default function Onboarding() {
           <div>
             <span className="eyebrow">Set up your school</span>
             <h2 className="text-[22px] mt-1.5">Name the school — you will be its proprietor</h2>
+            <p className="mt-2 text-[13px] text-ink-soft leading-relaxed">
+              Add the crest now and it becomes the school on every page and printable. You can
+              change it later under Account.
+            </p>
           </div>
           <Field
             label="School name"
@@ -175,6 +201,18 @@ export default function Onboarding() {
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
           />
+          <div>
+            <span className="eyebrow block mb-1.5">School crest</span>
+            <CrestPicker
+              preview={crestPreview}
+              onPick={pickCrest}
+              onClear={() => {
+                setCrestFile(null)
+                setCrestPreview(null)
+              }}
+              compact
+            />
+          </div>
           <Button type="submit" full loading={busy}>
             Create school
           </Button>

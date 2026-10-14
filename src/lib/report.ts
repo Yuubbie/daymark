@@ -26,7 +26,7 @@ export type TermReport = {
     photo_url: string | null
     fee_cleared: boolean
   }
-  school: { id: string; name: string }
+  school: { id: string; name: string; logo_url?: string | null }
   class: { id: string; name: string } | null
   term: { id: string; name: string; start_date: string; end_date: string } | null
   attendance: {

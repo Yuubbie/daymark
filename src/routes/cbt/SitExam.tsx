@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useParams } from 'react-router-dom'
-import { Wordmark } from '../../components/Logo'
+import { SchoolBrand } from '../../components/SchoolBrand'
+import { useAuth } from '../../lib/auth'
 import { Alert, Button, Field, Spinner, TextArea } from '../../components/ui'
 import {
   fetchPaperById,
@@ -326,10 +327,16 @@ function QuestionBody({
 }
 
 function Shell({ children }: { children: ReactNode }) {
+  const { school } = useAuth()
   return (
     <div className="min-h-dvh bg-paper">
       <header className="bg-ink text-ink-invert px-5 h-14 flex items-center">
-        <Wordmark size="xs" className="text-ink-invert" />
+        <SchoolBrand
+          name={school?.name ?? 'Exam'}
+          logoUrl={school?.logo_url}
+          size="xs"
+          className="text-ink-invert"
+        />
       </header>
       <main className="mx-auto max-w-2xl px-4 py-8">{children}</main>
     </div>

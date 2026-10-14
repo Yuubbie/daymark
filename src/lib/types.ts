@@ -35,6 +35,7 @@ export interface School {
   subscription_status: string
   address: string | null
   phone: string | null
+  logo_url: string | null
 }
 
 export interface Student {

@@ -674,3 +674,18 @@ export async function updateSchoolContact(schoolId: string, address: string, pho
     .eq('id', schoolId)
   if (error) throw error
 }
+
+export async function updateSchoolLogo(schoolId: string, logoUrl: string | null) {
+  const { error } = await supabase.from('schools').update({ logo_url: logoUrl }).eq('id', schoolId)
+  if (error) throw error
+}
+
+export async function uploadSchoolCrest(schoolId: string, file: File): Promise<string> {
+  const ext = (file.name.split('.').pop() || 'jpg').replace(/[^a-z0-9]/gi, '')
+  const path = `${schoolId}/logo/${Date.now()}.${ext}`
+  const { error: uploadErr } = await supabase.storage.from('student-photos').upload(path, file)
+  if (uploadErr) throw uploadErr
+  const { data } = supabase.storage.from('student-photos').getPublicUrl(path)
+  await updateSchoolLogo(schoolId, data.publicUrl)
+  return data.publicUrl
+}

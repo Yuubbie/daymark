@@ -106,8 +106,14 @@ Credit-card size (85.6 x 54 mm). Front and back as a pair.
 Cut, fold, laminate.
 A missing photo is a blank square, not a blocked print.
 Class (top left) returns to the class.
-Account → On the ID card saves address and phone
-on the back. Leave blank and it still says return to the office.
+Welcome → I run a school: name it and upload the crest.
+Account → School identity: change the crest later, and save
+address and phone for the ID reverse.
+The crest replaces Daymaark on the dashboard, ID cards,
+claim slips, term cards, and the exam desk.
+If there is no crest, the school name sits there instead.
+Login and marketing stay Daymaark.
+Leave address blank and the card still says return to the office.
 
 Classes → open the class → Print term cards.
 One sheet per child. Staff can print even if fees are due.
@@ -150,6 +156,7 @@ Apply form 404        Paste APPLY_RUN13.sql, then hard-refresh.
 No enrol button       Create a class first.
 No ID cards           Open the class, then Print ID cards.
 Blank if-found line   Account → On the ID card, save address and phone.
+Still seeing Daymaark  Account → On the ID card, upload a crest. Hard-refresh.
 No class term cards   Open the class, then Print term cards.
 
 WhatsApp care: 0703 235 2158

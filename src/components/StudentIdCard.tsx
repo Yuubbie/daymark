@@ -1,5 +1,3 @@
-import { Mark } from './Logo'
-
 export type IdStudent = {
   id: string
   first_name: string
@@ -8,23 +6,36 @@ export type IdStudent = {
   photo_url?: string | null
 }
 
+function Crest({ src }: { src?: string | null }) {
+  if (!src) return null
+  return (
+    <img
+      src={src}
+      alt=""
+      className="h-[12px] w-auto max-w-[16px] object-contain shrink-0 bg-ink-invert rounded-[1px]"
+    />
+  )
+}
+
 export function StudentIdCard({
   school,
   className,
   student,
   term,
+  logoUrl,
 }: {
   school: string
   className: string
   student: IdStudent
   term?: string | null
+  logoUrl?: string | null
 }) {
   const name = `${student.first_name} ${student.last_name}`
 
   return (
     <article className="id-card bg-surface text-ink overflow-hidden flex flex-col">
       <header className="id-card-head bg-ink text-ink-invert flex items-center gap-[2mm] px-[3.5mm] py-[2.2mm]">
-        <Mark className="h-[11px] w-[15px] shrink-0 text-ink-invert" accent="text-brass" />
+        <Crest src={logoUrl} />
         <div className="min-w-0 flex-1">
           <div className="font-display font-bold text-[9pt] leading-tight tracking-[-0.02em] truncate">
             {school}
@@ -74,18 +85,21 @@ export function StudentIdCardBack({
   term,
   address,
   phone,
+  logoUrl,
 }: {
   school: string
   student: IdStudent
   term?: string | null
   address?: string | null
   phone?: string | null
+  logoUrl?: string | null
 }) {
   const found = [address, phone].filter(Boolean).join(' · ')
   return (
     <article className="id-card id-card-back bg-surface text-ink overflow-hidden flex flex-col">
-      <header className="id-card-head bg-ink text-ink-invert px-[3.5mm] py-[2.2mm]">
-        <div className="font-display font-bold text-[9pt] leading-tight tracking-[-0.02em] truncate">
+      <header className="id-card-head bg-ink text-ink-invert flex items-center gap-[2mm] px-[3.5mm] py-[2.2mm]">
+        <Crest src={logoUrl} />
+        <div className="font-display font-bold text-[9pt] leading-tight tracking-[-0.02em] truncate min-w-0">
           {school}
         </div>
       </header>
@@ -122,6 +136,7 @@ export function StudentIdPair(props: {
   term?: string | null
   address?: string | null
   phone?: string | null
+  logoUrl?: string | null
 }) {
   return (
     <div className="id-pair">
@@ -132,6 +147,7 @@ export function StudentIdPair(props: {
         term={props.term}
         address={props.address}
         phone={props.phone}
+        logoUrl={props.logoUrl}
       />
     </div>
   )
@@ -141,15 +157,17 @@ export function ClaimSlip({
   school,
   student,
   code,
+  logoUrl,
 }: {
   school: string
   student: string
   code: string
+  logoUrl?: string | null
 }) {
   return (
     <article className="id-card id-slip bg-surface text-ink overflow-hidden flex flex-col">
       <header className="id-card-head bg-ink text-ink-invert flex items-center gap-[2mm] px-[3.5mm] py-[2.2mm]">
-        <Mark className="h-[11px] w-[15px] shrink-0 text-ink-invert" accent="text-brass" />
+        <Crest src={logoUrl} />
         <div className="min-w-0 flex-1">
           <div className="font-display font-bold text-[9pt] leading-tight tracking-[-0.02em] truncate">
             {school}

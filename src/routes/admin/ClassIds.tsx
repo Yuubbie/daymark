@@ -73,6 +73,7 @@ export default function ClassIds() {
                 term={term?.name}
                 address={school?.address}
                 phone={school?.phone}
+                logoUrl={school?.logo_url}
               />
             ))}
           </div>

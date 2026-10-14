@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AppShell } from '../components/AppShell'
+import { SchoolLogoUpload } from '../components/SchoolLogoUpload'
 import { Alert, Button, Field, Panel, Row } from '../components/ui'
 import { useAuth } from '../lib/auth'
 import { updateSchoolContact } from '../lib/queries'
@@ -81,11 +82,19 @@ export default function Account() {
         </Panel>
 
         {canEdit && school && (
-          <Panel title="On the ID card">
+          <Panel title="School identity">
             <p className="text-[13px] text-ink-soft mb-3">
-              Address and phone print on the back. Leave blank and the card still says return to
-              the office.
+              The crest replaces Daymaark on the dashboard, ID cards, claim slips, and term
+              cards. You can also add it when you name the school. Address and phone print on
+              the back of the ID. Leave blank and the card still says return to the office.
             </p>
+            <div className="mb-4">
+              <SchoolLogoUpload
+                schoolId={school.id}
+                currentUrl={school.logo_url}
+                onSaved={() => void refresh()}
+              />
+            </div>
             {error && (
               <div className="mb-3">
                 <Alert>{error}</Alert>

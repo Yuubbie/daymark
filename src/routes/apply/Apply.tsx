@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Wordmark } from '../../components/Logo'
+import { SchoolBrand } from '../../components/SchoolBrand'
 import { Alert, Button, Empty, Field, Spinner, TextArea } from '../../components/ui'
 import { schoolForApply, submitEnquiry } from '../../lib/queries'
 import { isSupabaseConfigured } from '../../lib/supabase'
@@ -79,9 +80,13 @@ export default function Apply() {
     <div className="min-h-dvh bg-paper">
       <header className="border-b border-rule bg-surface">
         <div className="mx-auto max-w-[440px] px-5 h-14 flex items-center">
-          <Link to="/" aria-label="Daymaark home">
-            <Wordmark size="sm" />
-          </Link>
+          {school ? (
+            <SchoolBrand name={school.name} size="sm" />
+          ) : (
+            <Link to="/" aria-label="Daymaark home">
+              <Wordmark size="sm" />
+            </Link>
+          )}
         </div>
       </header>
       <main className="mx-auto max-w-[440px] px-5 py-8">

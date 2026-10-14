@@ -1,5 +1,6 @@
 import { AttendanceSummary, RegisterLegend } from './RegisterStrip'
 import { Empty, Panel, Row } from './ui'
+import { useAuth } from '../lib/auth'
 import type { ReportSubject, TermReport } from '../lib/report'
 import { overallAverage } from '../lib/report'
 
@@ -15,9 +16,11 @@ function scoreLine(subject: ReportSubject) {
 }
 
 export function TermReportCard({ report }: { report: TermReport }) {
+  const { school } = useAuth()
   const name = `${report.student.first_name} ${report.student.last_name}`
   const overall = overallAverage(report.subjects)
   const att = report.attendance
+  const crest = report.school.logo_url ?? school?.logo_url
 
   return (
     <article className="report-sheet space-y-4">
@@ -33,7 +36,16 @@ export function TermReportCard({ report }: { report: TermReport }) {
             <div className="h-16 w-16 rounded-md border border-rule bg-surface-alt shrink-0" />
           )}
           <div className="min-w-0 flex-1">
-            <span className="eyebrow">{report.school.name}</span>
+            <div className="flex items-center gap-2 min-w-0">
+              {crest && (
+                <img
+                  src={crest}
+                  alt=""
+                  className="h-7 w-7 rounded-sm object-contain border border-rule bg-surface shrink-0"
+                />
+              )}
+              <span className="eyebrow truncate">{report.school.name}</span>
+            </div>
             <h1 className="text-[26px] mt-1">{name}</h1>
             <p className="mt-1 text-[13px] text-ink-soft">
               {report.class?.name ?? 'Unassigned'}

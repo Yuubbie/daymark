@@ -87,7 +87,7 @@ async function fetchProfile(userId: string, attempt = 0): Promise<ProfileResult>
 async function fetchSchool(schoolId: string): Promise<School | null> {
   const { data, error } = await supabase
     .from('schools')
-      .select('id, name, slug, subscription_status, address, phone')
+      .select('id, name, slug, subscription_status, address, phone, logo_url')
     .eq('id', schoolId)
     .maybeSingle()
   if (error) {
