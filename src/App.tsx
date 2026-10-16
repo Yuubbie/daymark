@@ -31,6 +31,7 @@ import Marketing from './routes/Marketing'
 import DemoApp from './routes/demo/DemoApp'
 import QuestionBank from './routes/cbt/QuestionBank'
 import Exams from './routes/cbt/Exams'
+import ExamPoster from './routes/cbt/ExamPoster'
 import Marking from './routes/cbt/Marking'
 import SitExam from './routes/cbt/SitExam'
 import StudentHome from './routes/student/StudentHome'
@@ -308,6 +309,14 @@ export default function App() {
             element={
               <Protected roles={['teacher', 'admin', 'proprietor']}>
                 <Exams />
+              </Protected>
+            }
+          />
+          <Route
+            path="/cbt/exams/:id/poster"
+            element={
+              <Protected roles={['teacher', 'admin', 'proprietor']}>
+                <ExamPoster />
               </Protected>
             }
           />

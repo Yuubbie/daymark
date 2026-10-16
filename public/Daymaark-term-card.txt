@@ -119,6 +119,27 @@ Classes → open the class → Print term cards.
 One sheet per child. Staff can print even if fees are due.
 The parent view still locks until fees are cleared.
 
+-----------------------------------------------
+WHERE TO PRINT AN EXAM POSTER
+-----------------------------------------------
+Paste APPLY_RUN14.sql first. The link table already
+existed; this only tightens who can sit it how often.
+
+CBT → Exams → on a published paper, tap Poster.
+The link is minted for you and the poster opens ready.
+One page: school crest, the paper, a QR code, the plain
+address, and how to sit it. Print or photocopy one copy
+for the classroom door. Students scan it from their own
+phones. No Daymaark account, no app.
+
+One attempt per name. A child on a borrowed phone types
+a name; that name may open only one attempt on the paper.
+Same name again while the attempt is still open resumes
+it, so a refresh or a flat battery does not lock anyone
+out. Once submitted, the name is spent.
+Identified students are keyed on their student number,
+not the typed name.
+
 ------------------------------------------------
 HOW TO APPLY IT IN A LIVE SCHOOL
 ------------------------------------------------
@@ -158,5 +179,8 @@ No ID cards           Open the class, then Print ID cards.
 Blank if-found line   Account → On the ID card, save address and phone.
 Still seeing Daymaark  Account → On the ID card, upload a crest. Hard-refresh.
 No class term cards   Open the class, then Print term cards.
+No Poster button      Publish the paper first. Drafts and closed papers do not show it.
+Name already used     That name already sat the paper. Use the register to check.
+No QR on the poster   Paste APPLY_RUN14.sql, then hard-refresh.
 
 WhatsApp care: 0703 235 2158

@@ -161,6 +161,8 @@
   aside, nav, .print-chrome { display: none !important; }
   main { padding: 0 !important; margin: 0 !important; }
   .report-sheet { break-inside: avoid; }
+  .poster-sheet { break-inside: avoid; page-break-inside: avoid; }
+  .poster-sheet section { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .class-reports .report-sheet {
     break-after: page;
     page-break-after: always;

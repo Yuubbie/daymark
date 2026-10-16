@@ -153,6 +153,18 @@ export async function listExams(): Promise<ExamRow[]> {
   return (data ?? []) as ExamRow[]
 }
 
+export async function fetchExamById(examId: string): Promise<ExamRow | null> {
+  const { data, error } = await supabase
+    .from('exams')
+    .select(
+      'id, title, subject, class_id, kind, status, duration_minutes, opens_at, closes_at, allow_offline, instructions, created_at',
+    )
+    .eq('id', examId)
+    .maybeSingle()
+  if (error) throw error
+  return (data as ExamRow | null) ?? null
+}
+
 export async function createExam(input: {
   school_id: string
   title: string

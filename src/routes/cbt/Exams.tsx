@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { Alert, Button, Empty, Field, Modal, Panel, Row, Spinner, TextArea } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
@@ -17,6 +18,7 @@ import type { ExamKind } from '../../lib/types'
 
 export default function Exams() {
   const { profile } = useAuth()
+  const navigate = useNavigate()
   const [exams, setExams] = useState<ExamRow[]>([])
   const [classes, setClasses] = useState<ClassRow[]>([])
   const [banks, setBanks] = useState<BankRow[]>([])
@@ -66,6 +68,15 @@ export default function Exams() {
     try {
       const token = await mintExamLink(id, kind)
       setLink(`${window.location.origin}/sit/${token}`)
+    } catch (e) {
+      setError((e as Error).message)
+    }
+  }
+
+  async function poster(id: string) {
+    try {
+      const token = await mintExamLink(id, 'student')
+      navigate(`/cbt/exams/${id}/poster?token=${token}`)
     } catch (e) {
       setError((e as Error).message)
     }
@@ -148,6 +159,9 @@ export default function Exams() {
                         <>
                           <button className="text-[11px] underline" onClick={() => void share(e.id, 'student')}>
                             Link
+                          </button>
+                          <button className="text-[11px] underline" onClick={() => void poster(e.id)}>
+                            Poster
                           </button>
                           {e.kind === 'interview' && (
                             <button className="text-[11px] underline" onClick={() => void share(e.id, 'applicant')}>

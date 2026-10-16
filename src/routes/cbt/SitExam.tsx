@@ -95,6 +95,10 @@ export default function SitExam({ examId }: { examId?: string }) {
 
   async function begin() {
     setError(null)
+    if (token && !name.trim()) {
+      setError('Type your full name before you start. One attempt per name.')
+      return
+    }
     try {
       const id = token ? await startLinked(token, name, email) : await startStudent(examId!)
       setAttemptId(id)
@@ -178,7 +182,7 @@ export default function SitExam({ examId }: { examId?: string }) {
         )}
         {token && (
           <div className="mt-5 space-y-3">
-            <Field label="Your name" value={name} onChange={(e) => setName(e.target.value)} hint="Required if you are sitting this on a borrowed device." />
+            <Field label="Your full name" value={name} onChange={(e) => setName(e.target.value)} hint="Type it exactly as it is on the class register. One attempt per name, so do not share it." />
             <Field label="Email (optional)" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
         )}
