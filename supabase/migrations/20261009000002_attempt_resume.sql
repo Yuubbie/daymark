@@ -50,7 +50,7 @@ begin
   end if;
 
   if v_attempt.status = 'in_progress' then
-    select coalesce(jsonb_object_agg(question_id, response), '{}'::jsonb)
+    select coalesce(jsonb_object_agg(question_id::text, response), '{}'::jsonb)
       into v_answers
       from exam_answers
      where attempt_id = v_attempt.id;
