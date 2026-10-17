@@ -286,6 +286,26 @@ export async function startStudent(examId: string) {
   return data as string
 }
 
+export type AttemptState = {
+  attempt_id: string
+  status: string
+  started_at: string
+  answers: Record<string, unknown>
+}
+
+/**
+ * What a live attempt already has: when it started, and any saved answers.
+ * Submit validates the token against the attempt's link, so this does too.
+ */
+export async function fetchAttemptState(attemptId: string, token?: string): Promise<AttemptState> {
+  const { data, error } = await supabase.rpc('linked_attempt_state', {
+    p_attempt_id: attemptId,
+    p_token: token || null,
+  })
+  if (error) throw error
+  return data as AttemptState
+}
+
 export async function submitAttempt(
   attemptId: string,
   answers: Record<string, unknown>,

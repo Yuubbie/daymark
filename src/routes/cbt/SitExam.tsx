@@ -4,6 +4,7 @@ import { SchoolBrand } from '../../components/SchoolBrand'
 import { useAuth } from '../../lib/auth'
 import { Alert, Button, Field, Spinner, TextArea } from '../../components/ui'
 import {
+  fetchAttemptState,
   fetchPaperById,
   fetchPaperByToken,
   shuffle,
@@ -15,6 +16,25 @@ import {
 } from '../../lib/cbt'
 
 const OFFLINE_KEY = 'daymark.offline.paper.'
+const DRAFT_KEY = 'daymark.attempt.draft.'
+const NAME_KEY = 'daymark.sit.name.'
+
+function readDraft(attemptId: string): Record<string, unknown> {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY + attemptId)
+    return raw ? (JSON.parse(raw) as Record<string, unknown>) : {}
+  } catch {
+    return {}
+  }
+}
+
+function clearDraft(attemptId: string) {
+  try {
+    localStorage.removeItem(DRAFT_KEY + attemptId)
+  } catch {
+    /* ignore */
+  }
+}
 
 export default function SitExam({ examId }: { examId?: string }) {
   const { token } = useParams()
@@ -30,6 +50,8 @@ export default function SitExam({ examId }: { examId?: string }) {
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<{ score: number; total: number; result_status: string } | null>(null)
   const tick = useRef<number | null>(null)
+  const deadline = useRef<number | null>(null)
+  const expiredAtStart = useRef(false)
 
   useEffect(() => {
     void (async () => {
@@ -37,6 +59,15 @@ export default function SitExam({ examId }: { examId?: string }) {
       try {
         const p = token ? await fetchPaperByToken(token) : await fetchPaperById(examId!)
         setPaper(p)
+        // Prefill the name this phone used, so a resumed sit is one tap.
+        if (token) {
+          try {
+            const remembered = localStorage.getItem(NAME_KEY + token)
+            if (remembered) setName(remembered)
+          } catch {
+            /* ignore */
+          }
+        }
         if (p.exam.allow_offline) {
           try {
             localStorage.setItem(OFFLINE_KEY + (token ?? examId), JSON.stringify(p))
@@ -72,26 +103,37 @@ export default function SitExam({ examId }: { examId?: string }) {
 
   useEffect(() => {
     if (!started || !paper?.exam.duration_minutes) return
-    setRemaining(paper.exam.duration_minutes * 60)
-    tick.current = window.setInterval(() => {
-      setRemaining((s) => {
-        if (s === null) return s
-        if (s <= 1) {
-          if (tick.current) window.clearInterval(tick.current)
-          return 0
-        }
-        return s - 1
-      })
-    }, 1000)
+    // begin() seeds the deadline from the attempt's real start time, so a
+    // refresh finishes the original clock instead of granting a fresh one.
+    if (deadline.current === null) {
+      deadline.current = Date.now() + paper.exam.duration_minutes * 60_000
+    }
+    const update = () => {
+      const left = Math.max(0, Math.round(((deadline.current ?? Date.now()) - Date.now()) / 1000))
+      setRemaining(left)
+    }
+    update()
+    tick.current = window.setInterval(update, 1000)
     return () => {
       if (tick.current) window.clearInterval(tick.current)
     }
   }, [started, paper])
 
   useEffect(() => {
-    if (remaining === 0 && attemptId && !result) void finish()
+    if (remaining === 0 && attemptId && !result && !expiredAtStart.current) void finish()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remaining])
+
+  // Answers only reach the server on submit, so a refresh mid-paper would
+  // otherwise lose them. Keep them in this browser until the paper is in.
+  useEffect(() => {
+    if (!started || !attemptId || result) return
+    try {
+      localStorage.setItem(DRAFT_KEY + attemptId, JSON.stringify(answers))
+    } catch {
+      /* ignore */
+    }
+  }, [answers, attemptId, started, result])
 
   async function begin() {
     setError(null)
@@ -101,8 +143,38 @@ export default function SitExam({ examId }: { examId?: string }) {
     }
     try {
       const id = token ? await startLinked(token, name, email) : await startStudent(examId!)
+
+      // A resumed attempt comes back with its real start time and whatever was
+      // already saved. The browser draft is layered on top because answers are
+      // only written to the server on submit.
+      let saved: Record<string, unknown> = {}
+      let beganAt = Date.now()
+      try {
+        const state = await fetchAttemptState(id, token)
+        saved = state.answers ?? {}
+        if (state.started_at) beganAt = new Date(state.started_at).getTime()
+      } catch {
+        /* a blank sheet beats a blocked start */
+      }
+      const answersNow = { ...saved, ...readDraft(id) }
+
+      if (paper?.exam.duration_minutes) {
+        deadline.current = beganAt + paper.exam.duration_minutes * 60_000
+        const left = Math.max(0, Math.round((deadline.current - Date.now()) / 1000))
+        // Time already gone? Let them see the paper and submit by hand rather
+        // than firing an empty sheet the moment the screen opens.
+        expiredAtStart.current = left === 0
+        setRemaining(left)
+      }
+
+      setAnswers(answersNow)
       setAttemptId(id)
       setStarted(true)
+      try {
+        if (token) localStorage.setItem(NAME_KEY + token, name.trim())
+      } catch {
+        /* ignore */
+      }
     } catch (e) {
       setError((e as Error).message)
     }
@@ -115,6 +187,7 @@ export default function SitExam({ examId }: { examId?: string }) {
     try {
       const r = await submitAttempt(attemptId, answers, token)
       setResult(r)
+      clearDraft(attemptId)
     } catch (e) {
       setError((e as Error).message)
     } finally {

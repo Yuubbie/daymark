@@ -122,9 +122,11 @@ The parent view still locks until fees are cleared.
 -----------------------------------------------
 WHERE TO PRINT AN EXAM POSTER
 -----------------------------------------------
-Paste APPLY_RUN14.sql, then APPLY_RUN15.sql. Run 14
-tightens who can sit it how often. Run 15 keeps one
-address per paper and lets a resumed attempt submit.
+Paste APPLY_RUN14.sql, then APPLY_RUN15.sql, then
+APPLY_RUN16.sql. Run 14 tightens who can sit it how
+often. Run 15 keeps one address per paper and lets a
+resumed attempt submit. Run 16 brings the answers and
+the clock back with it.
 
 CBT → Exams → on a published paper, tap Poster.
 The link is minted for you and the poster opens ready.
@@ -139,8 +141,10 @@ One attempt per name. A child on a borrowed phone types
 a name; that name may open only one attempt on the paper.
 Same name again while the attempt is still open resumes
 it, so a refresh or a flat battery does not lock anyone
-out. Continuing on a second poster finishes the same
-attempt. Once submitted, the name is spent.
+out. Answers typed on that phone come back with it, and
+the clock carries on from the first Start rather than
+beginning again. Continuing on a second poster finishes
+the same attempt. Once submitted, the name is spent.
 Identified students are keyed on their student number,
 not the typed name.
 
@@ -187,5 +191,7 @@ No Poster button      Publish the paper first. Drafts and closed papers do not s
 Name already used     That name already sat the paper. Use the register to check.
 Cannot submit resumed Paste APPLY_RUN15.sql, then hard-refresh.
 Link changed again    Paste APPLY_RUN15.sql. One open link per paper.
+Blank on refresh      Paste APPLY_RUN16.sql. Answers and the clock resume.
+Answers gone          Same phone only. A draft lives in that browser.
 
 WhatsApp care: 0703 235 2158
