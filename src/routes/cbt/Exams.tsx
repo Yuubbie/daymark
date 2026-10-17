@@ -160,9 +160,11 @@ export default function Exams() {
                           <button className="text-[11px] underline" onClick={() => void share(e.id, 'student')}>
                             Link
                           </button>
-                          <button className="text-[11px] underline" onClick={() => void poster(e.id)}>
-                            Poster
-                          </button>
+                          {e.kind !== 'interview' && (
+                            <button className="text-[11px] underline" onClick={() => void poster(e.id)}>
+                              Poster
+                            </button>
+                          )}
                           {e.kind === 'interview' && (
                             <button className="text-[11px] underline" onClick={() => void share(e.id, 'applicant')}>
                               Interview

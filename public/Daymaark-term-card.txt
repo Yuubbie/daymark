@@ -122,11 +122,14 @@ The parent view still locks until fees are cleared.
 -----------------------------------------------
 WHERE TO PRINT AN EXAM POSTER
 -----------------------------------------------
-Paste APPLY_RUN14.sql first. The link table already
-existed; this only tightens who can sit it how often.
+Paste APPLY_RUN14.sql, then APPLY_RUN15.sql. Run 14
+tightens who can sit it how often. Run 15 keeps one
+address per paper and lets a resumed attempt submit.
 
 CBT → Exams → on a published paper, tap Poster.
 The link is minted for you and the poster opens ready.
+Press it again and you get the same address, so two
+photocopies cannot disagree.
 One page: school crest, the paper, a QR code, the plain
 address, and how to sit it. Print or photocopy one copy
 for the classroom door. Students scan it from their own
@@ -136,7 +139,8 @@ One attempt per name. A child on a borrowed phone types
 a name; that name may open only one attempt on the paper.
 Same name again while the attempt is still open resumes
 it, so a refresh or a flat battery does not lock anyone
-out. Once submitted, the name is spent.
+out. Continuing on a second poster finishes the same
+attempt. Once submitted, the name is spent.
 Identified students are keyed on their student number,
 not the typed name.
 
@@ -181,6 +185,7 @@ Still seeing Daymaark  Account → On the ID card, upload a crest. Hard-refresh.
 No class term cards   Open the class, then Print term cards.
 No Poster button      Publish the paper first. Drafts and closed papers do not show it.
 Name already used     That name already sat the paper. Use the register to check.
-No QR on the poster   Paste APPLY_RUN14.sql, then hard-refresh.
+Cannot submit resumed Paste APPLY_RUN15.sql, then hard-refresh.
+Link changed again    Paste APPLY_RUN15.sql. One open link per paper.
 
 WhatsApp care: 0703 235 2158
