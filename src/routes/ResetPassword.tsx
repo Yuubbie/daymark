@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { isOpsEmail } from '../lib/ops'
 import { AuthLayout } from '../components/AuthLayout'
 import { Alert, Button, PasswordField } from '../components/ui'
 
@@ -19,7 +20,8 @@ export default function ResetPassword() {
     const { error } = await supabase.auth.updateUser({ password })
     setBusy(false)
     if (error) return setError(error.message)
-    navigate('/', { replace: true })
+    const { data } = await supabase.auth.getSession()
+    navigate(isOpsEmail(data.session?.user.email) ? '/ops' : '/', { replace: true })
   }
 
   return (

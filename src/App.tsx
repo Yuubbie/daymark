@@ -88,6 +88,7 @@ function Landing() {
   if (loading) return <Spinner />
   if (!session) return <Marketing />
   if (problem) return <Blocked problem={problem} />
+  if (isOpsEmail(session.user.email)) return <Navigate to="/ops" replace />
   if (!profile) return <Spinner />
   if (!profile.school_id) return <Navigate to="/welcome" replace />
 
@@ -135,10 +136,38 @@ function SignedIn({ children }: { children: ReactNode }) {
 
 /** Daymaark ops. Email allow-list, not a school role. Skips the school paywall. */
 function OpsOnly({ children }: { children: ReactNode }) {
-  const { session, loading } = useAuth()
+  const { session, loading, signOut } = useAuth()
   if (loading) return <Spinner />
   if (!session) return <Navigate to="/login" replace />
-  if (!isOpsEmail(session.user.email)) return <Navigate to="/" replace />
+  if (!isOpsEmail(session.user.email)) {
+    return (
+      <div className="min-h-dvh bg-paper flex items-center justify-center px-6">
+        <div className="w-full max-w-[440px]">
+          <Wordmark size="md" className="text-ink mb-7" />
+          <span className="eyebrow">Ops</span>
+          <h1 className="text-[26px] mt-1.5">This account is not ops</h1>
+          <p className="mt-3 text-[14px] text-ink-soft leading-relaxed">
+            Signed in as {session.user.email}. Only yomipeculiar@gmail.com and
+            daymaarkapp@gmail.com open this desk. Sign out, then sign in as one of those.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-2">
+            <Link to="/">
+              <Button variant="secondary">School office</Button>
+            </Link>
+            <Button
+              onClick={() => {
+                void signOut().then(() => {
+                  window.location.assign('/login')
+                })
+              }}
+            >
+              Sign out
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
   return <>{children}</>
 }
 

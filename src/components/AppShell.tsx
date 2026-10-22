@@ -2,6 +2,7 @@ import type { JSX } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { useAuth } from '../lib/auth'
+import { isOpsEmail } from '../lib/ops'
 import { ROLE_HOME } from '../lib/types'
 import { SchoolBrand } from './SchoolBrand'
 import {
@@ -106,7 +107,7 @@ function parentOf(path: string, role: string | undefined): string {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { profile, school, signOut } = useAuth()
+  const { profile, school, session, signOut } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const items = NAV[profile?.role ?? 'parent'] ?? []
@@ -162,7 +163,16 @@ export function AppShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
 
-        <div className="px-3 pb-5">
+        <div className="px-3 pb-5 space-y-0.5">
+          {isOpsEmail(session?.user.email) && (
+            <NavLink
+              to="/ops"
+              className="flex items-center gap-3 h-10 w-full px-3 rounded-md text-[14px]
+                         text-brass hover:text-ink-invert hover:bg-ink-invert/6 transition-colors"
+            >
+              Ops
+            </NavLink>
+          )}
           <button
             onClick={out}
             className="flex items-center gap-3 h-10 w-full px-3 rounded-md text-[14px]

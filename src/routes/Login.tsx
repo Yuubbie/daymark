@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
+import { isOpsEmail } from '../lib/ops'
 import { AuthLayout } from '../components/AuthLayout'
 import { Alert, Button, Field, PasswordField } from '../components/ui'
 
@@ -36,7 +37,7 @@ export default function Login() {
       }
       return setError(error.message)
     }
-    navigate('/')
+    navigate(isOpsEmail(email) ? '/ops' : '/')
   }
 
   async function resend() {

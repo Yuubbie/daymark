@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { isOpsEmail } from '../lib/ops'
 import { Wordmark } from '../components/Logo'
 import { Alert, Button, Spinner } from '../components/ui'
 
@@ -53,8 +54,10 @@ export default function AuthCallback() {
           otpType === 'recovery' ||
           url.searchParams.get('type') === 'recovery' ||
           hash.get('type') === 'recovery'
+        const { data: after } = await supabase.auth.getSession()
+        const home = isOpsEmail(after.session?.user.email) ? '/ops' : '/'
         window.history.replaceState({}, '', '/auth/callback')
-        navigate(isRecovery ? '/reset-password' : '/', { replace: true })
+        navigate(isRecovery ? '/reset-password' : home, { replace: true })
       } catch (e) {
         setError((e as Error).message)
       }
