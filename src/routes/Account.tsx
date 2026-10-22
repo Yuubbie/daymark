@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { AppShell } from '../components/AppShell'
 import { SchoolLogoUpload } from '../components/SchoolLogoUpload'
 import { Alert, Button, Field, Panel, Row } from '../components/ui'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
+import { isOpsEmail } from '../lib/ops'
 import { updateSchoolContact } from '../lib/queries'
 
 export default function Account() {
@@ -80,6 +82,17 @@ export default function Account() {
             )}
           </div>
         </Panel>
+
+        {isOpsEmail(session?.user.email) && (
+          <Panel title="Daymaark ops">
+            <p className="text-[13px] text-ink-soft mb-3">
+              Schools and proprietors across every school. Not the school office.
+            </p>
+            <Link to="/ops">
+              <Button variant="secondary">Open ops</Button>
+            </Link>
+          </Panel>
+        )}
 
         {canEdit && school && (
           <Panel title="School identity">

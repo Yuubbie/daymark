@@ -193,5 +193,16 @@ Cannot submit resumed Paste APPLY_RUN15.sql, then hard-refresh.
 Link changed again    Paste APPLY_RUN15.sql. One open link per paper.
 Blank on refresh      Paste APPLY_RUN16.sql. Answers and the clock resume.
 Answers gone          Same phone only. A draft lives in that browser.
+Ops 403 / forbidden   Paste APPLY_RUN17.sql, then hard-refresh.
+No Open ops           Sign in as yomipeculiar@gmail.com or daymaarkapp@gmail.com.
+
+------------------------------------------------
+DAYMAARK OPS
+------------------------------------------------
+Paste APPLY_RUN17.sql. Account → Open ops, or /ops.
+Schools and proprietors across every school. CSV is
+the sales list. Parent phones stay in the school.
+Not a school role. Those two emails keep their school
+logins; ops is an extra door.
 
 WhatsApp care: 0703 235 2158

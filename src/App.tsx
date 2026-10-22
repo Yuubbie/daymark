@@ -47,6 +47,8 @@ import Enquiries from './routes/admin/Enquiries'
 import ClassIds from './routes/admin/ClassIds'
 import ClassReports from './routes/admin/ClassReports'
 import ClassCodes from './routes/admin/ClassCodes'
+import OpsDesk from './routes/ops/OpsDesk'
+import { isOpsEmail } from './lib/ops'
 import { WhatsAppCare } from './components/BrandCredit'
 
 /** Shown when we have a session but cannot resolve a profile. Never spin forever. */
@@ -127,6 +129,15 @@ function SignedIn({ children }: { children: ReactNode }) {
   const { session, loading } = useAuth()
   if (loading) return <Spinner />
   if (!session) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
+
+/** Daymaark ops. Email allow-list, not a school role. Skips the school paywall. */
+function OpsOnly({ children }: { children: ReactNode }) {
+  const { session, loading } = useAuth()
+  if (loading) return <Spinner />
+  if (!session) return <Navigate to="/login" replace />
+  if (!isOpsEmail(session.user.email)) return <Navigate to="/" replace />
   return <>{children}</>
 }
 
@@ -414,6 +425,14 @@ export default function App() {
               <Protected roles={['proprietor', 'admin', 'teacher', 'parent', 'student']}>
                 <Account />
               </Protected>
+            }
+          />
+          <Route
+            path="/ops"
+            element={
+              <OpsOnly>
+                <OpsDesk />
+              </OpsOnly>
             }
           />
 
