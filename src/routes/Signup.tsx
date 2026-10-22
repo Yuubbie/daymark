@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 import { AuthLayout } from '../components/AuthLayout'
-import { Alert, Button, Field } from '../components/ui'
+import { Alert, Button, Field, PasswordField } from '../components/ui'
 
 export default function Signup() {
   const navigate = useNavigate()
@@ -108,12 +108,11 @@ export default function Signup() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <Field
+        <PasswordField
           label="Password"
-          type="password"
           autoComplete="new-password"
           minLength={8}
-          hint="At least 8 characters."
+          hint="At least 8 characters. Show if you need to check it."
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}

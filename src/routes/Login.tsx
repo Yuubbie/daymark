@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 import { AuthLayout } from '../components/AuthLayout'
-import { Alert, Button, Field } from '../components/ui'
+import { Alert, Button, Field, PasswordField } from '../components/ui'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -12,6 +12,7 @@ export default function Login() {
   const [busy, setBusy] = useState(false)
   const [resent, setResent] = useState(false)
   const [needsConfirm, setNeedsConfirm] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
 
   function redirectTo() {
     return `${window.location.origin}/auth/callback`
@@ -21,6 +22,7 @@ export default function Login() {
     setError(null)
     setResent(false)
     setNeedsConfirm(false)
+    setResetSent(false)
     if (!isSupabaseConfigured) {
       return setError('This preview has no database connected. Use Try the live demo, or add Supabase keys.')
     }
@@ -50,6 +52,19 @@ export default function Login() {
     setResent(true)
   }
 
+  async function sendReset() {
+    setError(null)
+    setResetSent(false)
+    if (!email.trim()) return setError('Type your email first, then request a new password.')
+    setBusy(true)
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: redirectTo(),
+    })
+    setBusy(false)
+    if (error) return setError(error.message)
+    setResetSent(true)
+  }
+
   return (
     <AuthLayout
       headline={
@@ -75,6 +90,11 @@ export default function Login() {
         {resent && (
           <p className="text-[13px] text-present">Confirmation email sent to {email}. Open it on this device.</p>
         )}
+        {resetSent && (
+          <p className="text-[13px] text-present">
+            Password reset sent to {email}. Open it on this device, then set a new one.
+          </p>
+        )}
         <Field
           label="Email"
           type="email"
@@ -83,9 +103,8 @@ export default function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <Field
+        <PasswordField
           label="Password"
-          type="password"
           autoComplete="current-password"
           required
           value={password}
@@ -105,6 +124,14 @@ export default function Login() {
               Resend confirmation email
             </button>
           )}
+          <button
+            type="button"
+            className="w-full text-center text-[12px] underline text-ink-faint hover:text-ink"
+            onClick={() => void sendReset()}
+            disabled={busy}
+          >
+            Forgot password
+          </button>
         </div>
       </form>
 

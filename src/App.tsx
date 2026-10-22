@@ -7,6 +7,7 @@ import { ROLE_HOME, type Role } from './lib/types'
 
 import Login from './routes/Login'
 import Signup from './routes/Signup'
+import ResetPassword from './routes/ResetPassword'
 import Onboarding from './routes/Onboarding'
 import AdminHome from './routes/admin/AdminHome'
 import Classes from './routes/admin/Classes'
@@ -149,6 +150,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/demo" element={<DemoApp />} />
           <Route path="/apply/:slug" element={<Apply />} />

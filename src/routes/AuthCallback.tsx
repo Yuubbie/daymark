@@ -48,8 +48,13 @@ export default function AuthCallback() {
             }
           }
         }
+        const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+        const isRecovery =
+          otpType === 'recovery' ||
+          url.searchParams.get('type') === 'recovery' ||
+          hash.get('type') === 'recovery'
         window.history.replaceState({}, '', '/auth/callback')
-        navigate('/', { replace: true })
+        navigate(isRecovery ? '/reset-password' : '/', { replace: true })
       } catch (e) {
         setError((e as Error).message)
       }

@@ -9,7 +9,7 @@ export const PLAN = {
   name: 'School',
   trialDays: 30,
   price: 200000,
-  per: 'term',
+  per: 'month',
   students: 'Unlimited students',
 }
 

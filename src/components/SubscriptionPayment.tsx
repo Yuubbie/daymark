@@ -162,7 +162,7 @@ export default function SubscriptionPayment({
         <h1 className="text-[26px] mt-1.5">Continue using Daymaark</h1>
         <p className="mt-3 text-[14px] text-ink-soft leading-relaxed">
           Your school's trial or paid period has ended. Continue for this
-          term.
+          month.
         </p>
 
         {status === "error" && errorMessage && (
@@ -190,7 +190,7 @@ export default function SubscriptionPayment({
               <div className="flex items-center justify-center">
                 <Stat
                   value={`₦${amount.toLocaleString("en-NG")}`}
-                  label="Due this term"
+                  label="Due this month"
                 />
               </div>
             </Panel>

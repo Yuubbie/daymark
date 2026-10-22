@@ -207,7 +207,7 @@ function DemoBanner({ onBilling }: { onBilling?: () => void }) {
   return (
     <div className="bg-brass-wash border-b border-brass/30 text-[12px] text-ink px-4 py-2 flex items-center justify-between gap-3">
       <span className="truncate">
-        Live demo · {demoSubscription.status === 'trial' ? `Trial, ${demoSubscription.daysLeft} days left` : 'Active'} · N200,000/term after 30 days
+        Live demo · {demoSubscription.status === 'trial' ? `Trial, ${demoSubscription.daysLeft} days left` : 'Active'} · N200,000/month after 30 days
       </span>
       <div className="flex items-center gap-3 shrink-0">
         {onBilling && (
@@ -482,7 +482,7 @@ function DemoOnboard({
             title="You are in."
             body={
               role === 'proprietor'
-                ? 'Greenfield Academy is on trial. Billing shows N200,000 per term when the trial ends.'
+                ? 'Greenfield Academy is on trial. Billing shows N200,000 per month when the trial ends.'
                 : 'Everything you see is sample data for a real school day.'
             }
           />

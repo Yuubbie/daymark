@@ -166,7 +166,7 @@ export default function Marketing() {
           {[
             ['20s', 'To mark a class present'],
             ['5 dashboards', 'Proprietor to student'],
-            ['30 days free', 'Then N200,000 a term'],
+            ['30 days free', 'Then N200,000 a month'],
             ['Offline-safe', 'Register works on 2G'],
           ].map(([k, v]) => (
             <div key={k}>
@@ -342,7 +342,7 @@ export default function Marketing() {
             <div className="mt-5 pt-4 border-t border-brass border-rule">
               <div className="flex items-center justify-between">
                 <span className="eyebrow">Subscription</span>
-                <span className="tnum text-[13px] text-brass">N200,000 / term</span>
+                <span className="tnum text-[13px] text-brass">N200,000 / month</span>
               </div>
             </div>
           </div>
@@ -414,7 +414,7 @@ export default function Marketing() {
           30 days free. Then one price for the whole school.
         </h2>
         <p className="mt-3 text-[15px] text-ink-soft max-w-[56ch]">
-          N200,000 a term, unlimited students. Parents, teachers and students are included, not
+          N200,000 a month, unlimited students. Parents, teachers and students are included, not
           charged per seat. No card needed to start the trial.
         </p>
         <div className="mt-10 grid md:grid-cols-3 gap-4">
@@ -427,7 +427,7 @@ export default function Marketing() {
           <PriceCard
             name="School"
             price="N200,000"
-            unit="per term, unlimited students"
+            unit="per month, unlimited students"
             featured
             points={[
               'Proprietor, admin, teacher, parent, student',
@@ -482,7 +482,7 @@ export default function Marketing() {
             ],
             [
               'What does it cost?',
-              '30 days free, then N200,000 a term for the whole school. Unlimited students. Parents, teachers and students are not charged per seat.',
+              '30 days free, then N200,000 a month for the whole school. Unlimited students. Parents, teachers and students are not charged per seat.',
             ],
             [
               'Can parents use it without a smartphone?',
@@ -515,7 +515,7 @@ export default function Marketing() {
             <h2 className="text-[36px] max-w-[16ch]">Run the whole school. Show the whole family.</h2>
             <p className="mt-3 text-ink-invert/65 max-w-[44ch]">
               Walk all five dashboards on a live school, then book a session with your own class list.
-              N200,000 a term after a 30-day trial.
+              N200,000 a month after a 30-day trial.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

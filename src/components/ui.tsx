@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
@@ -66,6 +66,42 @@ export function Field({ label, hint, error, mono, className = '', ...rest }: Fie
           ${mono ? 'font-mono tracking-[0.12em] uppercase' : ''} ${className}`}
         {...rest}
       />
+      {error ? (
+        <span className="block mt-1.5 text-[12px] text-absent">{error}</span>
+      ) : hint ? (
+        <span className="block mt-1.5 text-[12px] text-ink-faint">{hint}</span>
+      ) : null}
+    </label>
+  )
+}
+
+export function PasswordField({
+  label,
+  hint,
+  error,
+  className = '',
+  ...rest
+}: Omit<FieldProps, 'type' | 'mono'>) {
+  const [show, setShow] = useState(false)
+  return (
+    <label className="block">
+      <span className="eyebrow block mb-1.5">{label}</span>
+      <div className="relative">
+        <input
+          type={show ? 'text' : 'password'}
+          className={`w-full h-11 pl-3 pr-16 bg-surface border rounded-md text-[15px] text-ink
+            placeholder:text-ink-faint transition-colors
+            ${error ? 'border-absent' : 'border-rule-strong focus:border-brass'} ${className}`}
+          {...rest}
+        />
+        <button
+          type="button"
+          className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-faint hover:text-ink"
+          onClick={() => setShow((v) => !v)}
+        >
+          {show ? 'Hide' : 'Show'}
+        </button>
+      </div>
       {error ? (
         <span className="block mt-1.5 text-[12px] text-absent">{error}</span>
       ) : hint ? (
