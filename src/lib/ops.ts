@@ -37,6 +37,14 @@ export async function fetchOpsSchools(): Promise<OpsSchool[]> {
   return (data ?? []) as OpsSchool[]
 }
 
+export async function removeOpsSchool(schoolId: string, confirmName: string): Promise<void> {
+  const { error } = await supabase.rpc('ops_remove_school', {
+    p_school_id: schoolId,
+    p_confirm_name: confirmName,
+  })
+  if (error) throw error
+}
+
 export function schoolsToCsv(rows: OpsSchool[]): string {
   const cols = [
     'name',

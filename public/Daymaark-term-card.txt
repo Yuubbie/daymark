@@ -195,13 +195,17 @@ Blank on refresh      Paste APPLY_RUN16.sql. Answers and the clock resume.
 Answers gone          Same phone only. A draft lives in that browser.
 Ops 403 / forbidden   Paste APPLY_RUN17.sql, then hard-refresh.
 No Open ops           Sign in as yomipeculiar@gmail.com or daymaarkapp@gmail.com.
+Cannot remove school  Paste APPLY_RUN18.sql. Type the school name exactly.
 
 ------------------------------------------------
 DAYMAARK OPS
 ------------------------------------------------
-Paste APPLY_RUN17.sql. Account → Open ops, or /ops.
+Paste APPLY_RUN17.sql, then APPLY_RUN18.sql.
+Account → Open ops, or /ops.
 Schools and proprietors across every school. CSV is
 the sales list. Parent phones stay in the school.
+Open a school, Remove school, type the name exactly.
+Your login stays even if you sat in that school.
 Not a school role. Those two emails keep their school
 logins; ops is an extra door. Same password as signup.
 Forgot password on Sign in sends a reset email.

@@ -1,4 +1,4 @@
-import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { AuthProvider, useAuth } from './lib/auth'
 import { Button, Spinner } from './components/ui'
@@ -469,8 +469,14 @@ export default function App() {
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        <WhatsAppCare />
+        <CareUnlessOps />
       </AuthProvider>
     </BrowserRouter>
   )
+}
+
+function CareUnlessOps() {
+  const { pathname } = useLocation()
+  if (pathname.startsWith('/ops')) return null
+  return <WhatsAppCare />
 }
