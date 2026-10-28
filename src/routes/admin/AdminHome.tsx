@@ -85,10 +85,10 @@ export default function AdminHome() {
                   done={Boolean(term)}
                   n={profile?.role === 'proprietor' ? 2 : 1}
                   title="Set the current term"
-                  body="Attendance and reports are measured against it."
+                  body="Attendance, reports, and fees follow this term. Activating a new one marks fees due again."
                   action={
                     <Button variant="secondary" onClick={() => setTermOpen(true)}>
-                      {term ? 'Change' : 'Set term'}
+                      {term ? 'New term' : 'Set term'}
                     </Button>
                   }
                 />
@@ -204,10 +204,18 @@ export default function AdminHome() {
               <Stat value={sum?.lessonsToday ?? 0} label="Lessons posted" />
             </div>
             {term && (
-              <p className="mt-5 pt-4 border-t border-rule text-[13px] text-ink-faint">
-                Current term: <span className="text-ink">{term.name}</span>, {term.start_date} to{' '}
-                {term.end_date}
-              </p>
+              <div className="mt-5 pt-4 border-t border-rule flex items-center justify-between gap-3">
+                <p className="text-[13px] text-ink-faint">
+                  Current term: <span className="text-ink">{term.name}</span>, {term.start_date} to{' '}
+                  {term.end_date}
+                </p>
+                <button
+                  className="font-mono text-[11px] uppercase tracking-[0.1em] underline shrink-0"
+                  onClick={() => setTermOpen(true)}
+                >
+                  New term
+                </button>
+              </div>
             )}
           </Panel>
 
@@ -344,7 +352,7 @@ function TermModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Current term">
+    <Modal open={open} onClose={onClose} title="Activate a term">
       <form
         className="space-y-3.5"
         onSubmit={(e) => {
@@ -353,6 +361,11 @@ function TermModal({
         }}
       >
         {error && <Alert>{error}</Alert>}
+        <p className="text-[13px] text-ink-soft">
+          This becomes the current term. Every active student is marked fees due until the office
+          clears them. Fee structures from the last term are copied under the new name if the fee
+          tables exist.
+        </p>
         <Field label="Term name" required value={name} onChange={(e) => setName(e.target.value)} />
         <div className="grid grid-cols-2 gap-3">
           <Field
@@ -371,7 +384,7 @@ function TermModal({
           />
         </div>
         <Button type="submit" full loading={busy}>
-          Save term
+          Activate term
         </Button>
       </form>
     </Modal>

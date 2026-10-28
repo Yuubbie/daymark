@@ -22,6 +22,7 @@ export default function TeacherTimetable() {
   const [classSlots, setClassSlots] = useState<TimetableSlot[]>([])
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
+  const [editing, setEditing] = useState<TimetableSlot | null>(null)
 
   async function reloadMine() {
     if (!session) return
@@ -60,6 +61,11 @@ export default function TeacherTimetable() {
     void reloadClass(classId)
   }, [classId])
 
+  function openSlot(slot: TimetableSlot | null) {
+    setEditing(slot)
+    setOpen(true)
+  }
+
   return (
     <AppShell>
       <div className="mb-5 flex items-end justify-between gap-3">
@@ -67,7 +73,7 @@ export default function TeacherTimetable() {
           <span className="eyebrow">This week</span>
           <h1 className="text-[26px] mt-1">Your timetable</h1>
         </div>
-        <Button onClick={() => setOpen(true)} disabled={!classId}>
+        <Button onClick={() => openSlot(null)} disabled={!classId}>
           Add period
         </Button>
       </div>
@@ -80,7 +86,7 @@ export default function TeacherTimetable() {
             {mine.length === 0 ? (
               <Empty line="Nothing on your week yet. Add a period for a class you teach." />
             ) : (
-              <SlotTable slots={mine} showClass />
+              <SlotTable slots={mine} showClass onEdit={openSlot} />
             )}
           </Panel>
 
@@ -100,7 +106,7 @@ export default function TeacherTimetable() {
               {classSlots.length === 0 ? (
                 <Empty line="This class has no timetable yet." />
               ) : (
-                <SlotTable slots={classSlots} />
+                <SlotTable slots={classSlots} onEdit={openSlot} />
               )}
             </Panel>
           )}
@@ -109,13 +115,18 @@ export default function TeacherTimetable() {
 
       <TimetableSlotModal
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          setOpen(false)
+          setEditing(null)
+        }}
         schoolId={profile?.school_id ?? ''}
-        classId={classId}
+        classId={editing?.class_id ?? classId}
         teachers={teachers}
         defaultTeacherId={session?.user.id}
+        slot={editing}
         onSaved={async () => {
           setOpen(false)
+          setEditing(null)
           await Promise.all([reloadMine(), reloadClass(classId)])
         }}
       />
@@ -123,7 +134,15 @@ export default function TeacherTimetable() {
   )
 }
 
-function SlotTable({ slots, showClass }: { slots: TimetableSlot[]; showClass?: boolean }) {
+function SlotTable({
+  slots,
+  showClass,
+  onEdit,
+}: {
+  slots: TimetableSlot[]
+  showClass?: boolean
+  onEdit: (slot: TimetableSlot) => void
+}) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-[13px]">
@@ -135,6 +154,7 @@ function SlotTable({ slots, showClass }: { slots: TimetableSlot[]; showClass?: b
             <th className="text-left">Subject</th>
             {showClass && <th className="text-left">Class</th>}
             <th className="text-left">Room</th>
+            <th className="text-left"></th>
           </tr>
         </thead>
         <tbody className="divide-y divide-rule">
@@ -148,6 +168,14 @@ function SlotTable({ slots, showClass }: { slots: TimetableSlot[]; showClass?: b
               <td>{s.subject}</td>
               {showClass && <td>{s.class_name ?? '—'}</td>}
               <td>{s.room ?? '—'}</td>
+              <td className="text-right">
+                <button
+                  className="font-mono text-[11px] uppercase tracking-[0.1em] underline"
+                  onClick={() => onEdit(s)}
+                >
+                  Edit
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

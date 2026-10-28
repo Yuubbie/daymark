@@ -8,6 +8,7 @@ import {
   insertQuestion,
   listBanks,
   listQuestions,
+  updateQuestion,
   type BankRow,
   type QuestionRow,
 } from '../../lib/cbt'
@@ -20,6 +21,38 @@ const TYPES: { key: QuestionType; label: string }[] = [
   { key: 'comprehension', label: 'Comprehension' },
 ]
 
+const LETTERS = ['a', 'b', 'c', 'd']
+
+function optionTexts(q: QuestionRow | null): string[] {
+  const next = ['', '', '', '']
+  ;(q?.options ?? []).forEach((o, i) => {
+    if (i < 4) next[i] = o.text
+  })
+  return next
+}
+
+function correctFrom(q: QuestionRow | null): string {
+  const key = q?.answer_key
+  if (!key) return 'a'
+  if (typeof key.correct === 'string') return key.correct
+  const child = (key.children as { correct?: string }[] | undefined)?.[0]
+  return child?.correct ?? 'a'
+}
+
+function multiFrom(q: QuestionRow | null): string[] {
+  const key = q?.answer_key
+  if (!key) return []
+  if (Array.isArray(key.correct)) return key.correct as string[]
+  return []
+}
+
+function childPrompt(q: QuestionRow | null): string {
+  if (!q) return ''
+  if (q.question_type !== 'comprehension') return q.prompt
+  const child = (q.answer_key?.children as { prompt?: string }[] | undefined)?.[0]
+  return child?.prompt ?? q.prompt
+}
+
 export default function QuestionBank() {
   const { profile } = useAuth()
   const [banks, setBanks] = useState<BankRow[]>([])
@@ -30,6 +63,7 @@ export default function QuestionBank() {
   const [error, setError] = useState<string | null>(null)
   const [openBank, setOpenBank] = useState(false)
   const [openQ, setOpenQ] = useState(false)
+  const [editing, setEditing] = useState<QuestionRow | null>(null)
 
   async function load() {
     setLoading(true)
@@ -72,7 +106,13 @@ export default function QuestionBank() {
           <Button variant="secondary" onClick={() => setOpenBank(true)}>
             New bank
           </Button>
-          <Button onClick={() => setOpenQ(true)} disabled={!bankId}>
+          <Button
+            onClick={() => {
+              setEditing(null)
+              setOpenQ(true)
+            }}
+            disabled={!bankId}
+          >
             Add question
           </Button>
         </div>
@@ -126,6 +166,17 @@ export default function QuestionBank() {
                         </div>
                       </>
                     }
+                    right={
+                      <button
+                        className="font-mono text-[11px] uppercase tracking-[0.1em] underline"
+                        onClick={() => {
+                          setEditing(q)
+                          setOpenQ(true)
+                        }}
+                      >
+                        Edit
+                      </button>
+                    }
                   />
                 ))}
               </div>
@@ -147,11 +198,16 @@ export default function QuestionBank() {
       />
       <QuestionModal
         open={openQ}
-        onClose={() => setOpenQ(false)}
+        editing={editing}
+        onClose={() => {
+          setOpenQ(false)
+          setEditing(null)
+        }}
         schoolId={profile?.school_id ?? ''}
         bankId={bankId}
         onSaved={async () => {
           setOpenQ(false)
+          setEditing(null)
           if (bankId) setQuestions(await listQuestions(bankId))
         }}
       />
@@ -233,12 +289,14 @@ function QuestionModal({
   onClose,
   schoolId,
   bankId,
+  editing,
   onSaved,
 }: {
   open: boolean
   onClose: () => void
   schoolId: string
   bankId: string
+  editing: QuestionRow | null
   onSaved: () => void
 }) {
   const [type, setType] = useState<QuestionType>('objective')
@@ -251,12 +309,32 @@ function QuestionModal({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const letters = ['a', 'b', 'c', 'd']
+  useEffect(() => {
+    if (!open) return
+    setError(null)
+    if (editing) {
+      setType(editing.question_type)
+      setPrompt(childPrompt(editing))
+      setPassage(editing.passage ?? '')
+      setOpts(optionTexts(editing))
+      setCorrect(correctFrom(editing))
+      setMulti(multiFrom(editing))
+      setMarks(String(editing.marks))
+    } else {
+      setType('objective')
+      setPrompt('')
+      setPassage('')
+      setOpts(['', '', '', ''])
+      setCorrect('a')
+      setMulti([])
+      setMarks('1')
+    }
+  }, [open, editing])
 
   async function save() {
     setError(null)
     const options = opts
-      .map((t, i) => ({ id: letters[i], text: t.trim() }))
+      .map((t, i) => ({ id: LETTERS[i], text: t.trim() }))
       .filter((o) => o.text)
     if (!prompt.trim()) return setError('Write the question.')
     if ((type === 'objective' || type === 'multiple_select') && options.length < 2) {
@@ -280,19 +358,23 @@ function QuestionModal({
           ],
         }
       }
-      await insertQuestion({
-        school_id: schoolId,
-        bank_id: bankId,
-        question_type: type,
+      const body = {
         prompt: type === 'comprehension' ? 'Read the passage and answer.' : prompt.trim(),
         passage: type === 'comprehension' ? passage.trim() : null,
         options: type === 'subjective' ? [] : options,
         answer_key,
         marks: Number(marks) || 1,
-      })
-      setPrompt('')
-      setPassage('')
-      setOpts(['', '', '', ''])
+      }
+      if (editing) {
+        await updateQuestion({ id: editing.id, ...body })
+      } else {
+        await insertQuestion({
+          school_id: schoolId,
+          bank_id: bankId,
+          question_type: type,
+          ...body,
+        })
+      }
       onSaved()
     } catch (e) {
       setError((e as Error).message)
@@ -302,7 +384,7 @@ function QuestionModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Add a question">
+    <Modal open={open} onClose={onClose} title={editing ? 'Edit question' : 'Add a question'}>
       <form
         className="space-y-3.5"
         onSubmit={(e) => {
@@ -316,10 +398,11 @@ function QuestionModal({
             <button
               key={t.key}
               type="button"
+              disabled={!!editing}
               onClick={() => setType(t.key)}
               className={`h-8 px-3 rounded-sm text-[11px] font-mono uppercase tracking-[0.1em] border ${
                 type === t.key ? 'bg-ink text-ink-invert border-ink' : 'border-rule-strong text-ink-soft'
-              }`}
+              } ${editing ? 'opacity-60' : ''}`}
             >
               {t.label}
             </button>
@@ -336,7 +419,7 @@ function QuestionModal({
         />
         {type !== 'subjective' && (
           <div className="space-y-2">
-            {letters.map((l, i) => (
+            {LETTERS.map((l, i) => (
               <Field
                 key={l}
                 label={`Option ${l.toUpperCase()}`}
@@ -358,7 +441,7 @@ function QuestionModal({
               value={correct}
               onChange={(e) => setCorrect(e.target.value)}
             >
-              {letters.map((l) => (
+              {LETTERS.map((l) => (
                 <option key={l} value={l}>
                   {l.toUpperCase()}
                 </option>
@@ -370,7 +453,7 @@ function QuestionModal({
           <div>
             <span className="eyebrow block mb-1.5">Correct options</span>
             <div className="flex gap-2">
-              {letters.map((l) => (
+              {LETTERS.map((l) => (
                 <label key={l} className="flex items-center gap-1.5 text-[13px]">
                   <input
                     type="checkbox"
@@ -387,10 +470,12 @@ function QuestionModal({
         )}
         <Field label="Marks" type="number" min={0.5} step={0.5} value={marks} onChange={(e) => setMarks(e.target.value)} />
         <Button type="submit" full loading={busy}>
-          Save to bank
+          {editing ? 'Save changes' : 'Save to bank'}
         </Button>
         <p className="text-[12px] text-ink-faint">
-          Students cannot see bank questions until you publish them in an exam.
+          {editing
+            ? 'Fix the wording, options, or marks. Papers already published keep the copy they were set with until you set them again.'
+            : 'Students cannot see bank questions until you publish them in an exam.'}
         </p>
       </form>
     </Modal>

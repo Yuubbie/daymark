@@ -1,6 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, Button, Field, Modal } from './ui'
-import { insertTimetableSlot } from '../lib/queries'
+import {
+  deleteTimetableSlot,
+  insertTimetableSlot,
+  updateTimetableSlot,
+  type TimetableSlot,
+} from '../lib/queries'
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
 
@@ -11,6 +16,7 @@ export function TimetableSlotModal({
   classId,
   teachers,
   defaultTeacherId,
+  slot,
   onSaved,
 }: {
   open: boolean
@@ -19,6 +25,7 @@ export function TimetableSlotModal({
   classId: string
   teachers: Record<string, unknown>[]
   defaultTeacherId?: string
+  slot?: TimetableSlot | null
   onSaved: () => void
 }) {
   const [day, setDay] = useState('1')
@@ -29,16 +36,37 @@ export function TimetableSlotModal({
   const [teacherId, setTeacherId] = useState(defaultTeacherId ?? '')
   const [room, setRoom] = useState('')
   const [busy, setBusy] = useState(false)
+  const [removing, setRemoving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!open) return
+    setError(null)
+    if (slot) {
+      setDay(String(slot.day_of_week))
+      setPeriod(String(slot.period))
+      setStart(slot.start_time.slice(0, 5))
+      setEnd(slot.end_time.slice(0, 5))
+      setSubject(slot.subject)
+      setTeacherId(slot.teacher_id ?? '')
+      setRoom(slot.room ?? '')
+    } else {
+      setDay('1')
+      setPeriod('1')
+      setStart('08:00')
+      setEnd('08:40')
+      setSubject('')
+      setTeacherId(defaultTeacherId ?? '')
+      setRoom('')
+    }
+  }, [open, slot, defaultTeacherId])
 
   async function save() {
     setError(null)
     if (!subject.trim()) return setError('Name the subject.')
     setBusy(true)
     try {
-      await insertTimetableSlot({
-        schoolId,
-        classId,
+      const body = {
         dayOfWeek: Number(day),
         period: Number(period),
         start,
@@ -46,8 +74,12 @@ export function TimetableSlotModal({
         subject: subject.trim(),
         teacherId: teacherId || null,
         room: room || null,
-      })
-      setSubject('')
+      }
+      if (slot) {
+        await updateTimetableSlot(slot.id, body)
+      } else {
+        await insertTimetableSlot({ schoolId, classId, ...body })
+      }
       onSaved()
     } catch (e) {
       setError((e as Error).message)
@@ -56,8 +88,23 @@ export function TimetableSlotModal({
     }
   }
 
+  async function remove() {
+    if (!slot) return
+    if (!confirm('Remove this period from the week?')) return
+    setRemoving(true)
+    setError(null)
+    try {
+      await deleteTimetableSlot(slot.id)
+      onSaved()
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setRemoving(false)
+    }
+  }
+
   return (
-    <Modal open={open} onClose={onClose} title="Add a period">
+    <Modal open={open} onClose={onClose} title={slot ? 'Edit period' : 'Add a period'}>
       <form
         className="space-y-3.5"
         onSubmit={(e) => {
@@ -101,8 +148,13 @@ export function TimetableSlotModal({
         </label>
         <Field label="Room" value={room} onChange={(e) => setRoom(e.target.value)} />
         <Button type="submit" full loading={busy}>
-          Add period
+          {slot ? 'Save period' : 'Add period'}
         </Button>
+        {slot && (
+          <Button type="button" variant="danger" full loading={removing} onClick={() => void remove()}>
+            Remove period
+          </Button>
+        )}
       </form>
     </Modal>
   )

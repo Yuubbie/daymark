@@ -4,7 +4,7 @@ import { AppShell } from '../../components/AppShell'
 import { Empty, Panel, Row, Spinner } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
-import { publishedExamsForClass, type ExamRow } from '../../lib/cbt'
+import { publishedExamsForClass, submittedExamIdsForStudent, type ExamRow } from '../../lib/cbt'
 
 function kindLabel(kind: string) {
   if (kind === 'exam') return 'Exam'
@@ -35,7 +35,14 @@ export default function StudentHome() {
         const cls = student.classes as { name?: string } | { name?: string }[] | null
         const nm = Array.isArray(cls) ? cls[0]?.name : cls?.name
         if (nm) setClassName(nm)
-        if (student.class_id) setExams(await publishedExamsForClass(student.class_id))
+        if (student.class_id) {
+          const [open, sat] = await Promise.all([
+            publishedExamsForClass(student.class_id),
+            submittedExamIdsForStudent(profile.student_id),
+          ])
+          const done = new Set(sat)
+          setExams(open.filter((e) => !done.has(e.id)))
+        }
       }
       setLoading(false)
     })()

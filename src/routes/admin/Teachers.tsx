@@ -2,7 +2,14 @@ import { useEffect, useState } from 'react'
 import { AppShell } from '../../components/AppShell'
 import { Alert, Button, Empty, Field, Modal, Panel, Row, Spinner } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
-import { inviteStaff, listInvites, listStaff, reactivateTeacher, removeTeacher } from '../../lib/queries'
+import {
+  inviteStaff,
+  listInvites,
+  listStaff,
+  reactivateTeacher,
+  removeTeacher,
+  setStaffRole,
+} from '../../lib/queries'
 
 type InviteRole = 'teacher' | 'admin'
 
@@ -87,6 +94,24 @@ export default function Teachers() {
                           }
                         >
                           Restore
+                        </button>
+                      )}
+                      {t.role !== 'proprietor' && t.is_active !== false && canInviteAdmin && (
+                        <button
+                          className="text-[12px] underline"
+                          onClick={() => {
+                            const next = t.role === 'admin' ? 'teacher' : 'admin'
+                            const label =
+                              next === 'admin'
+                                ? 'Make this teacher an administrator?'
+                                : 'Move this administrator back to teacher?'
+                            if (!confirm(label)) return
+                            void setStaffRole(t.id as string, next)
+                              .then(() => load())
+                              .catch((e) => alert((e as Error).message))
+                          }}
+                        >
+                          {t.role === 'admin' ? 'Make teacher' : 'Make admin'}
                         </button>
                       )}
                       {t.role !== 'proprietor' && t.is_active !== false && (

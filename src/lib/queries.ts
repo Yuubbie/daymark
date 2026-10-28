@@ -9,6 +9,7 @@ export type ClassRow = {
   name: string
   level: string | null
   student_count: number
+  sort_order: number
 }
 
 export type StudentRow = {
@@ -45,33 +46,55 @@ export async function createTerm(
   start: string,
   end: string,
 ) {
-  await supabase.from('terms').update({ is_current: false }).eq('is_current', true)
+  const rpc = await supabase.rpc('activate_term', {
+    p_name: name.trim(),
+    p_start: start,
+    p_end: end,
+  })
+  if (!rpc.error) return { error: null }
+  const missing = /could not find the function|schema cache/i.test(rpc.error.message)
+  if (!missing) return { error: rpc.error }
+  await supabase.from('terms').update({ is_current: false }).eq('school_id', schoolId).eq('is_current', true)
   return supabase
     .from('terms')
     .insert({ school_id: schoolId, name, start_date: start, end_date: end, is_current: true })
 }
 
 export async function listClasses(): Promise<ClassRow[]> {
-  const { data, error } = await supabase
+  const withOrder = await supabase
     .from('classes')
-    .select('id, name, level, students(count)')
+    .select('id, name, level, sort_order, students(count)')
     .eq('is_active', true)
+    .order('sort_order')
     .order('name')
+  const { data, error } = withOrder.error && /sort_order/i.test(withOrder.error.message)
+    ? await supabase
+        .from('classes')
+        .select('id, name, level, students(count)')
+        .eq('is_active', true)
+        .order('name')
+    : withOrder
   if (error) throw error
-  return (data ?? []).map((c: Record<string, unknown>) => ({
+  return (data ?? []).map((c: Record<string, unknown>, i: number) => ({
     id: c.id as string,
     name: c.name as string,
     level: (c.level as string) ?? null,
     student_count: (c.students as { count: number }[])?.[0]?.count ?? 0,
+    sort_order: typeof c.sort_order === 'number' ? (c.sort_order as number) : (i + 1) * 10,
   }))
 }
 
 export async function createClass(schoolId: string, name: string, level: string) {
-  return supabase.from('classes').insert({
+  const payload = {
     school_id: schoolId,
     name: name.trim(),
     level: level.trim() || null,
-  })
+  }
+  const first = await supabase.from('classes').insert({ ...payload, sort_order: 9999 })
+  if (first.error && /sort_order/i.test(first.error.message)) {
+    return supabase.from('classes').insert(payload)
+  }
+  return first
 }
 
 export async function getClass(id: string) {
@@ -82,6 +105,45 @@ export async function getClass(id: string) {
     .maybeSingle()
   if (error) throw error
   return data
+}
+
+export async function renameClass(classId: string, name: string, level: string) {
+  const { error } = await supabase
+    .from('classes')
+    .update({
+      name: name.trim(),
+      level: level.trim() || null,
+    })
+    .eq('id', classId)
+  if (error) throw error
+}
+
+export async function deactivateClass(classId: string) {
+  const { error } = await supabase.rpc('deactivate_class', { p_class_id: classId })
+  if (error) throw error
+}
+
+export async function reorderClasses(classIds: string[]) {
+  const { error } = await supabase.rpc('reorder_classes', { p_class_ids: classIds })
+  if (error) throw error
+}
+
+export async function setStaffRole(profileId: string, role: 'teacher' | 'admin') {
+  const { error } = await supabase.rpc('set_staff_role', {
+    p_profile_id: profileId,
+    p_role: role,
+  })
+  if (error) throw error
+}
+
+export async function setSchoolAccent(color: string | null) {
+  const { error } = await supabase.rpc('set_school_accent', { p_color: color })
+  if (error) throw error
+}
+
+export async function unassignTeacher(assignmentId: string) {
+  const { error } = await supabase.from('class_teachers').delete().eq('id', assignmentId)
+  if (error) throw error
 }
 
 export async function listStudents(classId: string): Promise<StudentRow[]> {
@@ -499,6 +561,38 @@ export async function insertTimetableSlot(row: {
     teacher_id: row.teacherId,
     room: row.room,
   })
+  if (error) throw error
+}
+
+export async function updateTimetableSlot(
+  slotId: string,
+  row: {
+    dayOfWeek: number
+    period: number
+    start: string
+    end: string
+    subject: string
+    teacherId: string | null
+    room: string | null
+  },
+) {
+  const { error } = await supabase
+    .from('timetable_slots')
+    .update({
+      day_of_week: row.dayOfWeek,
+      period: row.period,
+      start_time: row.start,
+      end_time: row.end,
+      subject: row.subject,
+      teacher_id: row.teacherId,
+      room: row.room,
+    })
+    .eq('id', slotId)
+  if (error) throw error
+}
+
+export async function deleteTimetableSlot(slotId: string) {
+  const { error } = await supabase.from('timetable_slots').delete().eq('id', slotId)
   if (error) throw error
 }
 

@@ -3,7 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { Alert, Button, Empty, Field, Modal, Panel, Row, Spinner } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
-import { createClass, listClasses, type ClassRow } from '../../lib/queries'
+import {
+  createClass,
+  deactivateClass,
+  listClasses,
+  reorderClasses,
+  type ClassRow,
+} from '../../lib/queries'
 
 export default function Classes() {
   const { profile } = useAuth()
@@ -11,11 +17,16 @@ export default function Classes() {
   const [rows, setRows] = useState<ClassRow[]>([])
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [busyId, setBusyId] = useState<string | null>(null)
 
   async function load() {
     setLoading(true)
     try {
       setRows(await listClasses())
+      setError(null)
+    } catch (e) {
+      setError((e as Error).message)
     } finally {
       setLoading(false)
     }
@@ -24,6 +35,48 @@ export default function Classes() {
   useEffect(() => {
     void load()
   }, [])
+
+  async function move(id: string, dir: -1 | 1) {
+    const i = rows.findIndex((c) => c.id === id)
+    const j = i + dir
+    if (i < 0 || j < 0 || j >= rows.length) return
+    const next = [...rows]
+    const [item] = next.splice(i, 1)
+    next.splice(j, 0, item)
+    setRows(next)
+    setBusyId(id)
+    try {
+      await reorderClasses(next.map((c) => c.id))
+      setError(null)
+    } catch (e) {
+      setError((e as Error).message)
+      await load()
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  async function remove(c: ClassRow) {
+    if (
+      !confirm(
+        c.student_count > 0
+          ? `${c.name} still has ${c.student_count} student${c.student_count === 1 ? '' : 's'}. Move or remove them first.`
+          : `Remove ${c.name}? It leaves the active list. Records stay.`,
+      )
+    ) {
+      return
+    }
+    if (c.student_count > 0) return
+    setBusyId(c.id)
+    try {
+      await deactivateClass(c.id)
+      await load()
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBusyId(null)
+    }
+  }
 
   return (
     <AppShell>
@@ -37,6 +90,12 @@ export default function Classes() {
         <Button onClick={() => setOpen(true)}>New class</Button>
       </div>
 
+      {error && (
+        <div className="mb-4">
+          <Alert>{error}</Alert>
+        </div>
+      )}
+
       <Panel>
         {loading ? (
           <Spinner />
@@ -47,7 +106,7 @@ export default function Classes() {
           />
         ) : (
           <div className="divide-y divide-rule -my-3">
-            {rows.map((c) => (
+            {rows.map((c, i) => (
               <Row
                 key={c.id}
                 onClick={() => navigate(`/admin/classes/${c.id}`)}
@@ -58,9 +117,32 @@ export default function Classes() {
                   </>
                 }
                 right={
-                  <span className="tnum text-[13px] text-ink-faint">
-                    {c.student_count} {c.student_count === 1 ? 'student' : 'students'}
-                  </span>
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <span className="tnum text-[13px] text-ink-faint">
+                      {c.student_count} {c.student_count === 1 ? 'student' : 'students'}
+                    </span>
+                    <button
+                      className="font-mono text-[11px] uppercase tracking-[0.1em] underline disabled:opacity-40"
+                      disabled={i === 0 || busyId === c.id}
+                      onClick={() => void move(c.id, -1)}
+                    >
+                      Up
+                    </button>
+                    <button
+                      className="font-mono text-[11px] uppercase tracking-[0.1em] underline disabled:opacity-40"
+                      disabled={i === rows.length - 1 || busyId === c.id}
+                      onClick={() => void move(c.id, 1)}
+                    >
+                      Down
+                    </button>
+                    <button
+                      className="font-mono text-[11px] uppercase tracking-[0.1em] underline text-absent disabled:opacity-40"
+                      disabled={busyId === c.id}
+                      onClick={() => void remove(c)}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 }
               />
             ))}

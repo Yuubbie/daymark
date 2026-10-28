@@ -112,7 +112,7 @@ export async function listQuestions(bankId: string): Promise<QuestionRow[]> {
   if (!missing) throw rpc.error
   const { data, error } = await supabase
     .from('questions')
-    .select('id, bank_id, question_type, prompt, passage, options, marks, tags')
+    .select('id, bank_id, question_type, prompt, passage, options, answer_key, marks, tags')
     .eq('bank_id', bankId)
     .order('created_at', { ascending: false })
   if (error) throw error
@@ -139,6 +139,38 @@ export async function insertQuestion(row: {
     answer_key: row.answer_key ?? null,
     marks: row.marks,
   })
+  if (error) throw error
+}
+
+export async function updateQuestion(row: {
+  id: string
+  prompt: string
+  passage?: string | null
+  options?: { id: string; text: string }[]
+  answer_key?: Record<string, unknown> | null
+  marks: number
+}) {
+  const rpc = await supabase.rpc('update_bank_question', {
+    p_question_id: row.id,
+    p_prompt: row.prompt,
+    p_passage: row.passage ?? null,
+    p_options: row.options ?? [],
+    p_answer_key: row.answer_key ?? null,
+    p_marks: row.marks,
+  })
+  if (!rpc.error) return
+  const missing = /could not find the function|schema cache/i.test(rpc.error.message)
+  if (!missing) throw rpc.error
+  const { error } = await supabase
+    .from('questions')
+    .update({
+      prompt: row.prompt,
+      passage: row.passage ?? null,
+      options: row.options ?? [],
+      answer_key: row.answer_key ?? null,
+      marks: row.marks,
+    })
+    .eq('id', row.id)
   if (error) throw error
 }
 
@@ -378,6 +410,16 @@ export async function publishedExamsForClass(classId: string): Promise<ExamRow[]
     .order('opens_at', { ascending: true, nullsFirst: false })
   if (error) throw error
   return (data ?? []) as ExamRow[]
+}
+
+export async function submittedExamIdsForStudent(studentId: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('exam_attempts')
+    .select('exam_id')
+    .eq('student_id', studentId)
+    .in('status', ['submitted', 'marked'])
+  if (error) throw error
+  return [...new Set((data ?? []).map((r) => r.exam_id as string))]
 }
 
 export function shuffle<T>(arr: T[]): T[] {

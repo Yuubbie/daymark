@@ -9,6 +9,7 @@ import {
 } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { isSupabaseConfigured, supabase } from './supabase'
+import { applySchoolAccent } from './brand'
 import type { Profile, School } from './types'
 
 interface AuthValue {
@@ -87,10 +88,22 @@ async function fetchProfile(userId: string, attempt = 0): Promise<ProfileResult>
 async function fetchSchool(schoolId: string): Promise<School | null> {
   const { data, error } = await supabase
     .from('schools')
-      .select('id, name, slug, subscription_status, address, phone, logo_url')
+      .select('id, name, slug, subscription_status, address, phone, logo_url, accent_color')
     .eq('id', schoolId)
     .maybeSingle()
   if (error) {
+    if (/accent_color/i.test(error.message)) {
+      const retry = await supabase
+        .from('schools')
+        .select('id, name, slug, subscription_status, address, phone, logo_url')
+        .eq('id', schoolId)
+        .maybeSingle()
+      if (retry.error) {
+        console.error('school fetch failed', retry.error)
+        return null
+      }
+      return retry.data as School | null
+    }
     console.error('school fetch failed', error)
     return null
   }
@@ -132,7 +145,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     setProfile(p)
     setProblem(prob)
-    setSchool(p?.school_id ? await fetchSchool(p.school_id) : null)
+    const nextSchool = p?.school_id ? await fetchSchool(p.school_id) : null
+    setSchool(nextSchool)
+    applySchoolAccent(nextSchool?.accent_color)
     setLoading(false)
   }, [])
 
@@ -176,6 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null)
     setSchool(null)
     setProblem(null)
+    applySchoolAccent(null)
     setLoading(false)
   }, [])
 

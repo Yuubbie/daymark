@@ -69,7 +69,7 @@ export default function Marking() {
     <AppShell>
       <div className="mb-5">
         <span className="eyebrow">Results</span>
-        <h1 className="text-[26px] mt-1">{executive ? 'Approve results' : 'Marking queue'}</h1>
+        <h1 className="text-[26px] mt-1">Result approval</h1>
         <p className="mt-2 text-[14px] text-ink-soft">
           Teachers mark written answers. The proprietor or admin approves before any parent can see a score.
         </p>

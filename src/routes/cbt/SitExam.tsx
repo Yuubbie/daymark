@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { SchoolBrand } from '../../components/SchoolBrand'
+import { IconBack } from '../../components/Icons'
 import { useAuth } from '../../lib/auth'
 import { Alert, Button, Field, Spinner, TextArea } from '../../components/ui'
 import {
@@ -197,19 +198,13 @@ export default function SitExam({ examId }: { examId?: string }) {
 
   function downloadOffline() {
     if (!paper) return
-    const blob = new Blob([JSON.stringify({ paper, saved_at: new Date().toISOString() }, null, 2)], {
-      type: 'application/json',
-    })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `${paper.exam.title.replace(/\s+/g, '-')}.daymark.json`
-    a.click()
+    printPaperPdf(paper, questions)
   }
 
-  if (loading) return <Shell><Spinner /></Shell>
+  if (loading) return <Shell desk={!!examId}><Spinner /></Shell>
   if (error && !paper) {
     return (
-      <Shell>
+      <Shell desk={!!examId}>
         <Alert>{error}</Alert>
       </Shell>
     )
@@ -218,7 +213,7 @@ export default function SitExam({ examId }: { examId?: string }) {
 
   if (result) {
     return (
-      <Shell>
+      <Shell desk={!!examId}>
         <span className="eyebrow">Submitted</span>
         <h1 className="text-[28px] mt-1">{paper.exam.title}</h1>
         <p className="mt-4 text-[15px] text-ink-soft">
@@ -232,13 +227,25 @@ export default function SitExam({ examId }: { examId?: string }) {
             ? 'A teacher still has to mark the written parts. The proprietor approves before parents see it.'
             : 'Waiting for the proprietor or admin to approve this result before parents can see it.'}
         </p>
+        {examId && (
+          <div className="mt-6">
+            <Link to="/student">
+              <Button variant="secondary">Back to desk</Button>
+            </Link>
+          </div>
+        )}
       </Shell>
     )
   }
 
   if (!started) {
+    const mail = paper.exam.allow_offline
+      ? `mailto:?subject=${encodeURIComponent(`Completed: ${paper.exam.title}`)}&body=${encodeURIComponent(
+          `I sat ${paper.exam.title}${paper.exam.subject ? ` (${paper.exam.subject})` : ''}. Please find the printed paper attached, or I will send the PDF after printing.`,
+        )}`
+      : null
     return (
-      <Shell>
+      <Shell desk={!!examId}>
         <span className="eyebrow">{paper.exam.kind}</span>
         <h1 className="text-[28px] mt-1">{paper.exam.title}</h1>
         {paper.exam.subject && <p className="mt-1 text-[14px] text-ink-soft">{paper.exam.subject}</p>}
@@ -263,10 +270,22 @@ export default function SitExam({ examId }: { examId?: string }) {
           <Button onClick={() => void begin()}>Start</Button>
           {paper.exam.allow_offline && (
             <Button variant="secondary" onClick={downloadOffline}>
-              Download for offline
+              Print paper (PDF)
             </Button>
           )}
+          {mail && (
+            <a href={mail}>
+              <Button variant="ghost" type="button">
+                Email the office
+              </Button>
+            </a>
+          )}
         </div>
+        {paper.exam.allow_offline && (
+          <p className="mt-3 text-[12px] text-ink-faint">
+            Print opens a read-only paper. Use the browser Print dialog and choose Save as PDF. Sit online when you can, or email the printed paper to the office.
+          </p>
+        )}
       </Shell>
     )
   }
@@ -275,7 +294,7 @@ export default function SitExam({ examId }: { examId?: string }) {
   const ss = remaining !== null ? remaining % 60 : null
 
   return (
-    <Shell>
+    <Shell desk={!!examId}>
       <div className="flex items-baseline justify-between gap-3 mb-5">
         <div>
           <span className="eyebrow">{paper.exam.kind}</span>
@@ -403,11 +422,20 @@ function QuestionBody({
   )
 }
 
-function Shell({ children }: { children: ReactNode }) {
+function Shell({ children, desk }: { children: ReactNode; desk?: boolean }) {
   const { school } = useAuth()
   return (
     <div className="min-h-dvh bg-paper">
-      <header className="bg-ink text-ink-invert px-5 h-14 flex items-center">
+      <header className="bg-ink text-ink-invert px-5 h-14 flex items-center gap-3">
+        {desk && (
+          <Link
+            to="/student"
+            className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-invert/80 hover:text-brass shrink-0"
+          >
+            <IconBack className="h-3.5 w-3.5" />
+            Desk
+          </Link>
+        )}
         <SchoolBrand
           name={school?.name ?? 'Exam'}
           logoUrl={school?.logo_url}
@@ -418,4 +446,70 @@ function Shell({ children }: { children: ReactNode }) {
       <main className="mx-auto max-w-2xl px-4 py-8">{children}</main>
     </div>
   )
+}
+
+function escapeHtml(s: string) {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+function printPaperPdf(paper: Paper, questions: PaperQuestion[]) {
+  const blocks = questions
+    .map((q, i) => {
+      const opts = (q.options ?? [])
+        .map((o) => `<div class="opt"><span class="id">${escapeHtml(o.id.toUpperCase())}</span> ${escapeHtml(o.text)}</div>`)
+        .join('')
+      const kids = (q.children ?? [])
+        .map((c) => {
+          const copts = (c.options ?? [])
+            .map((o) => `<div class="opt"><span class="id">${escapeHtml(o.id.toUpperCase())}</span> ${escapeHtml(o.text)}</div>`)
+            .join('')
+          return `<p class="sub">${escapeHtml(c.prompt)}</p>${copts}`
+        })
+        .join('')
+      const written =
+        q.question_type === 'subjective'
+          ? '<div class="lines"></div><div class="lines"></div><div class="lines"></div>'
+          : ''
+      return `<section>
+        <div class="meta">${i + 1} · ${escapeHtml(q.question_type.replace('_', ' '))} · ${q.marks} mark${q.marks === 1 ? '' : 's'}</div>
+        ${q.passage ? `<p class="passage">${escapeHtml(q.passage)}</p>` : ''}
+        <p class="q">${escapeHtml(q.prompt)}</p>
+        ${opts}${kids}${written}
+      </section>`
+    })
+    .join('')
+  const html = `<!doctype html>
+<html><head><meta charset="utf-8"><title>${escapeHtml(paper.exam.title)}</title>
+<style>
+  body { font-family: Georgia, serif; color: #143A2B; margin: 24px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .eye { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #7C8B83; }
+  .note { font-size: 13px; color: #4A5F55; margin: 8px 0 20px; }
+  section { border-top: 1px solid #DDE2DB; padding: 14px 0; page-break-inside: avoid; }
+  .meta { font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #7C8B83; }
+  .q { font-weight: 700; margin: 6px 0; }
+  .passage { background: #FAF3E4; padding: 8px 10px; }
+  .opt { margin: 4px 0 4px 8px; }
+  .id { font-family: ui-monospace, monospace; font-size: 11px; margin-right: 8px; }
+  .lines { border-bottom: 1px solid #C3CCC2; height: 28px; }
+  .foot { margin-top: 24px; font-size: 12px; color: #7C8B83; }
+</style></head><body>
+  <div class="eye">${escapeHtml(paper.exam.kind)} · read only</div>
+  <h1>${escapeHtml(paper.exam.title)}</h1>
+  <div class="note">${paper.exam.subject ? escapeHtml(paper.exam.subject) + ' · ' : ''}${
+    paper.exam.duration_minutes ? paper.exam.duration_minutes + ' minutes · ' : ''
+  }${questions.length} questions. Write on the printout. No answers are printed. Save as PDF from the print dialog, then email the office if you sat this offline.</div>
+  ${paper.exam.instructions ? `<p class="note">${escapeHtml(paper.exam.instructions)}</p>` : ''}
+  ${blocks}
+  <p class="foot">Name: _______________________________ &nbsp; Class: _____________ &nbsp; Date: _____________</p>
+  <script>window.onload = function () { window.print(); }<\/script>
+</body></html>`
+  const w = window.open('', '_blank')
+  if (!w) return
+  w.document.write(html)
+  w.document.close()
 }

@@ -27,7 +27,9 @@ import {
   listOpenCodes,
   listStudents,
   listTeachers,
+  renameClass,
   setFeeCleared,
+  unassignTeacher,
   type StudentRow,
 } from '../../lib/queries'
 import { parseStudentSheet, type ParsedStudent } from '../../lib/importStudents'
@@ -51,6 +53,7 @@ export default function ClassDetail() {
   const [removeStudent, setRemoveStudent] = useState<{ id: string; name: string } | null>(null)
   const [removeBusy, setRemoveBusy] = useState(false)
   const [removeError, setRemoveError] = useState<string | null>(null)
+  const [renameOpen, setRenameOpen] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -131,7 +134,15 @@ export default function ClassDetail() {
         <Link to="/admin/classes" className="eyebrow hover:text-ink transition-colors">
           &larr; Classes
         </Link>
-        <h1 className="text-[26px] mt-1.5">{(cls?.name as string) ?? ''}</h1>
+        <div className="flex items-end justify-between gap-3">
+          <h1 className="text-[26px] mt-1.5">{(cls?.name as string) ?? ''}</h1>
+          <button
+            className="font-mono text-[11px] uppercase tracking-[0.1em] underline"
+            onClick={() => setRenameOpen(true)}
+          >
+            Rename
+          </button>
+        </div>
         <p className="text-[13px] text-ink-faint mt-1">
           <span className="tnum">{students.length}</span> students
           {unlinked > 0 && (
@@ -313,6 +324,19 @@ export default function ClassDetail() {
                         </div>
                       </>
                     }
+                    right={
+                      <button
+                        className="font-mono text-[11px] uppercase tracking-[0.1em] underline text-absent"
+                        onClick={() => {
+                          if (!confirm('Take this teacher off the class?')) return
+                          void unassignTeacher(t.id as string)
+                            .then(() => load())
+                            .catch((e) => setCodeError((e as Error).message))
+                        }}
+                      >
+                        Remove
+                      </button>
+                    }
                   />
                 )
               })}
@@ -355,6 +379,18 @@ export default function ClassDetail() {
         onClose={() => setLoginStudent(null)}
         onSaved={() => {
           setLoginStudent(null)
+          void load()
+        }}
+      />
+
+      <RenameClassModal
+        open={renameOpen}
+        onClose={() => setRenameOpen(false)}
+        classId={id}
+        name={(cls?.name as string) ?? ''}
+        level={(cls?.level as string) ?? ''}
+        onSaved={() => {
+          setRenameOpen(false)
           void load()
         }}
       />
@@ -866,6 +902,81 @@ function AddStudentsModal({
 
         <Button type="submit" full loading={busy}>
           Add {toSubmit.length > 0 ? toSubmit.length : ''} students
+        </Button>
+      </form>
+    </Modal>
+  )
+}
+
+function RenameClassModal({
+  open,
+  onClose,
+  classId,
+  name,
+  level,
+  onSaved,
+}: {
+  open: boolean
+  onClose: () => void
+  classId: string
+  name: string
+  level: string
+  onSaved: () => void
+}) {
+  const [nextName, setNextName] = useState(name)
+  const [nextLevel, setNextLevel] = useState(level)
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    if (open) {
+      setNextName(name)
+      setNextLevel(level)
+      setError(null)
+    }
+  }, [open, name, level])
+
+  async function save() {
+    setError(null)
+    if (!nextName.trim()) return setError('Name the class.')
+    setBusy(true)
+    try {
+      await renameClass(classId, nextName, nextLevel)
+      onSaved()
+    } catch (e) {
+      setError(
+        /duplicate key/i.test((e as Error).message)
+          ? 'A class with that name already exists.'
+          : (e as Error).message,
+      )
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title="Rename class">
+      <form
+        className="space-y-3.5"
+        onSubmit={(e) => {
+          e.preventDefault()
+          void save()
+        }}
+      >
+        {error && <Alert>{error}</Alert>}
+        <Field
+          label="Class name"
+          required
+          value={nextName}
+          onChange={(e) => setNextName(e.target.value)}
+        />
+        <Field
+          label="Level"
+          value={nextLevel}
+          onChange={(e) => setNextLevel(e.target.value)}
+        />
+        <Button type="submit" full loading={busy}>
+          Save
         </Button>
       </form>
     </Modal>

@@ -15,6 +15,7 @@ export default function Timetable() {
   const [slots, setSlots] = useState<TimetableSlot[]>([])
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
+  const [editing, setEditing] = useState<TimetableSlot | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -46,7 +47,13 @@ export default function Timetable() {
           <span className="eyebrow">Week</span>
           <h1 className="text-[26px] mt-1">Timetable</h1>
         </div>
-        <Button onClick={() => setOpen(true)} disabled={!classId}>
+        <Button
+          onClick={() => {
+            setEditing(null)
+            setOpen(true)
+          }}
+          disabled={!classId}
+        >
           Add period
         </Button>
       </div>
@@ -85,6 +92,7 @@ export default function Timetable() {
                       <th className="text-left">Time</th>
                       <th className="text-left">Subject</th>
                       <th className="text-left">Room</th>
+                      <th className="text-left"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-rule">
@@ -97,6 +105,17 @@ export default function Timetable() {
                         </td>
                         <td>{s.subject}</td>
                         <td>{s.room ?? '—'}</td>
+                        <td className="text-right">
+                          <button
+                            className="font-mono text-[11px] uppercase tracking-[0.1em] underline"
+                            onClick={() => {
+                              setEditing(s)
+                              setOpen(true)
+                            }}
+                          >
+                            Edit
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -108,12 +127,17 @@ export default function Timetable() {
       )}
       <TimetableSlotModal
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          setOpen(false)
+          setEditing(null)
+        }}
         schoolId={profile?.school_id ?? ''}
         classId={classId}
         teachers={teachers}
+        slot={editing}
         onSaved={async () => {
           setOpen(false)
+          setEditing(null)
           setSlots(await listTimetableForClass(classId))
         }}
       />

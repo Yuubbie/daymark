@@ -5,21 +5,42 @@ import { Alert, Button, Field, Panel, Row } from '../components/ui'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import { isOpsEmail } from '../lib/ops'
-import { updateSchoolContact } from '../lib/queries'
+import { applySchoolAccent, ACCENT_PRESETS, DEFAULT_ACCENT } from '../lib/brand'
+import { setSchoolAccent, updateSchoolContact } from '../lib/queries'
 
 export default function Account() {
   const { profile, school, session, signOut, refresh } = useAuth()
   const canEdit = profile?.role === 'admin' || profile?.role === 'proprietor'
   const [address, setAddress] = useState(school?.address ?? '')
   const [phone, setPhone] = useState(school?.phone ?? '')
+  const [accent, setAccent] = useState(school?.accent_color ?? DEFAULT_ACCENT)
   const [busy, setBusy] = useState(false)
+  const [accentBusy, setAccentBusy] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     setAddress(school?.address ?? '')
     setPhone(school?.phone ?? '')
-  }, [school?.address, school?.phone])
+    setAccent(school?.accent_color ?? DEFAULT_ACCENT)
+  }, [school?.address, school?.phone, school?.accent_color])
+
+  async function saveAccent(hex: string | null) {
+    setAccentBusy(true)
+    setError(null)
+    setNotice(null)
+    try {
+      await setSchoolAccent(hex)
+      applySchoolAccent(hex)
+      setAccent(hex ?? DEFAULT_ACCENT)
+      await refresh()
+      setNotice('Colour saved. It shows on buttons, marks, and print accents.')
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setAccentBusy(false)
+    }
+  }
 
   async function saveContact() {
     if (!school) return
@@ -133,6 +154,35 @@ export default function Account() {
               <Button onClick={() => void saveContact()} loading={busy}>
                 Save
               </Button>
+            </div>
+          </Panel>
+        )}
+
+        {canEdit && school && (
+          <Panel title="School colour">
+            <p className="text-[13px] text-ink-soft mb-3">
+              One accent. It replaces brass on buttons, marks, and print. Pick a school colour, or keep brass.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {ACCENT_PRESETS.map((p) => (
+                <button
+                  key={p.hex}
+                  type="button"
+                  disabled={accentBusy}
+                  onClick={() => void saveAccent(p.hex === DEFAULT_ACCENT ? null : p.hex)}
+                  className={`h-9 px-3 rounded-md border text-[12px] font-semibold ${
+                    (accent || DEFAULT_ACCENT).toUpperCase() === p.hex.toUpperCase()
+                      ? 'border-ink'
+                      : 'border-rule-strong'
+                  }`}
+                >
+                  <span
+                    className="inline-block h-2.5 w-2.5 rounded-sm mr-2 align-middle"
+                    style={{ background: p.hex }}
+                  />
+                  {p.label}
+                </button>
+              ))}
             </div>
           </Panel>
         )}

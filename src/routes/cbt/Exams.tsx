@@ -281,7 +281,7 @@ function SetPaperModal({
     if (ids.length === 0) {
       return setError(
         qrows.length === 0
-          ? 'This bank has no questions yet. Add one in Bank, then come back.'
+          ? 'This bank has no questions yet. Add one in Question Bank, then come back.'
           : 'Pick at least one question from the bank.',
       )
     }
@@ -374,7 +374,7 @@ function SetPaperModal({
             <p className="px-3 py-3 text-[13px] text-ink-faint">Loading questions</p>
           ) : qrows.length === 0 ? (
             <p className="px-3 py-3 text-[13px] text-ink-faint">
-              No questions in this bank. Open Bank, add at least one, then set the paper.
+              No questions in this bank. Open Question Bank, add at least one, then set the paper.
             </p>
           ) : (
             qrows.map((q) => (

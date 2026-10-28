@@ -36,6 +36,7 @@ export interface School {
   address: string | null
   phone: string | null
   logo_url: string | null
+  accent_color?: string | null
 }
 
 export interface Student {
