@@ -626,6 +626,9 @@ $$;
 
 grant execute on function school_billing_quote(uuid) to authenticated, service_role;
 
+drop function if exists public.activate_subscription(uuid, text, text, bigint);
+drop function if exists public.activate_subscription(uuid, text, text, bigint, text);
+
 create or replace function activate_subscription(
   p_school_id uuid,
   p_reference text,
@@ -708,5 +711,5 @@ begin
 end;
 $$;
 
-revoke all on function public.activate_subscription from public, anon, authenticated;
-grant execute on function public.activate_subscription to service_role;
+revoke all on function public.activate_subscription(uuid, text, text, bigint, text) from public, anon, authenticated;
+grant execute on function public.activate_subscription(uuid, text, text, bigint, text) to service_role;
