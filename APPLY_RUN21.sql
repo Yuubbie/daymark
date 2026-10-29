@@ -1,5 +1,6 @@
 -- Daymaark Run 21 — paste in Supabase SQL Editor after Run 20.
 -- HR register, clinic notes, report comments, per-student billing.
+-- Compare new roles as text so this paste can add the enum and use it in one go.
 
 
 alter type user_role add value if not exists 'hr';
@@ -17,22 +18,22 @@ $$;
 
 create or replace function is_hr()
 returns boolean language sql stable security definer set search_path = public as $$
-  select coalesce((select role = 'hr' from profiles where id = auth.uid()), false);
+  select coalesce((select role::text = 'hr' from profiles where id = auth.uid()), false);
 $$;
 
 create or replace function is_clinic()
 returns boolean language sql stable security definer set search_path = public as $$
-  select coalesce((select role = 'clinic' from profiles where id = auth.uid()), false);
+  select coalesce((select role::text = 'clinic' from profiles where id = auth.uid()), false);
 $$;
 
 create or replace function is_hr_desk()
 returns boolean language sql stable security definer set search_path = public as $$
-  select coalesce((select role in ('admin','proprietor','hr') from profiles where id = auth.uid()), false);
+  select coalesce((select role::text in ('admin','proprietor','hr') from profiles where id = auth.uid()), false);
 $$;
 
 create or replace function is_clinic_desk()
 returns boolean language sql stable security definer set search_path = public as $$
-  select coalesce((select role in ('proprietor','clinic') from profiles where id = auth.uid()), false);
+  select coalesce((select role::text in ('proprietor','clinic') from profiles where id = auth.uid()), false);
 $$;
 
 grant execute on function is_hr, is_clinic, is_hr_desk, is_clinic_desk to authenticated;
@@ -154,7 +155,7 @@ begin
       on a.staff_id = p.id and a.date = p_date and a.school_id = v_school
     where p.school_id = v_school
       and p.is_active
-      and p.role in ('proprietor','admin','teacher','hr','clinic')
+      and p.role::text in ('proprietor','admin','teacher','hr','clinic')
   ) x;
 
   return v_out;
@@ -182,7 +183,7 @@ begin
      where id = p_staff_id
        and school_id = auth_school_id()
        and is_active
-       and role in ('proprietor','admin','teacher','hr','clinic')
+       and role::text in ('proprietor','admin','teacher','hr','clinic')
   ) then
     raise exception 'staff not found in your school';
   end if;
