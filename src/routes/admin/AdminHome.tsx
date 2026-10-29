@@ -193,6 +193,29 @@ export default function AdminHome() {
                 <div className="eyebrow">Intake</div>
                 <div className="text-[14px] font-semibold mt-1">Enquiries</div>
               </Link>
+              <Link
+                to="/hr"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Staff</div>
+                <div className="text-[14px] font-semibold mt-1">HR register</div>
+              </Link>
+              {profile?.role === 'proprietor' && (
+                <Link
+                  to="/clinic"
+                  className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+                >
+                  <div className="eyebrow">Sick bay</div>
+                  <div className="text-[14px] font-semibold mt-1">Clinic</div>
+                </Link>
+              )}
+              <Link
+                to="/library"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Books</div>
+                <div className="text-[14px] font-semibold mt-1">Library soon</div>
+              </Link>
             </div>
           </Panel>
 

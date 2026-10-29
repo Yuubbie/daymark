@@ -207,7 +207,7 @@ function DemoBanner({ onBilling }: { onBilling?: () => void }) {
   return (
     <div className="bg-brass-wash border-b border-brass/30 text-[12px] text-ink px-4 py-2 flex items-center justify-between gap-3">
       <span className="truncate">
-        Live demo · {demoSubscription.status === 'trial' ? `Trial, ${demoSubscription.daysLeft} days left` : 'Active'} · N200,000/month after 30 days
+        Live demo · {demoSubscription.status === 'trial' ? `Trial, ${demoSubscription.daysLeft} days left` : 'Active'} · N1,500 / student / month after 30 days
       </span>
       <div className="flex items-center gap-3 shrink-0">
         {onBilling && (
@@ -482,7 +482,7 @@ function DemoOnboard({
             title="You are in."
             body={
               role === 'proprietor'
-                ? 'Greenfield Academy is on trial. Billing shows N200,000 per month when the trial ends.'
+                ? 'Greenfield Academy is on trial. Billing follows the roll when the trial ends. The school pays.'
                 : 'Everything you see is sample data for a real school day.'
             }
           />
@@ -818,7 +818,7 @@ function Billing() {
           <span className="tnum text-[40px] leading-none font-semibold">N{b.price.toLocaleString()}</span>
           <span className="text-[14px] text-ink-faint">/ {PLAN.per}</span>
         </div>
-        <p className="mt-2 text-[14px] text-ink-soft">{PLAN.students}. Parents, teachers and students included.</p>
+        <p className="mt-2 text-[14px] text-ink-soft">{PLAN.students} Parents and students are not billed.</p>
       </Panel>
 
       <Panel title="Trial">
@@ -857,7 +857,7 @@ function Billing() {
                   }, 900)
                 }}
               >
-                Pay N{b.price.toLocaleString()} for the term
+                Pay N{b.price.toLocaleString()} per student for the term
               </Button>
             </div>
           </div>

@@ -49,6 +49,9 @@ import ClassIds from './routes/admin/ClassIds'
 import ClassReports from './routes/admin/ClassReports'
 import ClassCodes from './routes/admin/ClassCodes'
 import OpsDesk from './routes/ops/OpsDesk'
+import HrDesk from './routes/hr/HrDesk'
+import ClinicDesk from './routes/clinic/ClinicDesk'
+import LibrarySoon from './routes/library/LibrarySoon'
 import { isOpsEmail } from './lib/ops'
 import { WhatsAppCare } from './components/BrandCredit'
 
@@ -453,8 +456,32 @@ export default function App() {
           <Route
             path="/account"
             element={
-              <Protected roles={['proprietor', 'admin', 'teacher', 'parent', 'student']}>
+              <Protected roles={['proprietor', 'admin', 'teacher', 'hr', 'clinic', 'parent', 'student']}>
                 <Account />
+              </Protected>
+            }
+          />
+          <Route
+            path="/hr"
+            element={
+              <Protected roles={['proprietor', 'admin', 'teacher', 'hr']}>
+                <HrDesk />
+              </Protected>
+            }
+          />
+          <Route
+            path="/clinic"
+            element={
+              <Protected roles={['proprietor', 'clinic']}>
+                <ClinicDesk />
+              </Protected>
+            }
+          />
+          <Route
+            path="/library"
+            element={
+              <Protected roles={['proprietor', 'admin']}>
+                <LibrarySoon />
               </Protected>
             }
           />
@@ -477,6 +504,8 @@ export default function App() {
 
 function CareUnlessOps() {
   const { pathname } = useLocation()
+  const { profile } = useAuth()
   if (pathname.startsWith('/ops')) return null
+  if (profile?.role === 'parent' || profile?.role === 'student') return null
   return <WhatsAppCare />
 }

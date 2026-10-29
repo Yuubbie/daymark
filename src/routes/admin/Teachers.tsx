@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { AppShell } from '../../components/AppShell'
 import { Alert, Button, Empty, Field, Modal, Panel, Row, Spinner } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
+import { listStaffSubjects } from '../../lib/office'
 import {
   inviteStaff,
   listInvites,
@@ -11,11 +12,12 @@ import {
   setStaffRole,
 } from '../../lib/queries'
 
-type InviteRole = 'teacher' | 'admin'
+type InviteRole = 'teacher' | 'admin' | 'hr' | 'clinic'
 
 export default function Teachers() {
   const { profile } = useAuth()
   const [staff, setStaff] = useState<Record<string, unknown>[]>([])
+  const [subjects, setSubjects] = useState<Record<string, string[]>>({})
   const [invites, setInvites] = useState<Record<string, unknown>[]>([])
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
@@ -28,6 +30,8 @@ export default function Teachers() {
       const [s, i] = await Promise.all([listStaff(), listInvites()])
       setStaff(s)
       setInvites(i.filter((x) => !x.accepted_at))
+      const ids = s.map((x) => x.id as string)
+      setSubjects(await listStaffSubjects(ids).catch(() => ({})))
     } finally {
       setLoading(false)
     }
@@ -49,11 +53,19 @@ export default function Teachers() {
           <span className="eyebrow">Staff</span>
           <h1 className="text-[26px] mt-1">People</h1>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 justify-end">
           {canInviteAdmin && (
-            <Button variant="secondary" onClick={() => openInvite('admin')}>
-              Invite admin
-            </Button>
+            <>
+              <Button variant="secondary" onClick={() => openInvite('admin')}>
+                Invite admin
+              </Button>
+              <Button variant="secondary" onClick={() => openInvite('hr')}>
+                Invite HR
+              </Button>
+              <Button variant="secondary" onClick={() => openInvite('clinic')}>
+                Invite clinic
+              </Button>
+            </>
           )}
           <Button onClick={() => openInvite('teacher')}>Invite teacher</Button>
         </div>
@@ -77,6 +89,15 @@ export default function Teachers() {
                         {t.email as string}
                         {t.is_active === false ? ' · left the school' : ''}
                       </div>
+                      {subjects[t.id as string]?.length ? (
+                        <div className="text-[12px] text-ink-soft mt-0.5">
+                          {subjects[t.id as string].join(' · ')}
+                        </div>
+                      ) : t.role === 'teacher' ? (
+                        <div className="text-[12px] text-ink-faint mt-0.5">
+                          Assign more than one subject from the class page.
+                        </div>
+                      ) : null}
                     </>
                   }
                   right={
@@ -97,22 +118,26 @@ export default function Teachers() {
                         </button>
                       )}
                       {t.role !== 'proprietor' && t.is_active !== false && canInviteAdmin && (
-                        <button
-                          className="text-[12px] underline"
-                          onClick={() => {
-                            const next = t.role === 'admin' ? 'teacher' : 'admin'
-                            const label =
-                              next === 'admin'
-                                ? 'Make this teacher an administrator?'
-                                : 'Move this administrator back to teacher?'
-                            if (!confirm(label)) return
+                        <select
+                          className="h-8 px-2 border border-rule rounded-sm bg-surface text-[12px]"
+                          value={t.role as string}
+                          onChange={(e) => {
+                            const next = e.target.value as InviteRole
+                            if (next === t.role) return
+                            if (!confirm(`Move this person to ${next}?`)) {
+                              e.target.value = t.role as string
+                              return
+                            }
                             void setStaffRole(t.id as string, next)
                               .then(() => load())
-                              .catch((e) => alert((e as Error).message))
+                              .catch((err) => alert((err as Error).message))
                           }}
                         >
-                          {t.role === 'admin' ? 'Make teacher' : 'Make admin'}
-                        </button>
+                          <option value="teacher">teacher</option>
+                          <option value="admin">admin</option>
+                          <option value="hr">hr</option>
+                          <option value="clinic">clinic</option>
+                        </select>
                       )}
                       {t.role !== 'proprietor' && t.is_active !== false && (
                         <button
@@ -220,7 +245,19 @@ function InviteModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={role === 'admin' ? 'Invite an admin' : 'Invite a teacher'}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={
+        role === 'admin'
+          ? 'Invite an admin'
+          : role === 'hr'
+            ? 'Invite HR'
+            : role === 'clinic'
+              ? 'Invite clinic staff'
+              : 'Invite a teacher'
+      }
+    >
       <form
         className="space-y-3.5"
         onSubmit={(e) => {
@@ -232,7 +269,11 @@ function InviteModal({
         <p className="text-[13px] text-ink-soft">
           {role === 'admin'
             ? 'The day-to-day administrator. They run classes, fees and the register. You stay proprietor.'
-            : 'They must sign up with this exact email.'}
+            : role === 'hr'
+              ? 'They mark who is in, out, or sick. Parents never see this desk.'
+              : role === 'clinic'
+                ? 'They record sick children. Only they and the proprietor open the clinic book.'
+                : 'They must sign up with this exact email. Assign more than one subject from each class.'}
         </p>
         <Field
           label="Email"

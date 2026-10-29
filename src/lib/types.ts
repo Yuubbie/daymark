@@ -1,4 +1,8 @@
-export type Role = 'proprietor' | 'admin' | 'teacher' | 'parent' | 'student'
+export type Role = 'proprietor' | 'admin' | 'teacher' | 'hr' | 'clinic' | 'parent' | 'student'
+
+export type StaffDayStatus = 'present' | 'absent' | 'sick'
+
+export type BillingPlanKey = 'month' | 'term' | 'year'
 
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused'
 
@@ -73,6 +77,8 @@ export const ROLE_HOME: Record<Role, string> = {
   proprietor: '/admin',
   admin: '/admin',
   teacher: '/teacher',
+  hr: '/hr',
+  clinic: '/clinic',
   parent: '/parent',
   student: '/student',
 }
@@ -83,4 +89,16 @@ export function isExecutive(role: Role | undefined): boolean {
 
 export function isStaffRole(role: Role | undefined): boolean {
   return role === 'admin' || role === 'proprietor' || role === 'teacher'
+}
+
+export function isHrDesk(role: Role | undefined): boolean {
+  return role === 'hr' || role === 'admin' || role === 'proprietor'
+}
+
+export function isClinicDesk(role: Role | undefined): boolean {
+  return role === 'clinic' || role === 'proprietor'
+}
+
+export function seesStaffRegister(role: Role | undefined): boolean {
+  return isStaffRole(role) || role === 'hr'
 }

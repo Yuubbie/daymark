@@ -166,7 +166,7 @@ export default function Marketing() {
           {[
             ['20s', 'To mark a class present'],
             ['5 dashboards', 'Proprietor to student'],
-            ['30 days free', 'Then N200,000 a month'],
+            ['30 days free', 'Then N1,500 per student / month'],
             ['Offline-safe', 'Register works on 2G'],
           ].map(([k, v]) => (
             <div key={k}>
@@ -327,7 +327,7 @@ export default function Marketing() {
         <RoleBlock
           kicker="For proprietors"
           title="The school as a business."
-          body="Enrolment, fee collection, outstanding balances, expenses and margin, term by term. One subscription covers the whole school."
+          body="Enrolment, fee collection, outstanding balances, expenses and margin, term by term. The school pays. Price follows the roll."
           cta="Open the proprietor demo"
           to="/demo?role=proprietor"
           reverse
@@ -342,7 +342,7 @@ export default function Marketing() {
             <div className="mt-5 pt-4 border-t border-brass border-rule">
               <div className="flex items-center justify-between">
                 <span className="eyebrow">Subscription</span>
-                <span className="tnum text-[13px] text-brass">N200,000 / month</span>
+                <span className="tnum text-[13px] text-brass">N1,500 / student / month</span>
               </div>
             </div>
           </div>
@@ -397,7 +397,7 @@ export default function Marketing() {
             {[
               ['Legacy school ERPs', 'Own the whole school on paper, but are heavy to start and parents still wait for reports.'],
               ['WhatsApp groups', 'Free, familiar, and structurally the wrong tool for a record.'],
-              ['Daymaark', 'The full school record, live the same day, offline-safe, for one flat term price.'],
+              ['Daymaark', 'The full school record, live the same day, offline-safe. The school pays per student.'],
             ].map(([t, b]) => (
               <li key={t} className="border border-ink-invert/15 rounded-lg p-4">
                 <div className="text-[14px] font-semibold">{t}</div>
@@ -411,37 +411,36 @@ export default function Marketing() {
       <section id="pricing" className="mx-auto max-w-6xl px-5 py-20">
         <span className="eyebrow">Pricing</span>
         <h2 className="text-[32px] sm:text-[40px] mt-2">
-          30 days free. Then one price for the whole school.
+          30 days free. Then the school pays per student.
         </h2>
         <p className="mt-3 text-[15px] text-ink-soft max-w-[56ch]">
-          N200,000 a month, unlimited students. Parents, teachers and students are included, not
-          charged per seat. No card needed to start the trial.
+          Parents and students are never charged for Daymaark. We count active students on the roll
+          and bill the school. No card needed to start the trial.
         </p>
         <div className="mt-10 grid md:grid-cols-3 gap-4">
           <PriceCard
-            name="Free trial"
-            price="N0"
-            unit="30 days, full product"
-            points={['Every dashboard switched on', 'Unlimited students', 'Bring your class list']}
+            name="Month"
+            price="N1,500"
+            unit="per student / month"
+            points={['School pays, not families', 'Counted from the live roll', 'Cancel any month']}
           />
           <PriceCard
-            name="School"
-            price="N200,000"
-            unit="per month, unlimited students"
+            name="Term"
+            price="N3,500"
+            unit="per student / term"
             featured
             points={[
-              'Proprietor, admin, teacher, parent, student',
-              'Register, lessons, homework, results',
-              'Fees, invoicing and finance reporting',
-              'Notices and same-day absence alerts',
-              'Offline-safe register',
+              'School pays, not families',
+              'Counted from the live roll',
+              'Register, lessons, results, fees',
+              'HR, clinic notes, CBT',
             ]}
           />
           <PriceCard
-            name="Group"
-            price="Talk"
-            unit="multi-campus"
-            points={['Consolidated reporting', 'Shared branding', 'Staff onboarding and migration']}
+            name="School year"
+            price="N10,000"
+            unit="per student / year"
+            points={['School pays, not families', 'Counted from the live roll', 'One invoice for the year']}
           />
         </div>
       </section>
@@ -482,7 +481,7 @@ export default function Marketing() {
             ],
             [
               'What does it cost?',
-              '30 days free, then N200,000 a month for the whole school. Unlimited students. Parents, teachers and students are not charged per seat.',
+              '30 days free, then the school pays N1,500 per student per month, N3,500 per term, or N10,000 per school year. Parents and students are not billed.',
             ],
             [
               'Can parents use it without a smartphone?',
@@ -515,7 +514,7 @@ export default function Marketing() {
             <h2 className="text-[36px] max-w-[16ch]">Run the whole school. Show the whole family.</h2>
             <p className="mt-3 text-ink-invert/65 max-w-[44ch]">
               Walk all five dashboards on a live school, then book a session with your own class list.
-              N200,000 a month after a 30-day trial.
+              The school pays per student after a 30-day trial.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

@@ -39,6 +39,10 @@ export type TermReport = {
     marks: AttendanceMark[]
   }
   subjects: ReportSubject[]
+  comments?: {
+    class_teacher: string | null
+    principal: string | null
+  }
 }
 
 export async function fetchTermReport(studentId: string, termId?: string): Promise<TermReport> {
@@ -56,6 +60,7 @@ export async function fetchTermReport(studentId: string, termId?: string): Promi
   return {
     ...row,
     subjects: row.subjects ?? [],
+    comments: row.comments ?? { class_teacher: null, principal: null },
     attendance: {
       ...row.attendance,
       marks,

@@ -15,11 +15,11 @@ admin, and it answers the one question every parent actually asks.
 
 | Role | Relationship |
 |---|---|
-| School (proprietor / admin) | Buyer. Pays N200,000 per month for the whole school. |
-| Parent | Daily user. Free, included in the school's subscription. |
+| School (proprietor / admin) | Buyer. Pays per student on the roll. |
+| Parent | Daily user. Free. The school pays, not the family. |
 | Teacher | Daily operator. Free, included. |
 
-Pricing: N200,000 per month after a 30-day trial. Unlimited students.
+Pricing: 30 days free, then N1,500 per student / month, N3,500 per student / term, or N10,000 per student / year. The school pays.
 
 ## Stack
 

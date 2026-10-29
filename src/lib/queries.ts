@@ -128,7 +128,7 @@ export async function reorderClasses(classIds: string[]) {
   if (error) throw error
 }
 
-export async function setStaffRole(profileId: string, role: 'teacher' | 'admin') {
+export async function setStaffRole(profileId: string, role: 'teacher' | 'admin' | 'hr' | 'clinic') {
   const { error } = await supabase.rpc('set_staff_role', {
     p_profile_id: profileId,
     p_role: role,
@@ -243,7 +243,7 @@ export async function listStaff() {
   const { data, error } = await supabase
     .from('profiles')
     .select('id, full_name, email, role, is_active')
-    .in('role', ['proprietor', 'admin', 'teacher'])
+    .in('role', ['proprietor', 'admin', 'teacher', 'hr', 'clinic'])
     .order('full_name')
   if (error) throw error
   return data ?? []
@@ -282,7 +282,7 @@ export async function inviteStaff(
   schoolId: string,
   email: string,
   fullName: string,
-  role: 'teacher' | 'admin' = 'teacher',
+  role: 'teacher' | 'admin' | 'hr' | 'clinic' = 'teacher',
 ) {
   const trimmed = email.trim().toLowerCase()
   const { data: u } = await supabase.auth.getUser()

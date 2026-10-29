@@ -6,11 +6,11 @@ export const DEMO_CLASS = 'JSS 1A'
 export const DEMO_CLAIM = 'ADAEZE01'
 
 export const PLAN = {
-  name: 'School',
+  name: 'Term',
   trialDays: 30,
-  price: 200000,
-  per: 'month',
-  students: 'Unlimited students',
+  price: 3500,
+  per: 'student / term',
+  students: 'Price follows the roll. The school pays.',
 }
 
 export type DemoRole = 'proprietor' | 'admin' | 'teacher' | 'parent' | 'student'

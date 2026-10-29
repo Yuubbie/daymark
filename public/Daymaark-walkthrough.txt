@@ -1,0 +1,427 @@
+DAYMAARK — HOW TO USE IT
+========================
+
+App: https://daymark-eosin-five.vercel.app
+Press Ctrl+Shift+R once so you are not on an old page.
+
+This paper is for walking someone through Daymaark.
+Read it out loud if you want. One step at a time.
+
+
+WHAT THIS APP IS
+----------------
+A school uses Daymaark to see what happened today.
+
+The office runs the school.
+The teacher marks who came, and writes what was taught.
+The parent sees that same day on their phone.
+A test the class sat becomes a mark on one sheet.
+That sheet is the term card.
+
+If fees are not paid, the parent cannot open the term card.
+That is on purpose.
+
+Daymaark does not do hostel, bus, library, pay, or bulk SMS.
+
+
+TWO WAYS TO SHOW IT
+-------------------
+1. Start a new school from nothing. Use this if you want to show setup.
+2. Use Greenfield Academy. Use this if you already pasted APPLY_RUN19.sql.
+   Same app. Greenfield is already full of children, lessons, and a test.
+
+Greenfield password for every login: DaymaarkDemo2026
+
+  proprietor.demo@daymaark.app   office boss     goes to /admin
+  admin.demo@daymaark.app        office          goes to /admin
+  teacher.demo@daymaark.app      teacher         goes to /teacher
+  parent.demo@daymaark.app       Adaeze's mum    goes to /parent
+  student.demo@daymaark.app      Adaeze          goes to /student
+
+Apply form:  /apply/greenfield-demo
+Sit a test:  /sit/greenfield-maths-ca
+Parent code: ADAEZE01
+
+Sign out when you change person.
+
+
+PART 1 — START A SCHOOL
+-----------------------
+Do this on a new account. Skip this part if you are using Greenfield.
+
+1. Open the app.
+2. Tap Create account.
+3. Type your name, email, and a password.
+4. If it asks you to open an email, open it.
+5. You land on a welcome page.
+6. Tap I run a school.
+7. Type the school name.
+8. Type your name.
+9. Add a crest if you have one. This picture becomes the school on
+   every page and every print. You can add it later under Account.
+10. Tap create.
+11. You are now the proprietor. You own the school.
+    You land on Today.
+
+Do these four jobs, in this order. Today shows you which ones are still open.
+
+Job 1. People
+   Tap People.
+   Invite an admin. They run the day. You still own the school.
+   Invite a teacher when you are ready.
+
+Job 2. Set the term
+   Tap Set term.
+   Example: First Term 2026/2027.
+   Put start date and end date.
+   The register and the term card use this term.
+
+Job 3. Classes
+   Tap Classes.
+   Tap New class.
+   Name it the way the school does. Example: JSS 1A.
+
+Job 4. Children
+   Open the class.
+   Tap Add.
+   Paste a list of names, or type them.
+   Put admission numbers if the school has them.
+
+On each child you can:
+
+   Code
+     Makes a short code. Give it to the parent.
+     The parent types that code to see their child.
+
+   Codes
+     Makes a code for every child in the class at once.
+
+   Login
+     Invite the child's own email, if the child will sit a test
+     with their own sign-in.
+
+   Photo
+     Put the child's picture. It prints on the ID.
+
+   Fees
+     Mark the child as paid, or fees due.
+
+   Assign
+     Put a teacher on this class. Form teacher, or by subject.
+
+Also before a visitor walks in:
+
+   Account
+     Address and phone. They print on the back of the ID card.
+
+   Fees
+     Set what the class pays this term, in instalments.
+
+   Apply
+     People who want a place fill /apply/ then the school name slug.
+     Their form lands here. Enrol puts the child on the class list.
+
+
+PART 2 — THE TEACHER IN THE MORNING
+-----------------------------------
+Sign in as the teacher. You land on Register.
+
+1. Pick the class if you teach more than one.
+2. Tap All present.
+3. Change the two or three who are not present.
+     P = present
+     L = late
+     A = absent
+     E = excused
+4. Tap a name if you want one short note. Example: Came after assembly.
+   The parent sees this note. Keep it to one line.
+5. It saves by itself. If the phone has no network, it waits and
+   sends later.
+
+Then tap Lesson.
+
+1. Pick the class and the subject.
+2. Type the topic.
+3. Type a short summary of what you taught.
+4. Type homework if there is any, and when it is due.
+5. Save.
+
+One subject, one day, one form. That is all.
+
+Timetable is the week.
+Notices is a note to the class.
+
+
+PART 3 — THE OFFICE TODAY
+-------------------------
+Sign in as proprietor or admin. You land on Today.
+
+Today shows:
+  how many children
+  who marked the register
+  who posted a lesson
+  who is falling behind
+  whose birthday is near
+
+The list on the side:
+
+  Today
+  Register        you can mark it too
+  Lesson          same form as the teacher
+  Timetable
+  Flagged         children whose attendance is falling
+  Bank            questions for tests
+  CBT             the papers
+  Marking         mark and approve
+  Classes         children, codes, IDs, reports
+  People          staff
+  Fees            what to pay, and remind one parent
+  Apply           people asking for a place
+  Notices         a note to the school, a class, parents, or staff
+  Account         crest, address, phone
+
+Inside a class:
+
+  IDs       print student cards. Browser print. Card size is CR80.
+  Reports   the term card for that child
+  Codes     parent codes for the whole class
+
+
+PART 4 — TESTS AND EXAMS
+------------------------
+A test in Daymaark is not a new book.
+You write questions once. You put some of them on a paper.
+The class sits it. You mark the written ones. The office says yes.
+Then the parent can see the mark.
+
+Step A. Bank
+
+  1. Tap Bank.
+  2. Tap New bank.
+  3. Give it a name. Example: JSS 1 Mathematics.
+  4. Pick the subject and the class.
+  5. Tap Add question.
+
+  Four kinds of question:
+
+    Objective         A B C D. One right answer.
+    Multiple select   More than one right answer.
+    Subjective        The child writes. A person marks it.
+    Comprehension     A passage, then small questions under it.
+
+  Build the bank. Use it again next time.
+
+Step B. Set a paper
+
+  1. Tap CBT.
+  2. Tap Set paper.
+  3. Give it a title.
+  4. Pick the kind:
+       assessment  = a class test
+       exam        = the term paper
+       interview   = for a new child who wants a place
+  5. Pick the class.
+  6. Put how many minutes.
+  7. Write short instructions.
+  8. Tick questions from the bank.
+  9. Save. It is a draft. Nobody can sit a draft.
+
+Step C. Publish
+
+  On the paper, tap Publish.
+  Now the class can sit it.
+
+  Then you get:
+
+    Link
+      Like a Google Form. Any phone. No Daymaark account.
+      It looks like /sit/ then a short code.
+
+    Poster
+      For a class test or exam. Not for an interview.
+      A page with a QR code for the classroom door.
+      Press Poster as many times as you like. Same link.
+
+    Interview
+      For a new child. They type their name.
+
+    Close
+      When time is up.
+
+Step D. Sit the paper (borrowed phone)
+
+  Open the link, or scan the poster.
+
+  1. Type the child's name. That is who they are. No login.
+  2. Tap start. The clock starts now.
+  3. Answer. Submit.
+
+  Rules:
+    One name, one try.
+    Close the phone and come back with the same name = carry on.
+    Already submitted = cannot start again.
+
+  A child with their own login sits from Desk instead.
+
+Step E. Mark and approve
+
+  Tap Marking.
+
+  The teacher marks written answers.
+  The proprietor or admin taps Approve.
+  Until Approve, the parent cannot see the score.
+
+  Reject sends it back.
+
+  The term card only shows papers that were approved.
+  If the card has no marks, nothing has been approved yet.
+
+
+PART 5 — THE PARENT
+-------------------
+The parent creates an account, or signs in.
+
+Welcome page. Tap I am a parent.
+Type the code the school gave them.
+On Greenfield that code is ADAEZE01.
+They can add a phone number.
+
+Today shows:
+  the child's name
+  the attendance strip for the term
+  today's lessons
+  the teacher's one-line notes
+
+Then:
+
+  Homework    work still open
+  Results     approved papers. Open card = the term card. Print from
+              the browser if you want paper.
+  Notices     school notes
+  Fees        what is owed. If fees are due, the term card stays locked.
+  Settings    phone number
+
+One child, one sheet.
+More than one child: tap the name at the top.
+
+
+PART 6 — THE CHILD
+------------------
+The office invites the child's email from the class, under Login.
+
+The child signs in and lands on Desk.
+They see open tests and exams for their class.
+They can open their report card.
+Same fee rule as the parent.
+
+
+PART 7 — SOMEONE WANTS A PLACE
+------------------------------
+No login.
+
+Open /apply/ then the school slug.
+Greenfield: /apply/greenfield-demo
+
+The guardian fills the form.
+The office sees it under Apply.
+They can mark contacted, offered, enrol, or decline.
+Enrol puts the child on a class list.
+Then make a parent code as usual.
+
+For an entrance test: publish an interview paper.
+Give them the Interview link.
+They type the child's name.
+
+
+PART 8 — SHOW GREENFIELD, IN THIS ORDER
+---------------------------------------
+Only if APPLY_RUN19.sql was pasted.
+Hard-refresh. Sign out between people.
+
+1. Office
+   Sign in as proprietor.demo@daymaark.app
+   Today.
+   Classes, open JSS 1A.
+     Adaeze's code is ADAEZE01.
+     Tunde still has fees due.
+   People.
+   Fees.
+   Apply. Kemi is contacted. Yusuf is new.
+   Notices.
+   CBT. One test is live. The term paper is still a draft.
+   Marking. Adaeze's test is waiting.
+   Account.
+
+2. Teacher
+   Sign in as teacher.demo@daymaark.app
+   Register. JSS 1A is already marked.
+     Tunde is absent on Mondays.
+     Bola is late on Wednesdays.
+     Tap a name to see the note.
+   Lesson. Today's maths, English, science.
+   CBT. Open Poster on the class test.
+
+3. Sit the poster
+   Open a private window.
+   Go to /sit/greenfield-maths-ca
+   Type a NEW name. Not Adaeze. She already submitted.
+   Start. Close the tab. Same name again. It carries on.
+   Submit. Try the same name. It blocks.
+
+4. Parent
+   Sign in as parent.demo@daymaark.app
+   Today. This is Adaeze.
+   Homework.
+   Results. Open card.
+   Fees.
+
+5. Child
+   Sign in as student.demo@daymaark.app
+   Desk. Papers. Report card.
+
+6. Apply
+   Private window.
+   /apply/greenfield-demo
+   Send one form.
+   Office sees it under Apply.
+
+7. Print
+   Open a child's ID. Print.
+   Open a term card. Print.
+   Use the browser print box. There is a Back button on the page.
+
+
+THE PATH TO SIT WITH A VISITOR
+------------------------------
+Keep this order. Do not skip around.
+
+1. Show the office. New school, or Greenfield proprietor.
+2. Teacher marks the register. Posts one lesson.
+3. Bank. Set a paper. Publish. Poster.
+4. A phone sits the paper with a new name.
+5. Marking. Approve.
+6. Parent Today. Term card.
+7. A child with fees due. The card stays locked.
+   Clear fees. The card opens.
+8. Apply form.
+9. Print an ID and a term card.
+
+Do not open /ops on this walk. That page is for the two people
+who run Daymaark, not for the school.
+
+
+IF SOMETHING IS EMPTY
+---------------------
+You did not paste APPLY_RUN19.sql,
+or you are on an old tab.
+
+Paste the SQL. Hard-refresh. Sign in again.
+
+
+ONE LINE TO REMEMBER
+--------------------
+Office sets the school.
+Teacher marks the day.
+Child sits the paper.
+Office says the mark is true.
+Parent sees that same day, on one sheet.

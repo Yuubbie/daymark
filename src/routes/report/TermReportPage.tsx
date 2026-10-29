@@ -2,16 +2,23 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AppShell } from '../../components/AppShell'
 import { TermReportCard } from '../../components/TermReport'
-import { Alert, Button, Empty, Spinner } from '../../components/ui'
+import { Alert, Button, Empty, Panel, Spinner, TextArea } from '../../components/ui'
 import { useAuth } from '../../lib/auth'
+import { saveReportComment } from '../../lib/office'
 import { fetchTermReport, type TermReport } from '../../lib/report'
+import { isStaffRole } from '../../lib/types'
 
 export default function TermReportPage() {
   const { studentId = '' } = useParams()
   const { profile } = useAuth()
+  const staff = isStaffRole(profile?.role)
   const [report, setReport] = useState<TermReport | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [classComment, setClassComment] = useState('')
+  const [principalComment, setPrincipalComment] = useState('')
+  const [commentBusy, setCommentBusy] = useState(false)
+  const [commentNotice, setCommentNotice] = useState<string | null>(null)
 
   useEffect(() => {
     if (!studentId) return
@@ -20,7 +27,11 @@ export default function TermReportPage() {
     setError(null)
     void fetchTermReport(studentId)
       .then((r) => {
-        if (!cancelled) setReport(r)
+        if (!cancelled) {
+          setReport(r)
+          setClassComment(r.comments?.class_teacher ?? '')
+          setPrincipalComment(r.comments?.principal ?? '')
+        }
       })
       .catch((e) => {
         if (!cancelled) setError((e as Error).message)
@@ -80,7 +91,52 @@ export default function TermReportPage() {
           <Alert>{error}</Alert>
         )
       ) : report ? (
-        <TermReportCard report={report} />
+        <>
+          <TermReportCard report={report} />
+          {staff && (
+            <div className="mt-4 print:hidden">
+              <Panel title="Teacher comments">
+                <form
+                  className="space-y-3.5"
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    setCommentBusy(true)
+                    setCommentNotice(null)
+                    void saveReportComment(studentId, classComment, principalComment)
+                      .then(async () => {
+                        const next = await fetchTermReport(studentId)
+                        setReport(next)
+                        setCommentNotice('Comments saved on the card.')
+                      })
+                      .catch((e) => setError((e as Error).message))
+                      .finally(() => setCommentBusy(false))
+                  }}
+                >
+                  <TextArea
+                    label="Class teacher"
+                    value={classComment}
+                    onChange={(e) => setClassComment(e.target.value)}
+                    placeholder="A short note on the term."
+                  />
+                  {(profile?.role === 'admin' || profile?.role === 'proprietor') && (
+                    <TextArea
+                      label="Principal"
+                      value={principalComment}
+                      onChange={(e) => setPrincipalComment(e.target.value)}
+                      placeholder="Head of school remark."
+                    />
+                  )}
+                  {commentNotice && (
+                    <p className="text-[13px] text-present font-semibold">{commentNotice}</p>
+                  )}
+                  <Button type="submit" loading={commentBusy}>
+                    Save comments
+                  </Button>
+                </form>
+              </Panel>
+            </div>
+          )}
+        </>
       ) : (
         <Empty line="No report to show." />
       )}

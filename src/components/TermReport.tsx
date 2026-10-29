@@ -129,6 +129,27 @@ export function TermReportCard({ report }: { report: TermReport }) {
         )}
       </Panel>
 
+      {(report.comments?.class_teacher || report.comments?.principal) && (
+        <Panel title="Comments">
+          {report.comments?.class_teacher && (
+            <div className="mb-4 last:mb-0">
+              <div className="eyebrow">Class teacher</div>
+              <p className="mt-1.5 text-[14px] text-ink-soft leading-relaxed whitespace-pre-wrap">
+                {report.comments.class_teacher}
+              </p>
+            </div>
+          )}
+          {report.comments?.principal && (
+            <div>
+              <div className="eyebrow">Principal</div>
+              <p className="mt-1.5 text-[14px] text-ink-soft leading-relaxed whitespace-pre-wrap">
+                {report.comments.principal}
+              </p>
+            </div>
+          )}
+        </Panel>
+      )}
+
       <p className="text-[12px] text-ink-faint print:block">
         Only approved CBT papers and the marked register for this term appear on this card.
         Register notes sit under attendance. Outstanding fees lock the parent view until the school

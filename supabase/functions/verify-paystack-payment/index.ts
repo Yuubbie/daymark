@@ -1,10 +1,10 @@
 // Edge Function: verifies a Paystack payment server-side and, only if
-// genuinely confirmed, activates the school's monthly subscription.
+// genuinely confirmed, activates the school's subscription.
 //
 // The browser callback is never trusted. This function:
 //   1. Requires a signed-in admin/proprietor JWT
 //   2. Asks Paystack whether the reference actually succeeded
-//   3. Checks the amount is at least N200,000
+//   3. Checks the amount covers student_count × the chosen plan
 //   4. Calls activate_subscription (service role)
 
 import { serve } from 'https://deno.land/std@0.190.0/http/server.ts'
@@ -14,8 +14,6 @@ const PAYSTACK_SECRET_KEY = Deno.env.get('PAYSTACK_SECRET_KEY') ?? ''
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-
-const MONTH_AMOUNT_KOBO = 20000000
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -27,6 +25,13 @@ function json(body: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   })
+}
+
+function planKey(raw: unknown): 'month' | 'term' | 'year' {
+  const s = String(raw ?? '').toLowerCase()
+  if (s.includes('term')) return 'term'
+  if (s.includes('year')) return 'year'
+  return 'month'
 }
 
 serve(async (req) => {
@@ -48,7 +53,10 @@ serve(async (req) => {
   }
 
   try {
-    const { reference, school_id } = await req.json()
+    const body = await req.json()
+    const reference = body?.reference
+    const school_id = body?.school_id
+    const requestedPlan = body?.plan
 
     if (!reference || typeof reference !== 'string') {
       return json({ error: 'Missing reference' }, 400)
@@ -108,23 +116,36 @@ serve(async (req) => {
     }
 
     const amountKobo: number = verifyData.data.amount
-    if (typeof amountKobo !== 'number' || amountKobo < MONTH_AMOUNT_KOBO) {
-      return json({
-        success: false,
-        error: `Amount paid is less than the required N200,000 monthly fee.`,
-      })
-    }
-
     const metaSchool = verifyData.data?.metadata?.school_id
     if (!metaSchool || metaSchool !== schoolId) {
       return json({ success: false, error: 'Payment does not belong to this school.' })
     }
+
+    const key = planKey(verifyData.data?.metadata?.plan ?? requestedPlan)
+    const { data: quote, error: quoteErr } = await supabase.rpc('school_billing_quote', {
+      p_school_id: schoolId,
+    })
+    if (quoteErr || !quote?.plans?.[key]) {
+      return json({ error: 'Could not price this school.' }, 500)
+    }
+
+    const dueKobo = Number(quote.plans[key].kobo)
+    if (typeof amountKobo !== 'number' || amountKobo < dueKobo) {
+      return json({
+        success: false,
+        error: `Amount paid is less than ${quote.student_count} students on the ${key} plan.`,
+      })
+    }
+
+    const planName =
+      key === 'term' ? 'daymark_term' : key === 'year' ? 'daymark_year' : 'daymark_month'
 
     const { error: activateErr } = await supabase.rpc('activate_subscription', {
       p_school_id: schoolId,
       p_reference: reference,
       p_provider: 'paystack',
       p_amount_kobo: amountKobo,
+      p_plan: planName,
     })
 
     if (activateErr) {

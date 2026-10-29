@@ -1,0 +1,926 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daymaark — Presentation Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --paper:#F7F8F6; --surface:#FFFFFF; --surface-alt:#F1F3EF;
+  --ink:#143A2B; --ink-soft:#4A5F55; --ink-faint:#7C8B83; --ink-invert:#F7F8F6;
+  --brass:#C9922B; --brass-dark:#A87A1F; --brass-wash:#FAF3E4;
+  --rule:#DDE2DB; --rule-strong:#C3CCC2;
+  --present:#2F7D5C; --absent:#C2413A; --late:#D99114; --excused:#6B7A80; --unmarked:#DDE2DB;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --sans:"Public Sans",ui-sans-serif,system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#0d1f18;font-family:var(--sans);color:var(--ink);overflow:hidden}
+
+/* ---- stage scaling ---- */
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center center}
+.slide{position:absolute;inset:0;background:var(--paper);opacity:0;pointer-events:none;
+  transition:opacity .28s ease;display:flex;flex-direction:column;overflow:hidden}
+.slide.active{opacity:1;pointer-events:auto}
+.slide.dark{background:var(--ink);color:var(--ink-invert)}
+.pad{padding:64px 76px;flex:1;display:flex;flex-direction:column;min-height:0}
+
+/* ---- type ---- */
+.eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint)}
+.slide.dark .eyebrow{color:var(--brass)}
+h1{font-family:var(--display);font-weight:700;letter-spacing:-.03em;line-height:1.02;margin:0}
+h2{font-family:var(--display);font-weight:700;letter-spacing:-.025em;line-height:1.06;margin:0}
+h3{font-family:var(--display);font-weight:700;letter-spacing:-.02em;margin:0;font-size:24px}
+.lead{font-size:19px;line-height:1.55;color:var(--ink-soft);max-width:60ch}
+.slide.dark .lead{color:rgba(247,248,246,.72)}
+.mono{font-family:var(--mono)}
+.tnum{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.small{font-size:13px;color:var(--ink-faint)}
+.slide.dark .small{color:rgba(247,248,246,.5)}
+b,strong{font-weight:700}
+a{color:inherit}
+
+/* ---- atoms ---- */
+.mark{display:inline-block;vertical-align:middle}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid var(--rule-strong);border-radius:999px;padding:6px 12px;color:var(--ink-soft)}
+.slide.dark .chip{border-color:rgba(247,248,246,.22);color:rgba(247,248,246,.75)}
+.chip.brass{border-color:var(--brass);color:var(--brass-dark);background:var(--brass-wash)}
+.slide.dark .chip.brass{background:transparent;color:var(--brass)}
+
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:22px}
+.slide.dark .card{background:rgba(247,248,246,.05);border-color:rgba(247,248,246,.14)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+.g4{grid-template-columns:repeat(4,1fr)}
+.rule{height:1px;background:var(--rule);border:0;margin:0}
+.slide.dark .rule{background:rgba(247,248,246,.16)}
+
+.stat .n{font-family:var(--display);font-weight:700;font-size:40px;letter-spacing:-.03em;line-height:1}
+.stat .l{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-top:8px}
+.slide.dark .stat .l{color:rgba(247,248,246,.5)}
+
+ul.clean{list-style:none;margin:0;padding:0}
+ul.clean li{position:relative;padding-left:26px;margin:11px 0;font-size:16px;line-height:1.5;color:var(--ink-soft)}
+.slide.dark ul.clean li{color:rgba(247,248,246,.78)}
+ul.clean li:before{content:"";position:absolute;left:0;top:9px;width:10px;height:2px;background:var(--brass)}
+
+table.mx{border-collapse:collapse;width:100%;font-size:14px}
+table.mx th,table.mx td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--rule)}
+table.mx th{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
+table.mx td.yes{color:var(--present);font-weight:600}
+table.mx td.no{color:var(--ink-faint)}
+table.mx td.col-us{background:var(--brass-wash);font-weight:600}
+.slide.dark table.mx th,.slide.dark table.mx td{border-color:rgba(247,248,246,.14)}
+.slide.dark table.mx th{color:rgba(247,248,246,.5)}
+.slide.dark table.mx td.col-us{background:rgba(201,146,43,.14)}
+
+.fill{font-family:var(--mono);font-size:.92em;color:var(--brass-dark);background:var(--brass-wash);
+  border:1px dashed var(--brass);border-radius:4px;padding:1px 8px;white-space:nowrap}
+.slide.dark .fill{color:var(--brass);background:rgba(201,146,43,.12);border-color:rgba(201,146,43,.6)}
+
+/* register strip */
+.strip{display:flex;flex-wrap:wrap;gap:3px}
+.strip i{width:7px;height:16px;border-radius:2px;background:var(--unmarked);display:block}
+.strip i.present{background:var(--present)}
+.strip i.late{background:var(--late)}
+.strip i.absent{background:var(--absent)}
+.strip i.excused{background:var(--excused)}
+
+/* footer */
+.foot{position:absolute;left:76px;right:76px;bottom:26px;display:flex;justify-content:space-between;
+  align-items:center;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
+.slide.dark .foot{color:rgba(247,248,246,.4)}
+.pageno{font-family:var(--mono)}
+
+/* cover */
+.cover .pad{justify-content:center}
+.cover h1{font-size:96px}
+.cover .lead{font-size:22px;margin-top:22px}
+
+/* divider */
+.divider{justify-content:center}
+.divider .num{font-family:var(--mono);font-size:15px;letter-spacing:.3em;color:var(--brass)}
+.divider h1{font-size:64px;margin-top:14px}
+.divider .lead{margin-top:18px}
+
+/* personal picker */
+.person{display:flex;gap:14px;align-items:flex-start}
+.person .tag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--brass-dark);background:var(--brass-wash);border-radius:4px;padding:4px 8px;white-space:nowrap}
+
+/* hud */
+#hud{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:50;display:flex;gap:8px;
+  align-items:center;background:rgba(13,31,24,.72);backdrop-filter:blur(8px);border:1px solid rgba(247,248,246,.14);
+  border-radius:999px;padding:8px 10px;transition:opacity .3s}
+#hud button{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-invert);
+  background:transparent;border:0;padding:7px 12px;border-radius:999px;cursor:pointer}
+#hud button:hover{background:rgba(247,248,246,.12)}
+#hud .pos{font-family:var(--mono);font-size:12px;color:rgba(247,248,246,.7);padding:0 8px}
+#bar{position:fixed;left:0;top:0;height:3px;background:var(--brass);z-index:60;width:0;transition:width .25s}
+
+/* notes */
+#notes{position:fixed;left:0;right:0;bottom:0;z-index:55;background:#0d1f18;color:var(--ink-invert);
+  border-top:1px solid rgba(247,248,246,.16);padding:16px 24px;transform:translateY(101%);transition:transform .28s;font-size:15px;line-height:1.6;max-height:32vh;overflow:auto}
+#notes.open{transform:translateY(0)}
+#notes .eyebrow{color:var(--brass);margin-bottom:6px}
+
+/* ---- print: one slide per landscape page ---- */
+@media print{
+  @page{size:1280px 720px;margin:0}
+  body{overflow:visible;background:#fff}
+  #viewport{position:static;display:block}
+  #stage{width:auto;height:auto;transform:none!important}
+  #hud,#bar,#notes{display:none!important}
+  .slide{position:relative;inset:auto;opacity:1!important;pointer-events:auto;
+    width:1280px;height:720px;break-after:page;page-break-after:always}
+  .slide:last-child{break-after:auto;page-break-after:auto}
+}
+</style>
+</head>
+<body>
+
+<div id="bar"></div>
+<div id="viewport"><div id="stage">
+
+<!-- ============================ COVER ============================ -->
+<section class="slide cover dark" data-note="Open warm. Say the sentence on the screen: Daymaark runs the whole school day and shows the family what happened today. Ask which hat they are wearing — school or investor — then walk the matching track.">
+  <div class="pad">
+    <div style="display:flex;align-items:center;gap:16px">
+      <svg class="mark" width="72" height="55" viewBox="0 0 34 26" aria-hidden="true">
+        <g fill="#F7F8F6"><rect x="2.6" y="3.4" width="3.4" height="19.2" rx="1.7"/><rect x="9.3" y="3.4" width="3.4" height="19.2" rx="1.7"/><rect x="16" y="3.4" width="3.4" height="19.2" rx="1.7"/><rect x="22.7" y="3.4" width="3.4" height="19.2" rx="1.7"/></g>
+        <path d="M1.9 21.1 L31.4 4.9" stroke="#C9922B" stroke-width="3.4" stroke-linecap="round"/>
+      </svg>
+      <span class="eyebrow">Every school day, marked</span>
+    </div>
+    <h1 style="margin-top:34px">Daymaark</h1>
+    <p class="lead">The full school record, live the same day. One platform for the proprietor, the admin, the teacher, the parent and the student.</p>
+    <div class="chips" style="margin-top:34px">
+      <span class="chip brass">For schools</span>
+      <span class="chip brass">For investors</span>
+      <span class="chip">One school · one term · one child · one sheet</span>
+    </div>
+  </div>
+  <div class="foot"><span>daymaark.com</span><span>Care · 0703 235 2158</span></div>
+</section>
+
+<!-- ============================ ONE LINE ============================ -->
+<section class="slide" data-note="The whole company in a paragraph. If they remember one thing, this is it. Emphasise: the school already keeps the record; Daymaark makes it live and shows the family.">
+  <div class="pad">
+    <span class="eyebrow">The company in one paragraph</span>
+    <h2 style="font-size:44px;max-width:26ch;margin-top:14px">Schools already keep the record. Daymaark makes it live — and shows the family the same day.</h2>
+    <div class="rule" style="margin:30px 0"></div>
+    <div class="grid g2" style="gap:34px">
+      <div>
+        <h3>What it is</h3>
+        <p class="lead" style="font-size:17px;margin-top:10px">A complete, light school platform: register, lessons, homework, results, fees and finance, across five dashboards, on one record.</p>
+      </div>
+      <div>
+        <h3>What it is not</h3>
+        <p class="lead" style="font-size:17px;margin-top:10px">Not a heavyweight ERP that takes a term to start. Not a WhatsApp group pretending to be a record. Not another report card built from scratch in December.</p>
+      </div>
+    </div>
+    <div style="margin-top:auto" class="card">
+      <span class="eyebrow">Signature idea</span>
+      <p style="font-size:18px;line-height:1.5;margin:10px 0 0">The register strip. A child's whole term as one mark per school day. A parent reads it in two seconds.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ AGENDA ============================ -->
+<section class="slide" data-note="Set expectations. Two tracks, one platform. Tell them you will stop after the client track if they are the school; investors stay for the second half.">
+  <div class="pad">
+    <span class="eyebrow">How to read this deck</span>
+    <h2 style="font-size:40px;margin-top:12px">One platform. Two tracks.</h2>
+    <div class="grid g2" style="gap:22px;margin-top:30px;flex:1">
+      <div class="card" style="display:flex;flex-direction:column">
+        <span class="eyebrow">Track A</span>
+        <h3 style="font-size:30px;margin-top:10px">For the school</h3>
+        <ul class="clean" style="margin-top:16px">
+          <li>The problem and the insight</li>
+          <li>What lands on day one</li>
+          <li>The term card a parent can hold</li>
+          <li>Fees, identity, admissions</li>
+          <li>Setup in an afternoon, security, price</li>
+        </ul>
+        <p class="small" style="margin-top:auto">Slides 5–20</p>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column">
+        <span class="eyebrow">Track B</span>
+        <h3 style="font-size:30px;margin-top:10px">For the investor</h3>
+        <ul class="clean" style="margin-top:16px">
+          <li>Market and why now</li>
+          <li>Product depth and defensibility</li>
+          <li>Model, unit economics, go-to-market</li>
+          <li>Traction, competition, roadmap</li>
+          <li>The ask</li>
+        </ul>
+        <p class="small" style="margin-top:auto">Slides 21–33</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ TRACK A DIVIDER ============================ -->
+<section class="slide divider dark" data-note="Slow down here. This half answers one question: why would a school switch.">
+  <div class="pad">
+    <div class="num">TRACK A · FOR THE SCHOOL</div>
+    <h1>Why a school switches.</h1>
+    <p class="lead" style="max-width:56ch">Five people run a school day. They currently run it on paper, a spreadsheet and a WhatsApp group. Daymaark puts all five on one record — and shows the family the same day.</p>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ PROBLEM ============================ -->
+<section class="slide" data-note="This is the emotional core for a school owner. Parents pay, then hear nothing. The silence is the product gap. Let it land before showing the fix.">
+  <div class="pad">
+    <span class="eyebrow">The problem</span>
+    <h2 style="font-size:46px;max-width:24ch;margin-top:12px">Parents pay every term. Then they hear nothing until report day.</h2>
+    <div class="grid g3" style="gap:16px;margin-top:34px;flex:1;align-content:start">
+      <div class="card">
+        <h3>The parent</h3>
+        <p class="lead" style="font-size:15px;margin-top:8px">Paid, and left in the dark. Was my child in school? Did they get the lesson? Is anything slipping?</p>
+      </div>
+      <div class="card">
+        <h3>The teacher</h3>
+        <p class="lead" style="font-size:15px;margin-top:8px">Keeps a paper register and a homework group. The same fact is written in three places, or none.</p>
+      </div>
+      <div class="card">
+        <h3>The school</h3>
+        <p class="lead" style="font-size:15px;margin-top:8px">Owns the record but cannot show it. Retention and fee collection suffer when families cannot see value.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px;border-left:4px solid var(--brass)">
+      <p style="font-size:19px;line-height:1.5;margin:0">The record already exists. The failure is that nobody outside the staffroom can see it.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ INSIGHT ============================ -->
+<section class="slide" data-note="The strategic bet. Daymaark is not a new form; it is the school's own record, rendered live. Show the two strips: one child at 94%, one at 68%. Same class, different story.">
+  <div class="pad">
+    <span class="eyebrow">The insight</span>
+    <h2 style="font-size:42px;max-width:26ch;margin-top:12px">The register is the product. Everything else is derived from it.</h2>
+    <div class="card" style="margin-top:30px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between">
+        <span style="font-weight:600;font-size:18px">Adaeze Okonkwo</span>
+        <span class="tnum" style="color:var(--present)">94%</span>
+      </div>
+      <div class="strip" data-seed="7" data-days="55" style="margin-top:10px"></div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:22px">
+        <span style="font-weight:600;font-size:18px">Bola Adeyemi</span>
+        <span class="tnum" style="color:var(--absent)">68%</span>
+      </div>
+      <div class="strip" data-seed="41" data-days="55" style="margin-top:10px"></div>
+    </div>
+    <p class="lead" style="margin-top:24px">One morning of marking per class becomes the attendance a parent understands, the notes the office sees, and the attendance figure that rides onto the term card. Mark once. Everything updates.</p>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ DAY ONE ============================ -->
+<section class="slide" data-note="Breadth slide. Five roles, one record. Do not read every line; say it replaces the register book, the homework group, the results spreadsheet and the fee ledger.">
+  <div class="pad">
+    <span class="eyebrow">What lands on day one</span>
+    <h2 style="font-size:40px;margin-top:12px">Five dashboards, one record.</h2>
+    <div class="grid g2" style="gap:16px;margin-top:26px;flex:1;align-content:start">
+      <div class="card"><h3>Proprietor</h3><p class="lead" style="font-size:15px;margin-top:6px">The school as a business: enrolment, collection, outstanding, expense, margin, term by term.</p></div>
+      <div class="card"><h3>Admin</h3><p class="lead" style="font-size:15px;margin-top:6px">Who has not posted, who has not linked, who is slipping. The school on one page.</p></div>
+      <div class="card"><h3>Teacher</h3><p class="lead" style="font-size:15px;margin-top:6px">Register in four taps, one-line notes, lessons, homework, and CBT papers.</p></div>
+      <div class="card"><h3>Parent</h3><p class="lead" style="font-size:15px;margin-top:6px">Today: present, what was taught, what is due, results, fees. Their child only.</p></div>
+    </div>
+    <div class="card" style="margin-top:16px"><h3>Student</h3><p class="lead" style="font-size:15px;margin-top:6px;max-width:none">Their assignments, resources and results, and their own login to sit tests and exams.</p></div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ TERM CARD ============================ -->
+<section class="slide" data-note="The thing a parent can physically hold. It is the register plus approved papers on one sheet. Stress: staff can print even if fees are due; the parent view stays locked until the school clears fees.">
+  <div class="pad">
+    <span class="eyebrow">The term card</span>
+    <h2 style="font-size:40px;max-width:28ch;margin-top:12px">A report card that is not a new form anyone fills in December.</h2>
+    <div class="grid g2" style="gap:26px;margin-top:28px;flex:1;align-items:start">
+      <ul class="clean">
+        <li>School, name, class, admission number, photo.</li>
+        <li>Attendance strip for the term, with the one-line notes under it.</li>
+        <li>Subjects rolled up from approved papers only — drafts never appear.</li>
+        <li>Prints on plain paper. One sheet per child, or the whole class at once.</li>
+        <li>Staff can print even when fees are due; the parent view stays gated.</li>
+      </ul>
+      <div class="card" style="background:var(--surface)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <span class="eyebrow">First Term 2026/2027</span>
+            <div style="font-family:var(--display);font-weight:700;font-size:26px;margin-top:6px">Bola Adeyemi</div>
+            <div class="small" style="margin-top:4px">JSS 1A · BFA-0002</div>
+          </div>
+          <div style="text-align:right">
+            <div class="tnum" style="font-size:30px;font-weight:600">72</div>
+            <div class="eyebrow">Overall</div>
+          </div>
+        </div>
+        <hr class="rule" style="margin:18px 0" />
+        <div class="eyebrow">Attendance · 48 school days</div>
+        <div class="strip" data-seed="12" data-days="48" style="margin-top:10px"></div>
+        <div style="display:flex;gap:18px;margin-top:14px" class="small">
+          <span style="color:var(--present)">Present 44</span>
+          <span style="color:var(--late)">Late 2</span>
+          <span style="color:var(--absent)">Absent 2</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ CBT ============================ -->
+<section class="slide" data-note="Assessment depth. Set a paper, students sit it on their own login, mark objective answers automatically, subjective by hand, then approve. The office is the gate that publishes a result.">
+  <div class="pad">
+    <span class="eyebrow">Assessment · CBT</span>
+    <h2 style="font-size:40px;margin-top:12px">Set, sit, mark, approve.</h2>
+    <div class="grid g4" style="gap:14px;margin-top:30px">
+      <div class="card"><span class="eyebrow">01</span><h3 style="margin-top:8px">Bank</h3><p class="small" style="margin-top:6px">Build a question bank by subject and class.</p></div>
+      <div class="card"><span class="eyebrow">02</span><h3 style="margin-top:8px">Sit</h3><p class="small" style="margin-top:6px">Students answer on their own login, on a phone.</p></div>
+      <div class="card"><span class="eyebrow">03</span><h3 style="margin-top:8px">Mark</h3><p class="small" style="margin-top:6px">Objective scores auto; subjective marked by hand.</p></div>
+      <div class="card"><span class="eyebrow">04</span><h3 style="margin-top:8px">Approve</h3><p class="small" style="margin-top:6px">The office approves a result before a parent sees it.</p></div>
+    </div>
+    <div class="grid g2" style="gap:16px;margin-top:22px">
+      <div class="card"><span class="eyebrow">Built for the conditions</span><p class="lead" style="font-size:15px;margin-top:8px">Works offline: a paper can be cached on the device if the network drops mid-test.</p></div>
+      <div class="card"><span class="eyebrow">Works without student logins</span><p class="lead" style="font-size:15px;margin-top:8px">A public exam link lets an interview candidate or a whole class sit without an account.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ FEES ============================ -->
+<section class="slide" data-note="Fees are why schools buy software. The gate is the feature: results and CBT lock for a family until the school clears fees. WhatsApp reminders are the office tapping one name, not a bulk blast.">
+  <div class="pad">
+    <span class="eyebrow">Fees</span>
+    <h2 style="font-size:40px;max-width:26ch;margin-top:12px">Fee collection, and a gate the school actually controls.</h2>
+    <div class="grid g2" style="gap:26px;margin-top:30px;flex:1;align-items:start">
+      <ul class="clean">
+        <li>Set what each class owes per term, split into instalments.</li>
+        <li>Parents see their own statement and can pay.</li>
+        <li>Mark a child fee-cleared and results unlock for that family.</li>
+        <li>Remind parents with a prefilled WhatsApp or SMS note — one name at a time.</li>
+        <li>Proprietor sees collection, outstanding and margin for the term.</li>
+      </ul>
+      <div class="card" style="border-left:4px solid var(--brass)">
+        <span class="eyebrow">The gate</span>
+        <p style="font-size:18px;line-height:1.5;margin:12px 0 0">If fees are outstanding, the report and CBT stay locked for that family. That is the collection lever working, not a bug.</p>
+        <hr class="rule" style="margin:18px 0" />
+        <p class="small" style="margin:0">Schools keep the choice: staff can still print term cards for the classroom even while a family is gated.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ IDENTITY ============================ -->
+<section class="slide" data-note="Onboarding parents and students without a messy signup. Claim codes move on paper slips; IDs print at credit-card size; students get their own school-issued login. All printable, all with a Back button.">
+  <div class="pad">
+    <span class="eyebrow">Identity &amp; onboarding</span>
+    <h2 style="font-size:40px;max-width:26ch;margin-top:12px">Getting the right people in, with paper and a code.</h2>
+    <div class="grid g3" style="gap:16px;margin-top:30px;flex:1;align-content:start">
+      <div class="card">
+        <h3>Claim codes</h3>
+        <p class="lead" style="font-size:15px;margin-top:8px">An eight-character code per child, printed as a slip. The parent signs up and enters it once.</p>
+      </div>
+      <div class="card">
+        <h3>Identity cards</h3>
+        <p class="lead" style="font-size:15px;margin-top:8px">CR80 credit-card size, front and back as a pair. Cut, fold, laminate. The school's crest sits on top.</p>
+      </div>
+      <div class="card">
+        <h3>Student logins</h3>
+        <p class="lead" style="font-size:15px;margin-top:8px">Not the parent code. The school invites the student's email; they sign up and sit exams on their own desk.</p>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:20px">A name on the class list is not a login. Daymaark keeps the roster, the parent link and the student login as three separate, deliberate steps.</p>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ ADMISSIONS ============================ -->
+<section class="slide" data-note="Admissions closes the loop. A public apply link with no login; enquiries land in the office; enrol straight onto a class and the child joins the roster.">
+  <div class="pad">
+    <span class="eyebrow">Admissions</span>
+    <h2 style="font-size:40px;max-width:28ch;margin-top:12px">A public apply link that becomes a seat in a class.</h2>
+    <div class="grid g2" style="gap:26px;margin-top:30px;flex:1;align-items:start">
+      <ul class="clean">
+        <li>The school gets a public form at its own link — no login for the parent.</li>
+        <li>Enquiries land in the office with the contact the guardian gave.</li>
+        <li>One tap enrols the child onto a class.</li>
+        <li>The child appears on the roster, ready for a claim code and an ID card.</li>
+      </ul>
+      <div class="card">
+        <span class="eyebrow">Why it matters</span>
+        <p class="lead" style="font-size:16px;margin-top:10px">Intake, roster and parent onboarding become one continuous flow instead of a paper application that gets re-typed into the register a week later.</p>
+        <p class="small" style="margin-top:14px">Marketing and login stay Daymaark. The apply page greets the family with the school's own name.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ CREST ============================ -->
+<section class="slide dark" data-note="Emotional ownership slide. This is their school, not ours. One crest, and every page and printable becomes the school's. Fall back to the school name when there is no crest.">
+  <div class="pad">
+    <span class="eyebrow">It is your school, not ours</span>
+    <h2 style="font-size:44px;max-width:26ch;margin-top:12px">Upload the crest once. Every page becomes the school's.</h2>
+    <div class="grid g2" style="gap:26px;margin-top:30px;flex:1;align-items:start">
+      <ul class="clean">
+        <li>Add the crest while naming the school, or later under Account.</li>
+        <li>It replaces the Daymaark mark on the dashboard.</li>
+        <li>It sits on ID cards, claim slips and term cards.</li>
+        <li>No crest? The school's name stands in its place.</li>
+      </ul>
+      <div class="card">
+        <span class="eyebrow">Stays Daymaark</span>
+        <p class="lead" style="font-size:16px;margin-top:10px">Only the marketing site, login and signup stay Daymaark. Everything inside the school wears the school's identity.</p>
+        <p class="small" style="margin-top:14px">One platform can serve thousands of schools and still feel like each one's own system.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ ROLES ============================ -->
+<section class="slide" data-note="Governance. One proprietor, one admin seat, teachers, parents, students. Clear boundaries mean the school can delegate without losing control.">
+  <div class="pad">
+    <span class="eyebrow">Who does what</span>
+    <h2 style="font-size:40px;margin-top:12px">Clear seats, clear boundaries.</h2>
+    <div class="grid" style="gap:12px;margin-top:26px">
+      <div class="person card"><span class="tag">Proprietor</span><div><h3 style="font-size:19px">Owns the school</h3><p class="small" style="margin-top:4px">Appoints the admin. Sees the business. Does not run the day.</p></div></div>
+      <div class="person card"><span class="tag">Admin</span><div><h3 style="font-size:19px">Runs the day</h3><p class="small" style="margin-top:4px">Term, classes, roster, fees, enquiries, claim codes.</p></div></div>
+      <div class="person card"><span class="tag">Teacher</span><div><h3 style="font-size:19px">Operates the record</h3><p class="small" style="margin-top:4px">Marks the register, posts lessons, publishes papers.</p></div></div>
+      <div class="person card"><span class="tag">Parent</span><div><h3 style="font-size:19px">Sees their child</h3><p class="small" style="margin-top:4px">Joins with a claim code. Sees that child only.</p></div></div>
+      <div class="person card"><span class="tag">Student</span><div><h3 style="font-size:19px">Their own desk</h3><p class="small" style="margin-top:4px">Assignments, results, and exams on their own login.</p></div></div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ SETUP ============================ -->
+<section class="slide" data-note="Reassure on effort. Order matters, but every step is a form. Most schools are running the register the same week. The live demo walks this exact sequence.">
+  <div class="pad">
+    <span class="eyebrow">Getting set up</span>
+    <h2 style="font-size:40px;margin-top:12px">Live in an afternoon, in order.</h2>
+    <div class="grid g2" style="gap:30px;margin-top:26px;flex:1;align-items:start">
+      <ol style="list-style:none;margin:0;padding:0;counter-reset:s">
+        <li style="counter-increment:s;padding:11px 0;border-bottom:1px solid var(--rule);font-size:16px"><span class="tnum" style="color:var(--brass);margin-right:12px">01</span>Create the school, name it, add the crest.</li>
+        <li style="counter-increment:s;padding:11px 0;border-bottom:1px solid var(--rule);font-size:16px"><span class="tnum" style="color:var(--brass);margin-right:12px">02</span>Appoint an admin, invite teachers.</li>
+        <li style="counter-increment:s;padding:11px 0;border-bottom:1px solid var(--rule);font-size:16px"><span class="tnum" style="color:var(--brass);margin-right:12px">03</span>Set the current term.</li>
+        <li style="counter-increment:s;padding:11px 0;border-bottom:1px solid var(--rule);font-size:16px"><span class="tnum" style="color:var(--brass);margin-right:12px">04</span>Create classes, paste the roster.</li>
+      </ol>
+      <ol style="list-style:none;margin:0;padding:0" start="5">
+        <li style="counter-increment:s;padding:11px 0;border-bottom:1px solid var(--rule);font-size:16px"><span class="tnum" style="color:var(--brass);margin-right:12px">05</span>Generate claim codes, send them home.</li>
+        <li style="counter-increment:s;padding:11px 0;border-bottom:1px solid var(--rule);font-size:16px"><span class="tnum" style="color:var(--brass);margin-right:12px">06</span>Invite parents and student logins.</li>
+        <li style="counter-increment:s;padding:11px 0;border-bottom:1px solid var(--rule);font-size:16px"><span class="tnum" style="color:var(--brass);margin-right:12px">07</span>Mark the first register. The strip begins.</li>
+        <li style="padding:11px 0;font-size:13px" class="small">Parents do not join until classes and the roster exist.</li>
+      </ol>
+    </div>
+    <p class="lead" style="font-size:16px">No install. It runs in the browser as an app and works on a mid-range Android.</p>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ SECURITY ============================ -->
+<section class="slide" data-note="Every school asks this. Two layers of scoping: by school, then by family. A parent sees only their own children. No cross-school leakage is the failure that matters most, and it is tested.">
+  <div class="pad">
+    <span class="eyebrow">Security &amp; data</span>
+    <h2 style="font-size:40px;max-width:26ch;margin-top:12px">Scoped by school. Then by family.</h2>
+    <div class="grid g2" style="gap:26px;margin-top:30px;flex:1;align-items:start">
+      <ul class="clean">
+        <li>Access is enforced at the database, not just the screen.</li>
+        <li>Staff see their school. Parents see their own children only.</li>
+        <li>Another school's data is never visible, ever.</li>
+        <li>Students see their own record, not the class's.</li>
+      </ul>
+      <div class="card">
+        <span class="eyebrow">The test that matters</span>
+        <p class="lead" style="font-size:16px;margin-top:10px">Create two schools and two parents. Confirm a parent sees only their child, and nothing from the other school.</p>
+        <p class="small" style="margin-top:14px">Same-school leakage between families is the failure we treat as release-blocking.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ RUNS WHERE ============================ -->
+<section class="slide" data-note="Feasibility. It has to work on a patchy network and a cheap phone, or it will not be used. Offline register, SMS digests, PWA install.">
+  <div class="pad">
+    <span class="eyebrow">Built for the conditions</span>
+    <h2 style="font-size:40px;max-width:28ch;margin-top:12px">It has to work on a patchy network, or it will not be used.</h2>
+    <div class="grid g3" style="gap:16px;margin-top:32px;flex:1;align-content:start">
+      <div class="card"><h3>Offline register</h3><p class="lead" style="font-size:15px;margin-top:8px">Marks save on the device and send when the teacher is back online. The morning cannot wait.</p></div>
+      <div class="card"><h3>On any phone</h3><p class="lead" style="font-size:15px;margin-top:8px">Installs as an app on Android and iOS from the browser. No app store, no install friction.</p></div>
+      <div class="card"><h3>Digests by SMS</h3><p class="lead" style="font-size:15px;margin-top:8px">Families on feature phones can still get the daily line by SMS, not only push.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ CLIENT PRICING ============================ -->
+<section class="slide" data-note="The school pays. Price follows the live roll. 30 days free, no card. Parents and students are never billed.">
+  <div class="pad">
+    <span class="eyebrow">Pricing</span>
+    <h2 style="font-size:40px;margin-top:12px">30 days free. Then the school pays per student.</h2>
+    <div class="grid g3" style="gap:16px;margin-top:30px;flex:1;align-content:start">
+      <div class="card">
+        <span class="eyebrow">Month</span>
+        <div class="stat" style="margin-top:10px"><div class="n">N1,500</div><div class="l">per student / month</div></div>
+        <p class="small" style="margin-top:14px">School pays, not families. Counted from the live roll. Cancel any month.</p>
+      </div>
+      <div class="card" style="border-color:var(--brass);border-width:2px;background:var(--brass-wash)">
+        <span class="eyebrow" style="color:var(--brass-dark)">Term</span>
+        <div class="stat" style="margin-top:10px"><div class="n" style="color:var(--brass-dark)">N3,500</div><div class="l" style="color:var(--brass-dark)">per student / term</div></div>
+        <p class="small" style="margin-top:14px;color:var(--brass-dark)">School pays. Register, lessons, results, fees, HR, clinic, CBT.</p>
+      </div>
+      <div class="card">
+        <span class="eyebrow">School year</span>
+        <div class="stat" style="margin-top:10px"><div class="n">N10,000</div><div class="l">per student / year</div></div>
+        <p class="small" style="margin-top:14px">School pays, not families. One invoice for the year.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ WHY IT WINS ============================ -->
+<section class="slide" data-note="Positioning for the school. It is not 'cheaper' or 'prettier' — it is the only option that is both a real record and same-day visible, and it is light enough to actually run.">
+  <div class="pad">
+    <span class="eyebrow">Why it wins</span>
+    <h2 style="font-size:40px;margin-top:12px">The full record, light enough to actually run.</h2>
+    <div class="grid g3" style="gap:16px;margin-top:32px;flex:1;align-content:start">
+      <div class="card"><h3>Paper &amp; ledger</h3><p class="lead" style="font-size:15px;margin-top:8px">A real record, but nobody outside the staffroom can see it, and it does not aggregate.</p></div>
+      <div class="card"><h3>WhatsApp groups</h3><p class="lead" style="font-size:15px;margin-top:8px">Free and familiar, but structurally the wrong tool for a record. Nothing to report from.</p></div>
+      <div class="card" style="border-color:var(--brass);border-width:2px;background:var(--brass-wash)"><h3>Legacy ERP</h3><p class="lead" style="font-size:15px;margin-top:8px">Owns the school, but heavy to start, and parents still wait for reports.</p></div>
+    </div>
+    <div class="card" style="margin-top:16px;border-left:4px solid var(--brass)">
+      <p style="font-size:18px;margin:0;line-height:1.5">Daymaark is the full school record — live the same day, offline-safe. The school pays per student. That combination is the opening.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ CLIENT CLOSE ============================ -->
+<section class="slide dark" data-note="Ask for the next step: walk the live demo, then book a session with the school's own class list. The trial needs no card.">
+  <div class="pad" style="justify-content:center">
+    <span class="eyebrow">Next step for the school</span>
+    <h1 style="font-size:56px;max-width:20ch;margin-top:16px">Run it on your own class list this term.</h1>
+    <p class="lead" style="font-size:20px;margin-top:20px">Walk all five dashboards on a live school, then bring your roster. 30 days free, no card, then the school pays per student on the roll.</p>
+    <div class="chips" style="margin-top:28px">
+      <span class="chip brass">Try the live demo</span>
+      <span class="chip">Book a walkthrough</span>
+      <span class="chip">Care · 0703 235 2158</span>
+    </div>
+  </div>
+  <div class="foot"><span>daymaark.com</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ TRACK B DIVIDER ============================ -->
+<section class="slide divider dark" data-note="Switch registers. Investor half is about market, model and momentum. Be candid about what is proven and what is planned.">
+  <div class="pad">
+    <div class="num">TRACK B · FOR THE INVESTOR</div>
+    <h1>The same record, as a business.</h1>
+    <p class="lead" style="max-width:58ch">A large, underserved market of small and mid-sized private schools, a product that is already complete across five roles, and a price that a school can pay from its own fee collection.</p>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ THESIS ============================ -->
+<section class="slide" data-note="The one-sentence investment thesis. Repeat the register insight, then the business claim: flat price, whole school, high margin, expansion by school.">
+  <div class="pad">
+    <span class="eyebrow">The thesis</span>
+    <h2 style="font-size:44px;max-width:24ch;margin-top:14px">Every school keeps a record. Nobody shows it to the family. We turned it into a live service — and made fees the hook.</h2>
+    <div class="grid g3" style="gap:16px;margin-top:34px;flex:1;align-content:start">
+      <div class="card"><h3>Wedge</h3><p class="lead" style="font-size:15px;margin-top:8px">Same-day parent visibility, which no incumbent provides and every school wants.</p></div>
+      <div class="card"><h3>Platform</h3><p class="lead" style="font-size:15px;margin-top:8px">One record across five roles, so the school does not need five tools.</p></div>
+      <div class="card"><h3>Economics</h3><p class="lead" style="font-size:15px;margin-top:8px">The school pays per student on the roll. Shared infrastructure, high gross margin, expansion by school.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ MARKET ============================ -->
+<section class="slide" data-note="Bottom-up, assumptions stated. These planning figures must be replaced with sourced counts before an external raise. The point is the shape: a very large number of small schools, each worth one flat price.">
+  <div class="pad">
+    <span class="eyebrow">Market</span>
+    <h2 style="font-size:38px;margin-top:10px">A very large number of small schools, each billed from the roll.</h2>
+    <table class="mx" style="margin-top:24px">
+      <thead><tr><th>Bottom-up build</th><th>Figure</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td>Private basic-education schools</td><td class="tnum"><span class="fill">30,000</span></td><td class="small">Planning figure — validate from state registers</td></tr>
+        <tr><td>Realistic serviceable now (urban, admin online)</td><td class="tnum"><span class="fill">10%</span> → 3,000</td><td class="small">Assumption</td></tr>
+        <tr><td>Annual contract value per school</td><td class="tnum"><span class="fill">—</span></td><td class="small">Follows the roll · N10,000 / student / year</td></tr>
+        <tr><td><b>Serviceable market</b></td><td class="tnum"><b><span class="fill">—</span></b></td><td class="small">Roll × plan; do not invent</td></tr>
+        <tr><td>3-year target (share of serviceable)</td><td class="tnum"><span class="fill">2%</span> → 60 schools</td><td class="small">Count of schools, not invented ARR</td></tr>
+      </tbody>
+    </table>
+    <p class="small" style="margin-top:16px">Replace every dashed value with a sourced number before an external round. The model is deliberately bottom-up so each input is auditable.</p>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ WHY NOW ============================ -->
+<section class="slide" data-note="Timing. Smartphones and cheap hosting have crossed the threshold; WhatsApp made parents reachable; heavy ERP implementations have burned trust. The window is open now.">
+  <div class="pad">
+    <span class="eyebrow">Why now</span>
+    <h2 style="font-size:40px;margin-top:12px">The window is open.</h2>
+    <div class="grid g2" style="gap:16px;margin-top:28px;flex:1;align-content:start">
+      <div class="card"><h3>Cheap to reach</h3><p class="lead" style="font-size:15px;margin-top:8px">Smartphone and PWA penetration has crossed the line where a phone-first school tool is viable without an app store.</p></div>
+      <div class="card"><h3>Cheap to serve</h3><p class="lead" style="font-size:15px;margin-top:8px">Managed Postgres, edge hosting and object storage cut the cost of serving a school to near-zero.</p></div>
+      <div class="card"><h3>Parents are reachable</h3><p class="lead" style="font-size:15px;margin-top:8px">WhatsApp made the parent channel free and universal. The digest has somewhere to land.</p></div>
+      <div class="card"><h3>ERP fatigue</h3><p class="lead" style="font-size:15px;margin-top:8px">Schools have paid for heavy systems that never got used. Light and live is now the differentiator.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ DEFENSIBILITY ============================ -->
+<section class="slide" data-note="Why this is hard to copy quickly. Depth across five roles on one schema, plus the offline constraint, plus switching cost once the register lives here.">
+  <div class="pad">
+    <span class="eyebrow">Product depth &amp; defensibility</span>
+    <h2 style="font-size:40px;max-width:26ch;margin-top:12px">Depth is the moat, not the landing page.</h2>
+    <div class="grid g3" style="gap:16px;margin-top:30px;flex:1;align-content:start">
+      <div class="card"><h3>One schema, five roles</h3><p class="lead" style="font-size:15px;margin-top:8px">Register, CBT, fees and identity share one model. A point tool cannot match without rebuilding.</p></div>
+      <div class="card"><h3>Offline-first</h3><p class="lead" style="font-size:15px;margin-top:8px">The register works with no network. That constraint is hard to bolt on late.</p></div>
+      <div class="card"><h3>Switching cost</h3><p class="lead" style="font-size:15px;margin-top:8px">Once attendance, results and fees live here, the school's own history keeps it here.</p></div>
+    </div>
+    <div class="card" style="margin-top:16px"><span class="eyebrow">Also shipped</span><p class="lead" style="font-size:16px;margin-top:8px;max-width:none">Timetable, notices, one-line register notes, admission enquiries, printable ID cards and term cards, school-branded crest, subscription billing and a daily digest.</p></div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ UNIT ECONOMICS ============================ -->
+<section class="slide" data-note="The numbers are the story: flat price, shared infra, high gross margin, fast payback, no per-seat cost. All figures are estimates and must be replaced with actuals.">
+  <div class="pad">
+    <span class="eyebrow">Model &amp; unit economics</span>
+    <h2 style="font-size:38px;margin-top:10px">The school pays. Price follows the roll.</h2>
+    <div class="grid g4" style="gap:14px;margin-top:26px">
+      <div class="card"><div class="stat"><div class="n">N10k</div><div class="l">per student / year</div></div><p class="small" style="margin-top:10px">School year plan</p></div>
+      <div class="card"><div class="stat"><div class="n"><span class="fill">85%</span></div><div class="l">Gross margin</div></div><p class="small" style="margin-top:10px">Shared infra; estimate</p></div>
+      <div class="card"><div class="stat"><div class="n">&lt;1</div><div class="l">Term payback</div></div><p class="small" style="margin-top:10px">Founder-led sales; estimate</p></div>
+      <div class="card"><div class="stat"><div class="n"><span class="fill">—</span></div><div class="l">ACV / LTV</div></div><p class="small" style="margin-top:10px">Depends on the roll</p></div>
+    </div>
+    <div class="grid g2" style="gap:16px;margin-top:20px">
+      <div class="card"><span class="eyebrow">Why margin holds</span><p class="lead" style="font-size:15px;margin-top:8px">Every extra school adds storage and jobs. Serving cost per school is small and falling.</p></div>
+      <div class="card"><span class="eyebrow">Expansion</span><p class="lead" style="font-size:15px;margin-top:8px">Growth is by school and by campus. Quote follows the live student count.</p></div>
+    </div>
+    <p class="small" style="margin-top:14px">All dashed figures are working assumptions to be replaced with actuals from billing and infrastructure.</p>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ GTM ============================ -->
+<section class="slide" data-note="Distribution. Land one lighthouse school per area, let parents and word of mouth pull the next. Price sits inside a school's own fee collection, so the buyer is not price-sensitive relative to the problem.">
+  <div class="pad">
+    <span class="eyebrow">Go to market</span>
+    <h2 style="font-size:40px;margin-top:12px">Land one school. Let the parents sell the next.</h2>
+    <div class="grid g3" style="gap:14px;margin-top:30px;align-content:start">
+      <div class="card"><div class="stat"><div class="n">01</div><div class="l">Land</div></div><p class="lead" style="font-size:15px;margin-top:10px">One lighthouse school per area. Founder-led onboarding on their real class list.</p></div>
+      <div class="card"><div class="stat"><div class="n">02</div><div class="l">Prove</div></div><p class="lead" style="font-size:15px;margin-top:10px">Same-day visibility shows up on parents' phones. Retention and fee collection improve.</p></div>
+      <div class="card"><div class="stat"><div class="n">03</div><div class="l">Pull</div></div><p class="lead" style="font-size:15px;margin-top:10px">Parents and neighbouring schools ask for it. Each campus becomes a new contract.</p></div>
+    </div>
+    <div class="grid g2" style="gap:16px;margin-top:20px">
+      <div class="card"><span class="eyebrow">Channels</span><ul class="clean" style="margin-top:10px"><li>Direct outreach to proprietors</li><li>Referral between schools in a cluster</li><li>WhatsApp care line as the front door</li></ul></div>
+      <div class="card"><span class="eyebrow">Why it converts</span><p class="lead" style="font-size:15px;margin-top:10px">The price is small next to the fee income a school already collects. The trial needs no card, so the decision is low-risk.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ TRACTION ============================ -->
+<section class="slide" data-note="Be candid. Fill these from the live dashboard before presenting. If the numbers are early, say so and lead with retention and usage, not vanity counts.">
+  <div class="pad">
+    <span class="eyebrow">Traction</span>
+    <h2 style="font-size:38px;margin-top:10px">Where we are today.</h2>
+    <div class="grid g4" style="gap:14px;margin-top:26px">
+      <div class="card"><div class="stat"><div class="n"><span class="fill">—</span></div><div class="l">Schools live</div></div></div>
+      <div class="card"><div class="stat"><div class="n"><span class="fill">—</span></div><div class="l">Students on record</div></div></div>
+      <div class="card"><div class="stat"><div class="n"><span class="fill">—</span></div><div class="l">Serving contracts</div></div></div>
+      <div class="card"><div class="stat"><div class="n"><span class="fill">—</span></div><div class="l">Term retention</div></div></div>
+    </div>
+    <div class="grid g2" style="gap:16px;margin-top:20px">
+      <div class="card"><span class="eyebrow">Product status</span><ul class="clean" style="margin-top:10px"><li>Complete across five roles</li><li>Register, CBT, fees and admissions shipped</li><li>Printable IDs and term cards shipped</li></ul></div>
+      <div class="card" style="border-left:4px solid var(--brass)"><span class="eyebrow">To complete</span><p class="lead" style="font-size:15px;margin-top:10px">Replace each dashed metric with a live figure from the admin dashboard, plus one usage metric (register days marked) and one outcome metric.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ COMPETITION ============================ -->
+<section class="slide" data-note="The matrix makes the gap obvious: incumbents either own the school but hide the parent, or reach the parent with no record behind it. Daymaark is the only full column.">
+  <div class="pad">
+    <span class="eyebrow">Competition</span>
+    <h2 style="font-size:38px;margin-top:10px">Only one column is complete.</h2>
+    <table class="mx" style="margin-top:22px">
+      <thead><tr><th>Capability</th><th>Paper / ledger</th><th>WhatsApp</th><th>Legacy ERP</th><th>Daymaark</th></tr></thead>
+      <tbody>
+        <tr><td>Daily register</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes</td><td class="yes col-us">Yes</td></tr>
+        <tr><td>Lessons &amp; homework</td><td class="no">No</td><td>Partial</td><td class="yes">Yes</td><td class="yes col-us">Yes</td></tr>
+        <tr><td>Results &amp; CBT</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td><td class="yes col-us">Yes</td></tr>
+        <tr><td>Fees &amp; finance</td><td>Partial</td><td class="no">No</td><td class="yes">Yes</td><td class="yes col-us">Yes</td></tr>
+        <tr><td>Same-day parent view</td><td class="no">No</td><td>Partial</td><td class="no">No</td><td class="yes col-us">Yes</td></tr>
+        <tr><td>Offline register</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="yes col-us">Yes</td></tr>
+        <tr><td>Light to start</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="yes col-us">Yes</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ ROADMAP ============================ -->
+<section class="slide" data-note="Shipped vs next. The left column proves execution; the right column shows a focused forward path, not a laundry list.">
+  <div class="pad">
+    <span class="eyebrow">Roadmap</span>
+    <h2 style="font-size:38px;margin-top:10px">Shipped, and what is next.</h2>
+    <div class="grid g2" style="gap:22px;margin-top:26px;flex:1;align-items:start">
+      <div class="card">
+        <span class="eyebrow" style="color:var(--present)">Shipped</span>
+        <ul class="clean" style="margin-top:12px">
+          <li>Five role dashboards on one record</li>
+          <li>Offline register and one-line notes</li>
+          <li>Lessons, homework, notices, timetable</li>
+          <li>CBT: bank, exams, marking, approval</li>
+          <li>Term cards and printable ID cards</li>
+          <li>Fees, instalments and WhatsApp reminders</li>
+          <li>Admission enquiries and school crest</li>
+          <li>Subscription billing and daily digest</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Next</span>
+        <ul class="clean" style="margin-top:12px">
+          <li>Downloadable report-card PDFs</li>
+          <li>Staff identity cards</li>
+          <li>Multi-campus group reporting</li>
+          <li>SMS digest at scale for feature phones</li>
+          <li>Proprietor analytics across terms</li>
+          <li>Hardening offline for the register and CBT</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ THE ASK ============================ -->
+<section class="slide dark" data-note="The ask. Fill the amount, runway and split before presenting. Tie the use of funds to the two metrics that matter: schools live and term retention.">
+  <div class="pad">
+    <span class="eyebrow">The ask</span>
+    <h2 style="font-size:40px;max-width:24ch;margin-top:12px"><span class="fill">N—</span> to turn one school into one hundred.</h2>
+    <div class="grid g3" style="gap:14px;margin-top:30px">
+      <div class="card"><div class="stat"><div class="n"><span class="fill">—</span></div><div class="l">Round size</div></div></div>
+      <div class="card"><div class="stat"><div class="n"><span class="fill">—</span></div><div class="l">Runway (months)</div></div></div>
+      <div class="card"><div class="stat"><div class="n"><span class="fill">—</span></div><div class="l">Target schools in 12 mo</div></div></div>
+    </div>
+    <div class="grid g2" style="gap:16px;margin-top:20px">
+      <div class="card"><span class="eyebrow">Use of funds</span><ul class="clean" style="margin-top:10px"><li>Direct school acquisition</li><li>Onboarding and support capacity</li><li>Engineering: PDF, scale, offline</li></ul></div>
+      <div class="card"><span class="eyebrow">Milestones it buys</span><ul class="clean" style="margin-top:10px"><li>Schools live on paid contracts</li><li>Term-over-term retention proven</li><li>Multi-campus ready</li></ul></div>
+    </div>
+    <p class="small" style="margin-top:14px">Every dashed figure is to be set by the founder. The model is bottom-up, so each number is traceable to a school count.</p>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ TEAM ============================ -->
+<section class="slide" data-note="Team slide. This must be personalised before any presentation. State why this team is the one to do it: proximity to schools and shipping speed.">
+  <div class="pad">
+    <span class="eyebrow">Team &amp; why us</span>
+    <h2 style="font-size:38px;margin-top:10px">Close to the schools, and shipping fast.</h2>
+    <div class="grid g3" style="gap:14px;margin-top:28px;flex:1;align-content:start">
+      <div class="card"><span class="eyebrow">Founder</span><h3 style="margin-top:8px"><span class="fill">Name</span></h3><p class="small" style="margin-top:6px"><span class="fill">one line of context</span></p></div>
+      <div class="card"><span class="eyebrow">Product / eng</span><h3 style="margin-top:8px"><span class="fill">Name</span></h3><p class="small" style="margin-top:6px"><span class="fill">one line of context</span></p></div>
+      <div class="card"><span class="eyebrow">Schools / growth</span><h3 style="margin-top:8px"><span class="fill">Name</span></h3><p class="small" style="margin-top:6px"><span class="fill">one line of context</span></p></div>
+    </div>
+    <div class="grid g2" style="gap:16px">
+      <div class="card"><span class="eyebrow">Why this team</span><p class="lead" style="font-size:15px;margin-top:8px">Proximity to Nigerian schools and a complete product shipped with no per-seat cost base.</p></div>
+      <div class="card"><span class="eyebrow">What we have built already</span><p class="lead" style="font-size:15px;margin-top:8px">A full five-role platform, live, before raising — not a deck and a wireframe.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span class="pageno"></span></div>
+</section>
+
+<!-- ============================ CLOSE ============================ -->
+<section class="slide cover dark" data-note="Close on the mission and the next step. Ask for a specific decision: a pilot cohort for schools, or a term sheet for investors.">
+  <div class="pad">
+    <span class="eyebrow">Every school day, marked</span>
+    <h1 style="font-size:64px;margin-top:20px;max-width:20ch">Run the whole school. Show the whole family.</h1>
+    <p class="lead" style="font-size:20px;margin-top:22px;max-width:52ch">One record for the whole day, and the family sees it the same day it happens. That is the whole company.</p>
+    <div class="chips" style="margin-top:30px">
+      <span class="chip brass">daymaark.com</span>
+      <span class="chip">Care · 0703 235 2158</span>
+      <span class="chip">Live demo at /demo</span>
+    </div>
+  </div>
+  <div class="foot"><span>Daymaark</span><span>Thank you</span></div>
+</section>
+
+</div></div>
+
+<div id="hud">
+  <button id="prev" aria-label="Previous">← Prev</button>
+  <span class="pos" id="pos">1 / 1</span>
+  <button id="next" aria-label="Next">Next →</button>
+  <button id="notesBtn" aria-label="Toggle notes">Notes</button>
+  <button id="printBtn" aria-label="Print">Print</button>
+</div>
+<div id="notes"><div class="eyebrow">Speaker notes</div><div id="notesBody"></div></div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i = 0, notesOpen = false;
+
+  // page numbers
+  slides.forEach(function(s, idx){
+    var el = s.querySelector('.pageno');
+    if (el) el.textContent = (idx + 1) + ' / ' + slides.length;
+  });
+
+  // register strips
+  slides.forEach(function(s){
+    s.querySelectorAll('.strip').forEach(function(strip){
+      var seed = parseInt(strip.getAttribute('data-seed') || '19', 10);
+      var days = parseInt(strip.getAttribute('data-days') || '50', 10);
+      var frag = document.createDocumentFragment();
+      var n = seed;
+      for (var k = 0; k < days; k++){
+        n = (n * 1103515245 + 12345) % 2147483648;
+        var r = (n / 2147483648) * 100;
+        var cls = k > days - 3 ? '' : (r > 93 ? 'absent' : r > 86 ? 'late' : r > 83 ? 'excused' : 'present');
+        var el = document.createElement('i');
+        if (cls) el.className = cls;
+        frag.appendChild(el);
+      }
+      strip.appendChild(frag);
+    });
+  });
+
+  function scale(){
+    var stage = document.getElementById('stage');
+    var pad = 26;
+    var sx = (window.innerWidth - pad) / 1280;
+    var sy = (window.innerHeight - pad) / 720;
+    var s = Math.min(sx, sy);
+    stage.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', scale);
+  scale();
+
+  function render(){
+    slides.forEach(function(s, idx){ s.classList.toggle('active', idx === i); });
+    document.getElementById('pos').textContent = (i + 1) + ' / ' + slides.length;
+    document.getElementById('bar').style.width = ((i + 1) / slides.length * 100) + '%';
+    document.getElementById('notesBody').textContent = slides[i].getAttribute('data-note') || '';
+    if (location.hash !== '#' + (i + 1)) history.replaceState(null, '', '#' + (i + 1));
+  }
+  function go(d){ i = Math.max(0, Math.min(slides.length - 1, i + d)); render(); }
+  function jump(n){ i = Math.max(0, Math.min(slides.length - 1, n)); render(); }
+
+  document.getElementById('prev').onclick = function(){ go(-1); };
+  document.getElementById('next').onclick = function(){ go(1); };
+  document.getElementById('printBtn').onclick = function(){ window.print(); };
+  document.getElementById('notesBtn').onclick = function(){
+    notesOpen = !notesOpen;
+    document.getElementById('notes').classList.toggle('open', notesOpen);
+  };
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown'){ e.preventDefault(); go(1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+    else if (e.key === 'Home'){ jump(0); }
+    else if (e.key === 'End'){ jump(slides.length - 1); }
+    else if (e.key === 'n' || e.key === 'N'){ document.getElementById('notesBtn').click(); }
+    else if (e.key === 'f' || e.key === 'F'){
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+    else if (/^[0-9]$/.test(e.key)){ jump(parseInt(e.key, 10) - 1); }
+  });
+
+  document.getElementById('viewport').addEventListener('click', function(e){
+    if (e.target.closest('#viewport') && !e.target.closest('#hud')) {
+      var x = e.clientX / window.innerWidth;
+      if (x > 0.5) go(1); else go(-1);
+    }
+  });
+
+  var start = parseInt((location.hash || '#1').replace('#', ''), 10);
+  if (!isNaN(start)) jump(start - 1); else render();
+})();
+</script>
+</body>
+</html>

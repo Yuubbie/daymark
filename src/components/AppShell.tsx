@@ -9,9 +9,12 @@ import {
   IconAccount,
   IconBack,
   IconClass,
+  IconClinic,
   IconFlag,
   IconHomework,
+  IconHr,
   IconLesson,
+  IconLibrary,
   IconNotice,
   IconRegister,
   IconSettings,
@@ -37,7 +40,7 @@ type Item = {
   mobile?: boolean
 }
 
-const STAFF_NAV: Item[] = [
+const OFFICE_NAV: Item[] = [
   { to: '/admin', label: 'Today', Icon: IconToday },
   { to: '/teacher', label: 'Register', Icon: IconRegister },
   { to: '/teacher/lesson', label: 'Lesson', Icon: IconLesson, mobile: false },
@@ -48,6 +51,8 @@ const STAFF_NAV: Item[] = [
   { to: '/cbt/marking', label: 'Result Approval', Icon: IconFlag, mobile: false },
   { to: '/admin/classes', label: 'Classes', Icon: IconClass, mobile: false },
   { to: '/admin/teachers', label: 'People', Icon: IconClass, mobile: false },
+  { to: '/hr', label: 'HR', Icon: IconHr, mobile: false },
+  { to: '/library', label: 'Library', Icon: IconLibrary, mobile: false },
   { to: '/admin/fees', label: 'Fees', Icon: IconClass, mobile: false },
   { to: '/admin/enquiries', label: 'Apply', Icon: IconClass, mobile: false },
   { to: '/admin/notices', label: 'Notices', Icon: IconNotice, mobile: false },
@@ -55,8 +60,12 @@ const STAFF_NAV: Item[] = [
 ]
 
 const NAV: Record<string, Item[]> = {
-  proprietor: STAFF_NAV,
-  admin: STAFF_NAV,
+  proprietor: [
+    ...OFFICE_NAV.slice(0, 11),
+    { to: '/clinic', label: 'Clinic', Icon: IconClinic, mobile: false },
+    ...OFFICE_NAV.slice(11),
+  ],
+  admin: OFFICE_NAV,
   teacher: [
     { to: '/teacher', label: 'Register', Icon: IconRegister },
     { to: '/teacher/lesson', label: 'Lesson', Icon: IconLesson },
@@ -65,7 +74,16 @@ const NAV: Record<string, Item[]> = {
     { to: '/cbt/bank', label: 'Question Bank', Icon: IconLesson, mobile: false },
     { to: '/cbt/marking', label: 'Result Approval', Icon: IconFlag, mobile: false },
     { to: '/teacher/notices', label: 'Notices', Icon: IconNotice, mobile: false },
+    { to: '/hr', label: 'HR', Icon: IconHr, mobile: false },
     { to: '/account', label: 'Account', Icon: IconAccount, mobile: false },
+  ],
+  hr: [
+    { to: '/hr', label: 'HR', Icon: IconHr },
+    { to: '/account', label: 'Account', Icon: IconAccount },
+  ],
+  clinic: [
+    { to: '/clinic', label: 'Clinic', Icon: IconClinic },
+    { to: '/account', label: 'Account', Icon: IconAccount },
   ],
   parent: [
     { to: '/parent', label: 'Today', Icon: IconToday },
@@ -82,7 +100,7 @@ const NAV: Record<string, Item[]> = {
   ],
 }
 
-const HOMES = ['/admin', '/teacher', '/parent', '/student']
+const HOMES = ['/admin', '/teacher', '/parent', '/student', '/hr', '/clinic']
 
 function parentOf(path: string, role: string | undefined): string {
   if (HOMES.includes(path) || path === '/account') {
@@ -95,6 +113,9 @@ function parentOf(path: string, role: string | undefined): string {
   if (path.startsWith('/admin/')) return '/admin'
   if (path.startsWith('/teacher/')) return '/teacher'
   if (path.startsWith('/cbt/')) return role === 'teacher' ? '/teacher' : '/admin'
+  if (path.startsWith('/hr')) return role === 'hr' ? '/hr' : '/admin'
+  if (path.startsWith('/clinic')) return role === 'clinic' ? '/clinic' : '/admin'
+  if (path.startsWith('/library')) return '/admin'
   if (path.startsWith('/parent/')) return '/parent'
   if (path.startsWith('/student/')) return '/student'
   if (path.startsWith('/report/')) {

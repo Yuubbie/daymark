@@ -110,3 +110,27 @@ export const IconTimetable = (p: P) => (
   </S>
 )
 
+export const IconHr = (p: P) => (
+  <S {...p}>
+    <circle cx="8" cy="8" r="2.6" />
+    <path d="M3.5 19a4.5 4.5 0 0 1 9 0" />
+    <circle cx="16.5" cy="8.5" r="2.2" />
+    <path d="M13.2 19a4.2 4.2 0 0 1 7.3-2.6" />
+  </S>
+)
+
+export const IconClinic = (p: P) => (
+  <S {...p}>
+    <rect x="4" y="4" width="16" height="16" rx="2" />
+    <path d="M12 8v8M8 12h8" />
+  </S>
+)
+
+export const IconLibrary = (p: P) => (
+  <S {...p}>
+    <path d="M4 19V5a1 1 0 0 1 1-1h4v15H5a1 1 0 0 0-1 1z" />
+    <path d="M9 19V4h6v15" />
+    <path d="M15 19V4h4a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-4" />
+  </S>
+)
+
