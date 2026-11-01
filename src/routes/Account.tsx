@@ -34,7 +34,7 @@ export default function Account() {
       applySchoolAccent(hex)
       setAccent(hex ?? DEFAULT_ACCENT)
       await refresh()
-      setNotice('Colour saved. It shows on buttons, marks, and print accents.')
+      setNotice('Colour saved. The sidebar, buttons, marks and print follow it.')
     } catch (e) {
       setError((e as Error).message)
     } finally {
@@ -161,7 +161,7 @@ export default function Account() {
         {canEdit && school && (
           <Panel title="School colour">
             <p className="text-[13px] text-ink-soft mb-3">
-              One accent. It replaces brass on buttons, marks, and print. Pick a school colour, or keep brass.
+              One colour. It paints the sidebar, the phone bar, buttons, marks and print. Pick a school colour, or keep brass.
             </p>
             <div className="flex flex-wrap gap-2">
               {ACCENT_PRESETS.map((p) => (

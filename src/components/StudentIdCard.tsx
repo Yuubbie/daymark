@@ -34,7 +34,7 @@ export function StudentIdCard({
 
   return (
     <article className="id-card bg-surface text-ink overflow-hidden flex flex-col">
-      <header className="id-card-head bg-ink text-ink-invert flex items-center gap-[2mm] px-[3.5mm] py-[2.2mm]">
+      <header className="id-card-head bg-chrome text-ink-invert flex items-center gap-[2mm] px-[3.5mm] py-[2.2mm]">
         <Crest src={logoUrl} />
         <div className="min-w-0 flex-1">
           <div className="font-display font-bold text-[9pt] leading-tight tracking-[-0.02em] truncate">
@@ -97,7 +97,7 @@ export function StudentIdCardBack({
   const found = [address, phone].filter(Boolean).join(' · ')
   return (
     <article className="id-card id-card-back bg-surface text-ink overflow-hidden flex flex-col">
-      <header className="id-card-head bg-ink text-ink-invert flex items-center gap-[2mm] px-[3.5mm] py-[2.2mm]">
+      <header className="id-card-head bg-chrome text-ink-invert flex items-center gap-[2mm] px-[3.5mm] py-[2.2mm]">
         <Crest src={logoUrl} />
         <div className="font-display font-bold text-[9pt] leading-tight tracking-[-0.02em] truncate min-w-0">
           {school}
@@ -166,7 +166,7 @@ export function ClaimSlip({
 }) {
   return (
     <article className="id-card id-slip bg-surface text-ink overflow-hidden flex flex-col">
-      <header className="id-card-head bg-ink text-ink-invert flex items-center gap-[2mm] px-[3.5mm] py-[2.2mm]">
+      <header className="id-card-head bg-chrome text-ink-invert flex items-center gap-[2mm] px-[3.5mm] py-[2.2mm]">
         <Crest src={logoUrl} />
         <div className="min-w-0 flex-1">
           <div className="font-display font-bold text-[9pt] leading-tight tracking-[-0.02em] truncate">

@@ -40,15 +40,35 @@ export function washHex(hex: string) {
   )
 }
 
+function luminance(hex: string) {
+  const p = hexParts(hex)
+  if (!p) return 0
+  return (0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2]) / 255
+}
+
+/** Sidebar and phone bar. Light school colours are darkened so type stays readable. */
+export function chromeFromAccent(hex: string) {
+  const lum = luminance(hex)
+  if (lum > 0.45) return darkenHex(hex, 0.48)
+  if (lum > 0.28) return darkenHex(hex, 0.22)
+  return hex
+}
+
 export function applySchoolAccent(hex: string | null | undefined) {
   const root = document.documentElement
+  const theme = document.querySelector('meta[name="theme-color"]')
   if (!hex || !hexParts(hex)) {
     root.style.removeProperty('--color-brass')
     root.style.removeProperty('--color-brass-dark')
     root.style.removeProperty('--color-brass-wash')
+    root.style.removeProperty('--color-chrome')
+    theme?.setAttribute('content', '#143A2B')
     return
   }
+  const chrome = chromeFromAccent(hex)
   root.style.setProperty('--color-brass', hex)
   root.style.setProperty('--color-brass-dark', darkenHex(hex, 0.18))
   root.style.setProperty('--color-brass-wash', washHex(hex))
+  root.style.setProperty('--color-chrome', chrome)
+  theme?.setAttribute('content', chrome)
 }

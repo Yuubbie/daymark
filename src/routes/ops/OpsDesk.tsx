@@ -148,7 +148,7 @@ export default function OpsDesk() {
 
   return (
     <div className="min-h-dvh bg-paper">
-      <header className="bg-ink text-ink-invert">
+      <header className="bg-chrome text-ink-invert">
         <div className="mx-auto max-w-5xl px-5 h-16 flex items-center gap-4">
           <Wordmark size="sm" className="text-ink-invert" />
           <span className="h-5 w-px bg-ink-invert/20" />

@@ -1,7 +1,7 @@
 {
   "name": "Daymaark",
   "short_name": "Daymaark",
-  "description": "Every school day, marked.",
+  "description": "School OS for Nigerian schools. Register, CBT, report cards, household fees, HR and clinic.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

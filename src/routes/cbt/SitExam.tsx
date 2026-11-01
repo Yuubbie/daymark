@@ -426,7 +426,7 @@ function Shell({ children, desk }: { children: ReactNode; desk?: boolean }) {
   const { school } = useAuth()
   return (
     <div className="min-h-dvh bg-paper">
-      <header className="bg-ink text-ink-invert px-5 h-14 flex items-center gap-3">
+      <header className="bg-chrome text-ink-invert px-5 h-14 flex items-center gap-3">
         {desk && (
           <Link
             to="/student"

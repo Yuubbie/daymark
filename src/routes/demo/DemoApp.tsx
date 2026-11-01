@@ -529,7 +529,7 @@ function DemoShell({
   return (
     <div className="min-h-dvh bg-paper">
       <DemoBanner onBilling={role === 'proprietor' ? () => onTab('billing') : undefined} />
-      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-[248px] bg-ink text-ink-invert flex-col z-20 pt-[34px]">
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-[248px] bg-chrome text-ink-invert flex-col z-20 pt-[34px]">
         <div className="px-6 py-6">
           <Wordmark size="sm" className="text-ink-invert" />
         </div>
@@ -564,7 +564,7 @@ function DemoShell({
         </div>
       </aside>
 
-      <header className="lg:hidden sticky top-0 z-10 bg-ink text-ink-invert">
+      <header className="lg:hidden sticky top-0 z-10 bg-chrome text-ink-invert">
         <div className="px-4 h-14 flex items-center gap-3">
           <Wordmark size="xs" className="text-ink-invert" />
           <span className="h-5 w-px bg-ink-invert/20" />

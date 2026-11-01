@@ -23,6 +23,9 @@
   --color-brass-dark: #A87A1F;
   --color-brass-wash: #FAF3E4;
 
+  /* Sidebar and phone bar. Follows the school colour when one is set. */
+  --color-chrome:     #143A2B;
+
   /* Rules */
   --color-rule:        #DDE2DB;
   --color-rule-strong: #C3CCC2;

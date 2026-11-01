@@ -145,7 +145,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-dvh bg-paper">
       {/* ---------- Desktop sidebar ---------- */}
       <aside
-        className="hidden lg:flex fixed inset-y-0 left-0 w-[248px] bg-ink text-ink-invert
+        className="hidden lg:flex fixed inset-y-0 left-0 w-[248px] bg-chrome text-ink-invert
                    flex-col z-20 print:hidden"
       >
         <div className="px-6 py-6">
@@ -206,7 +206,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* ---------- Phone top bar ---------- */}
-      <header className="lg:hidden sticky top-0 z-10 bg-ink text-ink-invert print:hidden">
+      <header className="lg:hidden sticky top-0 z-10 bg-chrome text-ink-invert print:hidden">
         <div className="px-4 h-14 flex items-center gap-2">
           {showBack ? (
             <button
