@@ -2,7 +2,7 @@ export type Role = 'proprietor' | 'admin' | 'teacher' | 'hr' | 'clinic' | 'paren
 
 export type StaffDayStatus = 'present' | 'absent' | 'sick'
 
-export type BillingPlanKey = 'month' | 'term' | 'year'
+export type BillingPlanKey = 'term'
 
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused'
 

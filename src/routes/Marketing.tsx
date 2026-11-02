@@ -181,7 +181,7 @@ export default function Marketing() {
           {[
             ['20s', 'To mark a class present'],
             ['7 desks', 'Office, HR, clinic, family'],
-            ['30 days free', 'Then N1,500 per student / month'],
+            ['30 days free', 'Then N1,000 per student / term'],
             ['Offline-safe', 'Register works on 2G'],
           ].map(([k, v]) => (
             <div key={k}>
@@ -438,7 +438,7 @@ export default function Marketing() {
             <div className="mt-5 pt-4 border-t border-brass border-rule">
               <div className="flex items-center justify-between">
                 <span className="eyebrow">Subscription</span>
-                <span className="tnum text-[13px] text-brass">N1,500 / student / month</span>
+                <span className="tnum text-[13px] text-brass">N1,000 / student / term</span>
               </div>
             </div>
           </div>
@@ -838,30 +838,19 @@ export default function Marketing() {
           Parents and students are never charged for Daymaark. We count active students on the roll
           and bill the school. No card needed to start the trial.
         </p>
-        <div className="mt-10 grid md:grid-cols-3 gap-4">
-          <PriceCard
-            name="Month"
-            price="N1,500"
-            unit="per student / month"
-            points={['School pays, not families', 'Counted from the live roll', 'Cancel any month']}
-          />
+        <div className="mt-10 max-w-md">
           <PriceCard
             name="Term"
-            price="N3,500"
+            price="N1,000"
             unit="per student / term"
             featured
             points={[
               'School pays, not families',
               'Counted from the live roll',
               'Register, lessons, results, fees',
-              'HR, clinic notes, CBT',
+              'HR, clinic notes, CBT, admissions',
+              'No other plan required',
             ]}
-          />
-          <PriceCard
-            name="School year"
-            price="N10,000"
-            unit="per student / year"
-            points={['School pays, not families', 'Counted from the live roll', 'One invoice for the year']}
           />
         </div>
       </section>
@@ -902,7 +891,7 @@ export default function Marketing() {
             ],
             [
               'What does it cost?',
-              '30 days free, then the school pays N1,500 per student per month, N3,500 per term, or N10,000 per school year. Parents and students are not billed.',
+              '30 days free, then the school pays N1,000 per student per term. That is the only plan. Parents and students are not billed.',
             ],
             [
               'Can parents use it without a smartphone?',

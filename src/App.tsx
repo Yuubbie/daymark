@@ -37,6 +37,11 @@ import Marking from './routes/cbt/Marking'
 import SitExam from './routes/cbt/SitExam'
 import StudentHome from './routes/student/StudentHome'
 import StudentSit from './routes/student/StudentSit'
+import StudentWork from './routes/student/StudentWork'
+import StudentResults from './routes/student/StudentResults'
+import StudentAttendance from './routes/student/StudentAttendance'
+import StudentNotices from './routes/student/StudentNotices'
+import TeacherReports from './routes/teacher/Reports'
 import Timetable from './routes/admin/Timetable'
 import TeacherTimetable from './routes/teacher/Timetable'
 import TeacherNotices from './routes/teacher/Notices'
@@ -294,6 +299,14 @@ export default function App() {
             }
           />
           <Route
+            path="/teacher/reports"
+            element={
+              <Protected roles={['teacher', 'admin', 'proprietor']}>
+                <TeacherReports />
+              </Protected>
+            }
+          />
+          <Route
             path="/parent"
             element={
               <Protected roles={['parent']}>
@@ -382,10 +395,58 @@ export default function App() {
             }
           />
           <Route
+            path="/student/assignments"
+            element={
+              <Protected roles={['student']}>
+                <StudentWork kind="assignment" />
+              </Protected>
+            }
+          />
+          <Route
+            path="/student/tests"
+            element={
+              <Protected roles={['student']}>
+                <StudentWork kind="test" />
+              </Protected>
+            }
+          />
+          <Route
+            path="/student/exams"
+            element={
+              <Protected roles={['student']}>
+                <StudentWork kind="exam" />
+              </Protected>
+            }
+          />
+          <Route
             path="/student/sit/:examId"
             element={
               <Protected roles={['student']}>
                 <StudentSit />
+              </Protected>
+            }
+          />
+          <Route
+            path="/student/results"
+            element={
+              <Protected roles={['student']}>
+                <StudentResults />
+              </Protected>
+            }
+          />
+          <Route
+            path="/student/attendance"
+            element={
+              <Protected roles={['student']}>
+                <StudentAttendance />
+              </Protected>
+            }
+          />
+          <Route
+            path="/student/notices"
+            element={
+              <Protected roles={['student']}>
+                <StudentNotices />
               </Protected>
             }
           />

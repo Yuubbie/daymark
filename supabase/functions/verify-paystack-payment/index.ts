@@ -27,11 +27,9 @@ function json(body: unknown, status = 200) {
   })
 }
 
-function planKey(raw: unknown): 'month' | 'term' | 'year' {
-  const s = String(raw ?? '').toLowerCase()
-  if (s.includes('term')) return 'term'
-  if (s.includes('year')) return 'year'
-  return 'month'
+// Single plan: N1,000 per student per term.
+function planKey(_raw: unknown): 'term' {
+  return 'term'
 }
 
 serve(async (req) => {
@@ -137,8 +135,7 @@ serve(async (req) => {
       })
     }
 
-    const planName =
-      key === 'term' ? 'daymark_term' : key === 'year' ? 'daymark_year' : 'daymark_month'
+    const planName = 'daymark_term'
 
     const { error: activateErr } = await supabase.rpc('activate_subscription', {
       p_school_id: schoolId,

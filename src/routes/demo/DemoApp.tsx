@@ -207,7 +207,7 @@ function DemoBanner({ onBilling }: { onBilling?: () => void }) {
   return (
     <div className="bg-brass-wash border-b border-brass/30 text-[12px] text-ink px-4 py-2 flex items-center justify-between gap-3">
       <span className="truncate">
-        Live demo · {demoSubscription.status === 'trial' ? `Trial, ${demoSubscription.daysLeft} days left` : 'Active'} · N1,500 / student / month after 30 days
+        Live demo · {demoSubscription.status === 'trial' ? `Trial, ${demoSubscription.daysLeft} days left` : 'Active'} · N1,000 / student / term after 30 days
       </span>
       <div className="flex items-center gap-3 shrink-0">
         {onBilling && (

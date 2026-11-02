@@ -19,7 +19,7 @@ admin, and it answers the one question every parent actually asks.
 | Parent | Daily user. Free. The school pays, not the family. |
 | Teacher | Daily operator. Free, included. |
 
-Pricing: 30 days free, then N1,500 per student / month, N3,500 per student / term, or N10,000 per student / year. The school pays.
+Pricing: 30 days free, then N1,000 per student / term. That is the only plan. The school pays.
 
 ## Stack
 
@@ -39,7 +39,7 @@ npm run dev
 |---|---|
 | `/preview` | Design system on one page. Works without Supabase. |
 | `/login` | Split auth screen |
-| `/admin` `/teacher` `/parent` | Role homes, guarded by RLS and route guards |
+| `/admin` `/teacher` `/parent` `/student` | Role homes, guarded by RLS and route guards |
 
 ## Database
 

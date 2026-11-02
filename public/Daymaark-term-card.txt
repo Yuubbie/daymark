@@ -209,6 +209,6 @@ Your login stays even if you sat in that school.
 Not a school role. Those two emails keep their school
 logins; ops is an extra door. Same password as signup.
 Forgot password on Sign in sends a reset email.
-N200,000 a month after the 30-day trial.
+N1,000 per student per term after the 30-day trial.
 
 WhatsApp care: 0703 235 2158

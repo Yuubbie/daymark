@@ -8,7 +8,7 @@ export const DEMO_CLAIM = 'ADAEZE01'
 export const PLAN = {
   name: 'Term',
   trialDays: 30,
-  price: 3500,
+  price: 1000,
   per: 'student / term',
   students: 'Price follows the roll. The school pays.',
 }

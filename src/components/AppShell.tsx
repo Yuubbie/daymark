@@ -69,7 +69,8 @@ const NAV: Record<string, Item[]> = {
   teacher: [
     { to: '/teacher', label: 'Register', Icon: IconRegister },
     { to: '/teacher/lesson', label: 'Lesson', Icon: IconLesson },
-    { to: '/teacher/timetable', label: 'Timetable', Icon: IconTimetable },
+    { to: '/teacher/reports', label: 'Reports', Icon: IconHomework },
+    { to: '/teacher/timetable', label: 'Timetable', Icon: IconTimetable, mobile: false },
     { to: '/cbt/exams', label: 'CBT', Icon: IconLesson },
     { to: '/cbt/bank', label: 'Question Bank', Icon: IconLesson, mobile: false },
     { to: '/cbt/marking', label: 'Result Approval', Icon: IconFlag, mobile: false },
@@ -96,7 +97,13 @@ const NAV: Record<string, Item[]> = {
   ],
   student: [
     { to: '/student', label: 'Desk', Icon: IconToday },
-    { to: '/account', label: 'Account', Icon: IconAccount },
+    { to: '/student/assignments', label: 'Assignments', Icon: IconHomework },
+    { to: '/student/tests', label: 'Tests', Icon: IconLesson },
+    { to: '/student/exams', label: 'Exams', Icon: IconFlag },
+    { to: '/student/results', label: 'Results', Icon: IconFlag, mobile: false },
+    { to: '/student/attendance', label: 'Attendance', Icon: IconClass, mobile: false },
+    { to: '/student/notices', label: 'Notices', Icon: IconNotice, mobile: false },
+    { to: '/account', label: 'Account', Icon: IconAccount, mobile: false },
   ],
 }
 

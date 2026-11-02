@@ -57,7 +57,7 @@ export default function StudentHome() {
         <span className="eyebrow">{school?.name}{className ? ` · ${className}` : ''}</span>
         <h1 className="text-[26px] mt-1">{name || 'Your desk'}</h1>
         <p className="mt-2 text-[14px] text-ink-soft">
-          Sit tests and exams here when your teacher publishes them. Sign in with the email the school invited.
+          Assignments, tests and exams. Sit a paper when your teacher publishes it.
         </p>
       </div>
       {loading ? (
@@ -66,16 +66,59 @@ export default function StudentHome() {
         <Empty line="This login is not linked to a student yet. Ask the office to invite your email from the class page (Login)." />
       ) : (
         <div className="space-y-4">
-          {profile.student_id && (
-            <Panel title="This term">
+          <Panel title="Your work">
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                to="/student/assignments"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Due</div>
+                <div className="text-[14px] font-semibold mt-1">Assignments</div>
+              </Link>
+              <Link
+                to="/student/tests"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">{tests.length ? `${tests.length} open` : 'Sit'}</div>
+                <div className="text-[14px] font-semibold mt-1">Tests</div>
+              </Link>
+              <Link
+                to="/student/exams"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">{papers.length ? `${papers.length} open` : 'Sit'}</div>
+                <div className="text-[14px] font-semibold mt-1">Exams</div>
+              </Link>
               <Link
                 to={`/report/${profile.student_id}`}
-                className="font-mono text-[11px] uppercase tracking-[0.1em] underline"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
               >
-                Open report card
+                <div className="eyebrow">This term</div>
+                <div className="text-[14px] font-semibold mt-1">Report card</div>
               </Link>
-            </Panel>
-          )}
+              <Link
+                to="/student/results"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Approved</div>
+                <div className="text-[14px] font-semibold mt-1">Results</div>
+              </Link>
+              <Link
+                to="/student/attendance"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">Register</div>
+                <div className="text-[14px] font-semibold mt-1">Attendance</div>
+              </Link>
+              <Link
+                to="/student/notices"
+                className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
+              >
+                <div className="eyebrow">From the office</div>
+                <div className="text-[14px] font-semibold mt-1">Notices</div>
+              </Link>
+            </div>
+          </Panel>
           <PaperList title="Tests" empty="No tests are open for your class yet" rows={tests} />
           <PaperList title="Exams" empty="No exams are open for your class yet" rows={papers} />
         </div>

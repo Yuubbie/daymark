@@ -595,26 +595,12 @@ begin
     'school_id', v_school,
     'student_count', v_n,
     'plans', jsonb_build_object(
-      'month', jsonb_build_object(
-        'key', 'daymark_month',
-        'interval', 'month',
-        'naira_per_student', 1500,
-        'naira', v_n * 1500,
-        'kobo', v_n * 150000
-      ),
       'term', jsonb_build_object(
         'key', 'daymark_term',
         'interval', 'term',
-        'naira_per_student', 3500,
-        'naira', v_n * 3500,
-        'kobo', v_n * 350000
-      ),
-      'year', jsonb_build_object(
-        'key', 'daymark_year',
-        'interval', 'year',
-        'naira_per_student', 10000,
-        'naira', v_n * 10000,
-        'kobo', v_n * 1000000
+        'naira_per_student', 1000,
+        'naira', v_n * 1000,
+        'kobo', v_n * 100000
       )
     )
   );
@@ -630,7 +616,7 @@ create or replace function activate_subscription(
   p_reference text,
   p_provider  text default 'paystack',
   p_amount_kobo bigint default 0,
-  p_plan text default 'daymark_month'
+  p_plan text default 'daymark_term'
 ) returns uuid
 language plpgsql security definer set search_path = public as $$
 declare
@@ -644,16 +630,8 @@ begin
     raise exception 'forbidden';
   end if;
 
-  v_plan := case
-    when p_plan in ('daymark_term', 'term') then 'daymark_term'
-    when p_plan in ('daymark_year', 'year') then 'daymark_year'
-    else 'daymark_month'
-  end;
-  v_interval := case v_plan
-    when 'daymark_term' then 'term'
-    when 'daymark_year' then 'year'
-    else 'month'
-  end;
+  v_plan := 'daymark_term';
+  v_interval := 'term';
 
   select count(*)::int into v_n from students where school_id = p_school_id and is_active;
   if v_n < 1 then v_n := 1; end if;
