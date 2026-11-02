@@ -145,6 +145,7 @@ export default function ClassDetail() {
         </div>
         <p className="text-[13px] text-ink-faint mt-1">
           <span className="tnum">{students.length}</span> students
+          {cls?.report_kind === 'statement' ? ' · Statement card' : ''}
           {unlinked > 0 && (
             <>
               {', '}
@@ -389,6 +390,7 @@ export default function ClassDetail() {
         classId={id}
         name={(cls?.name as string) ?? ''}
         level={(cls?.level as string) ?? ''}
+        reportKind={(cls?.report_kind as 'numeric' | 'statement' | undefined) ?? 'numeric'}
         onSaved={() => {
           setRenameOpen(false)
           void load()
@@ -914,6 +916,7 @@ function RenameClassModal({
   classId,
   name,
   level,
+  reportKind,
   onSaved,
 }: {
   open: boolean
@@ -921,10 +924,12 @@ function RenameClassModal({
   classId: string
   name: string
   level: string
+  reportKind: 'numeric' | 'statement'
   onSaved: () => void
 }) {
   const [nextName, setNextName] = useState(name)
   const [nextLevel, setNextLevel] = useState(level)
+  const [nextKind, setNextKind] = useState<'numeric' | 'statement'>(reportKind)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -932,16 +937,17 @@ function RenameClassModal({
     if (open) {
       setNextName(name)
       setNextLevel(level)
+      setNextKind(reportKind)
       setError(null)
     }
-  }, [open, name, level])
+  }, [open, name, level, reportKind])
 
   async function save() {
     setError(null)
     if (!nextName.trim()) return setError('Name the class.')
     setBusy(true)
     try {
-      await renameClass(classId, nextName, nextLevel)
+      await renameClass(classId, nextName, nextLevel, nextKind)
       onSaved()
     } catch (e) {
       setError(
@@ -975,6 +981,21 @@ function RenameClassModal({
           value={nextLevel}
           onChange={(e) => setNextLevel(e.target.value)}
         />
+        <label className="block">
+          <span className="eyebrow block mb-1.5">Report card</span>
+          <select
+            value={nextKind}
+            onChange={(e) => setNextKind(e.target.value as 'numeric' | 'statement')}
+            className="w-full h-11 px-3 bg-surface border border-rule-strong rounded-md text-[15px]
+                       text-ink focus:border-brass"
+          >
+            <option value="numeric">Scores — tests and exams</option>
+            <option value="statement">Statements — Nursery / EYFS</option>
+          </select>
+          <span className="block mt-1.5 text-[12px] text-ink-faint">
+            Statement cards drop numbers. The class teacher writes a comment and a level on each goal.
+          </span>
+        </label>
         <Button type="submit" full loading={busy}>
           Save
         </Button>

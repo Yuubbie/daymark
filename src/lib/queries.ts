@@ -8,6 +8,7 @@ export type ClassRow = {
   id: string
   name: string
   level: string | null
+  report_kind?: 'numeric' | 'statement' | null
   student_count: number
   sort_order: number
 }
@@ -61,36 +62,59 @@ export async function createTerm(
 }
 
 export async function listClasses(): Promise<ClassRow[]> {
-  const withOrder = await supabase
+  let query = await supabase
     .from('classes')
-    .select('id, name, level, sort_order, students(count)')
+    .select('id, name, level, report_kind, sort_order, students(count)')
     .eq('is_active', true)
     .order('sort_order')
     .order('name')
-  const { data, error } = withOrder.error && /sort_order/i.test(withOrder.error.message)
-    ? await supabase
-        .from('classes')
-        .select('id, name, level, students(count)')
-        .eq('is_active', true)
-        .order('name')
-    : withOrder
-  if (error) throw error
-  return (data ?? []).map((c: Record<string, unknown>, i: number) => ({
+  if (query.error && /report_kind/i.test(query.error.message)) {
+    query = await supabase
+      .from('classes')
+      .select('id, name, level, sort_order, students(count)')
+      .eq('is_active', true)
+      .order('sort_order')
+      .order('name') as typeof query
+  }
+  if (query.error && /sort_order/i.test(query.error.message)) {
+    query = await supabase
+      .from('classes')
+      .select('id, name, level, students(count)')
+      .eq('is_active', true)
+      .order('name') as typeof query
+  }
+  if (query.error) throw query.error
+  return (query.data ?? []).map((c: Record<string, unknown>, i: number) => ({
     id: c.id as string,
     name: c.name as string,
     level: (c.level as string) ?? null,
+    report_kind: ((c.report_kind as 'numeric' | 'statement' | null) ?? 'numeric'),
     student_count: (c.students as { count: number }[])?.[0]?.count ?? 0,
     sort_order: typeof c.sort_order === 'number' ? (c.sort_order as number) : (i + 1) * 10,
   }))
 }
 
-export async function createClass(schoolId: string, name: string, level: string) {
+export async function createClass(
+  schoolId: string,
+  name: string,
+  level: string,
+  reportKind: 'numeric' | 'statement' = 'numeric',
+) {
   const payload = {
     school_id: schoolId,
     name: name.trim(),
     level: level.trim() || null,
+    report_kind: reportKind,
   }
   const first = await supabase.from('classes').insert({ ...payload, sort_order: 9999 })
+  if (first.error && /report_kind/i.test(first.error.message)) {
+    const { report_kind: _rk, ...rest } = payload
+    const retry = await supabase.from('classes').insert({ ...rest, sort_order: 9999 })
+    if (retry.error && /sort_order/i.test(retry.error.message)) {
+      return supabase.from('classes').insert(rest)
+    }
+    return retry
+  }
   if (first.error && /sort_order/i.test(first.error.message)) {
     return supabase.from('classes').insert(payload)
   }
@@ -98,23 +122,42 @@ export async function createClass(schoolId: string, name: string, level: string)
 }
 
 export async function getClass(id: string) {
-  const { data, error } = await supabase
+  const first = await supabase
     .from('classes')
-    .select('id, name, level, school_id')
+    .select('id, name, level, report_kind, school_id')
     .eq('id', id)
     .maybeSingle()
-  if (error) throw error
-  return data
+  if (first.error && /report_kind/i.test(first.error.message)) {
+    const { data, error } = await supabase
+      .from('classes')
+      .select('id, name, level, school_id')
+      .eq('id', id)
+      .maybeSingle()
+    if (error) throw error
+    return data
+  }
+  if (first.error) throw first.error
+  return first.data
 }
 
-export async function renameClass(classId: string, name: string, level: string) {
-  const { error } = await supabase
-    .from('classes')
-    .update({
-      name: name.trim(),
-      level: level.trim() || null,
-    })
-    .eq('id', classId)
+export async function renameClass(
+  classId: string,
+  name: string,
+  level: string,
+  reportKind?: 'numeric' | 'statement',
+) {
+  const patch: Record<string, unknown> = {
+    name: name.trim(),
+    level: level.trim() || null,
+  }
+  if (reportKind) patch.report_kind = reportKind
+  const { error } = await supabase.from('classes').update(patch).eq('id', classId)
+  if (error && /report_kind/i.test(error.message)) {
+    delete patch.report_kind
+    const retry = await supabase.from('classes').update(patch).eq('id', classId)
+    if (retry.error) throw retry.error
+    return
+  }
   if (error) throw error
 }
 

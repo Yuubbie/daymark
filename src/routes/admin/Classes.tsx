@@ -10,6 +10,7 @@ import {
   reorderClasses,
   type ClassRow,
 } from '../../lib/queries'
+import { looksLikeEarlyYears } from '../../lib/marks'
 
 export default function Classes() {
   const { profile } = useAuth()
@@ -113,7 +114,13 @@ export default function Classes() {
                 left={
                   <>
                     <div className="text-[15px] font-semibold">{c.name}</div>
-                    {c.level && <div className="text-[12px] text-ink-faint">{c.level}</div>}
+                    {(c.level || c.report_kind === 'statement') && (
+                      <div className="text-[12px] text-ink-faint">
+                        {[c.level, c.report_kind === 'statement' ? 'Statement card' : null]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </div>
+                    )}
                   </>
                 }
                 right={
@@ -176,13 +183,15 @@ function NewClassModal({
 }) {
   const [name, setName] = useState('')
   const [level, setLevel] = useState('')
+  const [reportKind, setReportKind] = useState<'numeric' | 'statement'>('numeric')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
   async function save() {
     setError(null)
     setBusy(true)
-    const { error } = await createClass(schoolId, name, level)
+    const kind = looksLikeEarlyYears(name, level) ? 'statement' : reportKind
+    const { error } = await createClass(schoolId, name, level, kind)
     setBusy(false)
     if (error) {
       return setError(
@@ -193,6 +202,7 @@ function NewClassModal({
     }
     setName('')
     setLevel('')
+    setReportKind('numeric')
     onSaved()
   }
 
@@ -219,8 +229,26 @@ function NewClassModal({
           placeholder="Year 1"
           hint="Optional grouping, for example Year 1 or JSS 1."
           value={level}
-          onChange={(e) => setLevel(e.target.value)}
+          onChange={(e) => {
+            setLevel(e.target.value)
+            if (looksLikeEarlyYears(name, e.target.value)) setReportKind('statement')
+          }}
         />
+        <label className="block">
+          <span className="eyebrow block mb-1.5">Report card</span>
+          <select
+            value={reportKind}
+            onChange={(e) => setReportKind(e.target.value as 'numeric' | 'statement')}
+            className="w-full h-11 px-3 bg-surface border border-rule-strong rounded-md text-[15px]
+                       text-ink focus:border-brass"
+          >
+            <option value="numeric">Scores — tests and exams</option>
+            <option value="statement">Statements — Nursery / EYFS</option>
+          </select>
+          <span className="block mt-1.5 text-[12px] text-ink-faint">
+            Statement cards use comments and Emerging / Expected / Exceeding. No averages.
+          </span>
+        </label>
         <Button type="submit" full loading={busy}>
           Create class
         </Button>

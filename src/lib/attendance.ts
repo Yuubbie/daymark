@@ -22,6 +22,7 @@ export type TeachableClass = {
   id: string
   name: string
   level: string | null
+  report_kind?: 'numeric' | 'statement' | null
   student_count?: number
 }
 
@@ -91,19 +92,41 @@ async function fetchTeachableClasses(
   userId: string,
 ): Promise<TeachableClass[]> {
   if (role === 'admin' || role === 'proprietor') {
-    const { data, error } = await supabase
+    const first = await supabase
       .from('classes')
-      .select('id, name, level')
+      .select('id, name, level, report_kind')
       .eq('is_active', true)
       .order('name')
-    if (error) throw error
-    return (data ?? []) as TeachableClass[]
+    if (first.error && /report_kind/i.test(first.error.message)) {
+      const { data, error } = await supabase
+        .from('classes')
+        .select('id, name, level')
+        .eq('is_active', true)
+        .order('name')
+      if (error) throw error
+      return (data ?? []) as TeachableClass[]
+    }
+    if (first.error) throw first.error
+    return (first.data ?? []) as TeachableClass[]
   }
 
-  const { data, error } = await supabase
+  let data: { classes: unknown }[] | null = null
+  let error: { message: string } | null = null
+  const first = await supabase
     .from('class_teachers')
-    .select('classes(id, name, level)')
+    .select('classes(id, name, level, report_kind)')
     .eq('teacher_id', userId)
+  if (first.error && /report_kind/i.test(first.error.message)) {
+    const retry = await supabase
+      .from('class_teachers')
+      .select('classes(id, name, level)')
+      .eq('teacher_id', userId)
+    data = retry.data as { classes: unknown }[] | null
+    error = retry.error
+  } else {
+    data = first.data as { classes: unknown }[] | null
+    error = first.error
+  }
   if (error) throw error
 
   const seen = new Set<string>()

@@ -42,6 +42,8 @@ import StudentResults from './routes/student/StudentResults'
 import StudentAttendance from './routes/student/StudentAttendance'
 import StudentNotices from './routes/student/StudentNotices'
 import TeacherReports from './routes/teacher/Reports'
+import TeacherMarks from './routes/teacher/Marks'
+import TeacherStatements from './routes/teacher/Statements'
 import Timetable from './routes/admin/Timetable'
 import TeacherTimetable from './routes/teacher/Timetable'
 import TeacherNotices from './routes/teacher/Notices'
@@ -303,6 +305,22 @@ export default function App() {
             element={
               <Protected roles={['teacher', 'admin', 'proprietor']}>
                 <TeacherReports />
+              </Protected>
+            }
+          />
+          <Route
+            path="/teacher/marks"
+            element={
+              <Protected roles={['teacher', 'admin', 'proprietor']}>
+                <TeacherMarks />
+              </Protected>
+            }
+          />
+          <Route
+            path="/teacher/statements"
+            element={
+              <Protected roles={['teacher', 'admin', 'proprietor']}>
+                <TeacherStatements />
               </Protected>
             }
           />

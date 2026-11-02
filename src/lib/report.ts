@@ -9,6 +9,15 @@ export type ReportPaper = {
   total: number | null
   percent: number | null
   submitted_at: string | null
+  source?: 'cbt' | 'paper'
+}
+
+export type ReportStatement = {
+  area: string
+  goal: string
+  comment: string | null
+  level: 'emerging' | 'expected' | 'exceeding' | null
+  position: number
 }
 
 export type ReportSubject = {
@@ -27,8 +36,9 @@ export type TermReport = {
     fee_cleared: boolean
   }
   school: { id: string; name: string; logo_url?: string | null }
-  class: { id: string; name: string } | null
+  class: { id: string; name: string; level?: string | null; report_kind?: 'numeric' | 'statement' } | null
   term: { id: string; name: string; start_date: string; end_date: string } | null
+  report_kind?: 'numeric' | 'statement'
   attendance: {
     days: number
     present: number
@@ -39,6 +49,7 @@ export type TermReport = {
     marks: AttendanceMark[]
   }
   subjects: ReportSubject[]
+  statements?: ReportStatement[]
   comments?: {
     class_teacher: string | null
     principal: string | null
@@ -60,6 +71,8 @@ export async function fetchTermReport(studentId: string, termId?: string): Promi
   return {
     ...row,
     subjects: row.subjects ?? [],
+    statements: row.statements ?? [],
+    report_kind: row.report_kind ?? row.class?.report_kind ?? 'numeric',
     comments: row.comments ?? { class_teacher: null, principal: null },
     attendance: {
       ...row.attendance,

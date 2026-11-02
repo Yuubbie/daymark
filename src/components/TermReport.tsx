@@ -1,13 +1,19 @@
 import { AttendanceSummary, RegisterLegend } from './RegisterStrip'
 import { Empty, Panel, Row } from './ui'
 import { useAuth } from '../lib/auth'
-import type { ReportSubject, TermReport } from '../lib/report'
+import type { ReportStatement, ReportSubject, TermReport } from '../lib/report'
 import { overallAverage } from '../lib/report'
+import { STATEMENT_LEVELS } from '../lib/marks'
 
 function kindLabel(kind: string) {
   if (kind === 'exam') return 'Exam'
   if (kind === 'interview') return 'Interview'
+  if (kind === 'assessment') return 'Test'
   return 'Test'
+}
+
+function sourceLabel(source?: string) {
+  return source === 'paper' ? 'Paper' : 'CBT'
 }
 
 function scoreLine(subject: ReportSubject) {
@@ -15,12 +21,31 @@ function scoreLine(subject: ReportSubject) {
   return `${subject.average.toFixed(1)}%`
 }
 
+function levelShort(level: ReportStatement['level']) {
+  return STATEMENT_LEVELS.find((l) => l.key === level)?.short ?? ''
+}
+
+function groupStatements(rows: ReportStatement[]) {
+  const order: string[] = []
+  const map = new Map<string, ReportStatement[]>()
+  for (const r of rows) {
+    if (!map.has(r.area)) {
+      order.push(r.area)
+      map.set(r.area, [])
+    }
+    map.get(r.area)!.push(r)
+  }
+  return order.map((area) => ({ area, goals: map.get(area)! }))
+}
+
 export function TermReportCard({ report }: { report: TermReport }) {
   const { school } = useAuth()
   const name = `${report.student.first_name} ${report.student.last_name}`
-  const overall = overallAverage(report.subjects)
+  const statement = (report.report_kind ?? report.class?.report_kind) === 'statement'
+  const overall = statement ? null : overallAverage(report.subjects)
   const att = report.attendance
   const crest = report.school.logo_url ?? school?.logo_url
+  const areas = groupStatements(report.statements ?? [])
 
   return (
     <article className="report-sheet space-y-4">
@@ -92,42 +117,79 @@ export function TermReportCard({ report }: { report: TermReport }) {
         </div>
       </Panel>
 
-      <Panel title="Subjects">
-        {report.subjects.length === 0 ? (
-          <Empty line="No approved papers this term yet. Marks appear here after a teacher publishes a paper and the school approves the result." />
-        ) : (
-          <div className="divide-y divide-rule -my-3">
-            {report.subjects.map((s) => (
-              <div key={s.subject} className="py-3">
-                <Row
-                  left={
-                    <>
-                      <div className="text-[15px] font-semibold">{s.subject}</div>
-                      <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-faint mt-0.5">
-                        {s.papers.length} paper{s.papers.length === 1 ? '' : 's'}
+      {statement ? (
+        <Panel title="Learning goals">
+          {areas.length === 0 ? (
+            <Empty line="No statements this term yet. The class teacher writes a comment and a level for each goal." />
+          ) : (
+            <div className="space-y-5">
+              <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-faint">
+                E Emerging · Ex Expected · Exc Exceeding
+              </p>
+              {areas.map((a) => (
+                <div key={a.area}>
+                  <div className="eyebrow mb-2">{a.area}</div>
+                  <div className="divide-y divide-rule border-t border-rule">
+                    {a.goals.map((g) => (
+                      <div key={`${g.area}-${g.goal}`} className="py-2.5">
+                        <div className="flex items-baseline justify-between gap-3">
+                          <div className="text-[14px] font-semibold">{g.goal}</div>
+                          <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint shrink-0">
+                            {levelShort(g.level) || '—'}
+                          </span>
+                        </div>
+                        {g.comment && (
+                          <p className="mt-1 text-[13px] text-ink-soft leading-relaxed whitespace-pre-wrap">
+                            {g.comment}
+                          </p>
+                        )}
                       </div>
-                    </>
-                  }
-                  right={<span className="tnum text-[15px] font-semibold">{scoreLine(s)}</span>}
-                />
-                <ul className="mt-1 space-y-1">
-                  {s.papers.map((p) => (
-                    <li key={p.exam_id} className="flex items-baseline justify-between gap-3 text-[13px]">
-                      <span className="text-ink-soft min-w-0 truncate">
-                        {kindLabel(p.kind)} · {p.title}
-                      </span>
-                      <span className="tnum shrink-0">
-                        {p.score ?? '—'} / {p.total ?? '—'}
-                        {p.percent != null ? ` · ${p.percent.toFixed(0)}%` : ''}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        )}
-      </Panel>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Panel>
+      ) : (
+        <Panel title="Subjects">
+          {report.subjects.length === 0 ? (
+            <Empty line="No papers this term yet. Marks appear after a teacher types a paper score or the school approves a CBT result." />
+          ) : (
+            <div className="divide-y divide-rule -my-3">
+              {report.subjects.map((s) => (
+                <div key={s.subject} className="py-3">
+                  <Row
+                    left={
+                      <>
+                        <div className="text-[15px] font-semibold">{s.subject}</div>
+                        <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-faint mt-0.5">
+                          {s.papers.length} paper{s.papers.length === 1 ? '' : 's'}
+                        </div>
+                      </>
+                    }
+                    right={<span className="tnum text-[15px] font-semibold">{scoreLine(s)}</span>}
+                  />
+                  <ul className="mt-1 space-y-1">
+                    {s.papers.map((p) => (
+                      <li key={p.exam_id} className="flex items-baseline justify-between gap-3 text-[13px]">
+                        <span className="text-ink-soft min-w-0 truncate">
+                          {kindLabel(p.kind)} · {p.title}
+                          <span className="text-ink-faint"> · {sourceLabel(p.source)}</span>
+                        </span>
+                        <span className="tnum shrink-0">
+                          {p.score ?? '—'} / {p.total ?? '—'}
+                          {p.percent != null ? ` · ${p.percent.toFixed(0)}%` : ''}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+        </Panel>
+      )}
 
       {(report.comments?.class_teacher || report.comments?.principal) && (
         <Panel title="Comments">
@@ -151,9 +213,10 @@ export function TermReportCard({ report }: { report: TermReport }) {
       )}
 
       <p className="text-[12px] text-ink-faint print:block">
-        Only approved CBT papers and the marked register for this term appear on this card.
-        Register notes sit under attendance. Outstanding fees lock the parent view until the school
-        clears them.
+        {statement
+          ? 'Statement cards use teacher comments and Emerging / Expected / Exceeding. No averages. The register for this term still prints.'
+          : 'Approved CBT papers, typed paper marks, and the marked register for this term appear on this card.'}{' '}
+        Outstanding fees lock the parent view until the school clears them.
       </p>
     </article>
   )
