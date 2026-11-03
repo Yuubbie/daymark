@@ -269,8 +269,8 @@ export default function Marketing() {
               },
               {
                 k: 'Library',
-                t: 'Coming soon',
-                b: 'Catalogue, loans and returns. The desk is reserved on every school.',
+                t: 'Library',
+                b: 'The school library desk.',
               },
               {
                 k: 'Apply',
@@ -787,7 +787,7 @@ export default function Marketing() {
               ],
               [
                 'Library',
-                'Coming soon. Catalogue, loans and returns. The desk is already reserved on every school.',
+                'The school library desk.',
               ],
             ].map(([t, b]) => (
               <div key={t}>
@@ -911,7 +911,7 @@ export default function Marketing() {
             ],
             [
               'Does it do HR, clinic and library?',
-              'HR marks staff in, out or sick. Clinic records visits. Library is reserved on every school — catalogue and loans come next. CBT, term cards, household fees, admissions, ID cards, timetable and notices are live.',
+              'HR marks staff in, out or sick. Clinic records visits. Library is a desk on every school. CBT, term cards, household fees, admissions, ID cards, timetable and notices are live.',
             ],
             [
               'Can the school use its own colour?',

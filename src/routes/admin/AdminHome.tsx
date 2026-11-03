@@ -214,7 +214,7 @@ export default function AdminHome() {
                 className="border border-rule rounded-md px-3 py-3 hover:border-brass transition-colors"
               >
                 <div className="eyebrow">Books</div>
-                <div className="text-[14px] font-semibold mt-1">Library soon</div>
+                <div className="text-[14px] font-semibold mt-1">Library</div>
               </Link>
             </div>
           </Panel>
