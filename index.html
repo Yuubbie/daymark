@@ -1,20 +1,25 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-NG">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Daymaark — School OS for Nigerian schools</title>
+    <title>Daymaark — School Management System in Nigeria</title>
     <meta
       name="description"
-      content="Daymaark is the school OS for Nigerian schools: attendance register, lessons, CBT exams, term report cards, household fees, HR staff register, clinic notes, admissions, ID cards and timetable. Parents see the day the same day it happens."
+      content="Daymaark is a school management system in Nigeria for attendance, CBT exams, term report cards, household fees, HR and clinic. Built for Nigerian schools. N1,000 per student per term. 30 days free."
     />
     <meta
       name="keywords"
-      content="Nigerian school software, school management system Nigeria, school attendance app, CBT exam software, school report card, school fees collection, HR staff register, school clinic, parent app Nigeria, Daymaark"
+      content="school management system, school management system in Nigeria, school management system Nigeria, Nigerian school management software, school ERP Nigeria, school attendance software Nigeria, CBT exam software Nigeria, school report card software, school fees software Nigeria, Daymaark"
     />
     <meta name="author" content="Daymaark" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
     <link rel="canonical" href="https://daymark-eosin-five.vercel.app/" />
+    <link rel="alternate" hreflang="en-NG" href="https://daymark-eosin-five.vercel.app/" />
+    <link rel="alternate" hreflang="en" href="https://daymark-eosin-five.vercel.app/" />
+    <meta name="geo.region" content="NG" />
+    <meta name="geo.placename" content="Nigeria" />
     <meta name="theme-color" content="#143A2B" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
@@ -23,10 +28,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Daymaark" />
-    <meta property="og:title" content="Daymaark — School OS for Nigerian schools" />
+    <meta property="og:title" content="Daymaark — School Management System in Nigeria" />
     <meta
       property="og:description"
-      content="Register, CBT, report cards, household fees, HR, clinic and admissions. Every school day, marked."
+      content="School management system for Nigerian schools: attendance, CBT, report cards, household fees, HR and clinic. N1,000 per student per term."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://daymark-eosin-five.vercel.app/" />
@@ -34,10 +39,10 @@
     <meta property="og:locale" content="en_NG" />
     <meta property="og:site_name" content="Daymaark" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Daymaark — School OS for Nigerian schools" />
+    <meta name="twitter:title" content="Daymaark — School Management System in Nigeria" />
     <meta
       name="twitter:description"
-      content="Register, CBT, report cards, household fees, HR, clinic and admissions. Every school day, marked."
+      content="School management system for Nigerian schools: attendance, CBT, report cards, household fees, HR and clinic."
     />
     <meta name="twitter:image" content="https://daymark-eosin-five.vercel.app/og.png" />
     <script type="application/ld+json">
@@ -45,22 +50,43 @@
         "@context": "https://schema.org",
         "@graph": [
           {
-            "@type": "SoftwareApplication",
+            "@type": "WebSite",
+            "@id": "https://daymark-eosin-five.vercel.app/#website",
+            "url": "https://daymark-eosin-five.vercel.app/",
             "name": "Daymaark",
+            "inLanguage": "en-NG",
+            "description": "School management system in Nigeria.",
+            "publisher": { "@id": "https://daymark-eosin-five.vercel.app/#org" }
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://daymark-eosin-five.vercel.app/#app",
+            "name": "Daymaark",
+            "alternateName": ["Daymark", "Daymaark school management system"],
             "applicationCategory": "EducationalApplication",
+            "applicationSubCategory": "School management system",
             "operatingSystem": "Web, Android, iOS",
             "url": "https://daymark-eosin-five.vercel.app/",
-            "description": "School OS for Nigerian schools: attendance, lessons, CBT exams, term report cards, household fees, HR, clinic, admissions, ID cards and timetable.",
+            "image": "https://daymark-eosin-five.vercel.app/og.png",
+            "inLanguage": "en-NG",
+            "countriesSupported": "NG",
+            "audience": { "@type": "EducationalAudience", "educationalRole": "school" },
+            "description": "Daymaark is a school management system in Nigeria. Attendance register, CBT exams, term report cards, household fees, HR staff register, clinic notes, admissions, ID cards and timetable. The school pays N1,000 per student per term.",
             "offers": {
               "@type": "Offer",
               "priceCurrency": "NGN",
               "price": "1000",
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock",
               "description": "N1,000 per student per term after a 30-day trial. The school pays."
             },
             "featureList": [
+              "School management system for Nigerian schools",
               "Daily attendance register",
               "Lessons and homework",
               "CBT exams and question bank",
+              "Paper exam mark entry",
+              "Nursery and EYFS statement report cards",
               "Term report cards",
               "Household school fees",
               "HR staff register",
@@ -69,13 +95,61 @@
               "Printable CR80 student ID cards",
               "Timetable",
               "School notices"
-            ]
+            ],
+            "publisher": { "@id": "https://daymark-eosin-five.vercel.app/#org" }
           },
           {
             "@type": "Organization",
+            "@id": "https://daymark-eosin-five.vercel.app/#org",
             "name": "Daymaark",
+            "legalName": "Daymaark",
             "url": "https://daymark-eosin-five.vercel.app/",
-            "logo": "https://daymark-eosin-five.vercel.app/icon-512.png"
+            "logo": "https://daymark-eosin-five.vercel.app/icon-512.png",
+            "areaServed": { "@type": "Country", "name": "Nigeria" },
+            "knowsAbout": [
+              "school management system",
+              "school management system in Nigeria",
+              "school attendance",
+              "CBT exams",
+              "term report cards"
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What is the best school management system in Nigeria?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Daymaark is a school management system built for Nigerian schools. It covers attendance, CBT exams, term report cards, household fees, HR, clinic, admissions, ID cards and timetable. The school pays N1,000 per student per term after 30 days free."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What is a school management system?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "A school management system is software that runs the daily school record: register, lessons, exams, report cards, fees and staff. Daymaark is a school management system for Nigerian schools, light enough to run on 2G, with a parent view of the same day."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How much does Daymaark school management software cost in Nigeria?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "30 days free, then N1,000 per student per term. That is the only plan. The school pays. Parents and students are not billed."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does Daymaark work without sitting exams on a computer?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Teachers can type paper-exam scores. Nursery and EYFS classes use statement report cards with comments and Emerging, Expected or Exceeding. Children can have logins without sitting a paper on the portal."
+                }
+              }
+            ]
           }
         ]
       }
@@ -86,7 +160,9 @@
       href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-
+    <noscript>
+      <meta http-equiv="refresh" content="0; url=/school-management-system-nigeria.html" />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>

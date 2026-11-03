@@ -1,13 +1,12 @@
 # Daymark
 
-**Every school day, marked.**
+**School management system in Nigeria. Every school day, marked.**
 
-Daymark is a parent-transparency layer for Nigerian schools. Parents pay fees and then
-hear nothing until report card day. Daymark closes that silence: daily attendance, what
-was taught, and what homework is due, visible the same day it happens.
+Daymark is a school management system for Nigerian schools: attendance register, CBT
+exams, paper marks, Nursery/EYFS statements, term report cards, household fees, HR,
+clinic, admissions, ID cards and timetable. Parents see the same day it happens.
 
-It is not a school ERP. It sits alongside whatever the school already uses for fees and
-admin, and it answers the one question every parent actually asks.
+Pricing: 30 days free, then N1,000 per student per term. That is the only plan.
 
 ---
 

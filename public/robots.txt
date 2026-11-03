@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /teacher
+Disallow: /parent
+Disallow: /student
+Disallow: /ops
 
 Sitemap: https://daymark-eosin-five.vercel.app/sitemap.xml

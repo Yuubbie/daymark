@@ -120,15 +120,15 @@ export default function Marketing() {
         <div className="mx-auto max-w-6xl px-5 py-16 lg:py-24 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-brass">
-              Every school day, marked
+              School management system in Nigeria
             </p>
-            <h1 className="mt-4 text-[40px] sm:text-[56px] lg:text-[64px] leading-[1.02] max-w-[14ch]">
-              What happened at school today.
+            <h1 className="mt-4 text-[40px] sm:text-[56px] lg:text-[64px] leading-[1.02] max-w-[16ch]">
+              The school management system Nigerian schools actually run.
             </h1>
             <p className="mt-5 text-[16px] sm:text-[18px] leading-relaxed text-ink-invert/70 max-w-[44ch]">
-              The school OS for Nigerian schools. Register, lessons, CBT, report cards, household
-              fees, HR, clinic and admissions — proprietor, admin, teacher, HR, clinic, parent and
-              student, on one record.
+              Daymaark is a school management system in Nigeria: attendance register, CBT exams,
+              term report cards, household fees, HR, clinic and admissions. Proprietor, admin,
+              teacher, parent and student, on one record. N1,000 per student per term.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/demo">
@@ -194,8 +194,8 @@ export default function Marketing() {
 
       <section id="product" className="mx-auto max-w-6xl px-5 py-20">
         <span className="eyebrow">The gap</span>
-        <h2 className="text-[32px] sm:text-[40px] mt-2 max-w-[18ch]">
-          Schools already have software. Parents still have WhatsApp.
+        <h2 className="text-[32px] sm:text-[40px] mt-2 max-w-[20ch]">
+          A school management system, not another WhatsApp group.
         </h2>
         <div className="mt-10 grid md:grid-cols-3 gap-4">
           {[
@@ -719,13 +719,13 @@ export default function Marketing() {
       <section id="functions" className="bg-surface-alt border-y border-rule">
         <div className="mx-auto max-w-6xl px-5 py-20">
           <span className="eyebrow">Every live function</span>
-          <h2 className="text-[32px] sm:text-[40px] mt-2 max-w-[20ch]">
-            School management software that actually names the desks.
+          <h2 className="text-[32px] sm:text-[40px] mt-2 max-w-[22ch]">
+            School management system in Nigeria, named by the desks it runs.
           </h2>
           <p className="mt-3 text-[15px] text-ink-soft max-w-[60ch]">
-            Nigerian school software, attendance register, CBT exam, term report card, household
-            school fees, HR staff register, clinic sick-bay, admissions, CR80 ID cards, timetable
-            and notices — one product, one roll.
+            School management system, school management system in Nigeria, attendance register,
+            CBT exam, term report card, household school fees, HR staff register, clinic sick-bay,
+            admissions, CR80 ID cards, timetable and notices — one product, one roll.
           </p>
           <dl className="mt-10 grid sm:grid-cols-2 gap-x-10 gap-y-6">
             {[
@@ -742,8 +742,16 @@ export default function Marketing() {
                 'Set a paper, print a QR poster, sit one attempt per name. Objective marks itself. Office approves before a parent sees it.',
               ],
               [
+                'Paper exam marks',
+                'Type scores for a paper the class wrote by hand. No CBT sit. The term card still prints.',
+              ],
+              [
+                'Nursery and EYFS statements',
+                'Goals with comments and Emerging, Expected or Exceeding. No averages for children who should not sit a paper.',
+              ],
+              [
                 'Term report cards',
-                'Register plus approved CBT, class-teacher and principal comments. Outstanding fees lock the print.',
+                'Register plus approved CBT or paper marks, class-teacher and principal comments. Outstanding fees lock the print.',
               ],
               [
                 'Household school fees',
@@ -886,6 +894,14 @@ export default function Marketing() {
         <dl className="mt-8 divide-y divide-rule border-y border-rule">
           {[
             [
+              'What is the best school management system in Nigeria?',
+              'Daymaark is a school management system built for Nigerian schools. Register, CBT, report cards, household fees, HR, clinic, admissions, ID cards and timetable. 30 days free, then N1,000 per student per term. The school pays.',
+            ],
+            [
+              'What is a school management system?',
+              'Software that runs the daily school record: attendance, lessons, exams, report cards, fees and staff. Daymaark is a school management system in Nigeria that parents can open the same day, including on 2G.',
+            ],
+            [
               'What does it replace?',
               'The register book, the homework WhatsApp group, the results spreadsheet, the fee ledger, the staff book and the sick-bay notebook. Admissions and CBT sit on the same record, so most schools run on Daymaark alone.',
             ],
@@ -955,10 +971,13 @@ export default function Marketing() {
           <div>
             <Wordmark size="sm" />
             <p className="mt-3 text-[12px] text-ink-faint max-w-[36ch]">
-              The school OS for Nigerian schools. Every school day, marked.
+              School management system in Nigeria. Every school day, marked.
             </p>
           </div>
           <div className="flex gap-8 text-[13px] text-ink-soft">
+            <a href="/school-management-system-nigeria.html" className="hover:text-ink">
+              School management system
+            </a>
             <Link to="/login" className="hover:text-ink">
               Sign in
             </Link>

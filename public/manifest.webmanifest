@@ -1,7 +1,7 @@
 {
   "name": "Daymaark",
   "short_name": "Daymaark",
-  "description": "School OS for Nigerian schools. Register, CBT, report cards, household fees, HR and clinic.",
+  "description": "School management system in Nigeria. Attendance, CBT, report cards, household fees, HR and clinic.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
