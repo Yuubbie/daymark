@@ -6,4 +6,4 @@ Disallow: /parent
 Disallow: /student
 Disallow: /ops
 
-Sitemap: https://daymark-eosin-five.vercel.app/sitemap.xml
+Sitemap: https://daymaark.com/sitemap.xml

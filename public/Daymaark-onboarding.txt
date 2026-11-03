@@ -1,7 +1,7 @@
 DAYMAARK — HOW TO OPEN YOUR SCHOOL
 ==================================
 Anyone can follow this. No call required.
-App: https://daymark-eosin-five.vercel.app
+App: https://daymaark.com
 Care (WhatsApp): 0703 235 2158
 
 Order matters. Do not skip ahead.
@@ -24,7 +24,7 @@ A name on the class list is not a login.
 ------------------------------------------------
 1. PROPRIETOR — CREATE THE SCHOOL
 ------------------------------------------------
-1. Open https://daymark-eosin-five.vercel.app/signup
+1. Open https://daymaark.com/signup
 2. Enter your name, email and password.
 3. Open the confirmation email and confirm.
 4. You land on Welcome. Choose "I run a school".
@@ -82,7 +82,7 @@ Do this only after the roster exists.
 1. Open the class page.
 2. Generate claim codes.
 3. Send each code home (print, WhatsApp, or the class CSV).
-4. The parent signs up at https://daymark-eosin-five.vercel.app/signup
+4. The parent signs up at https://daymaark.com/signup
 5. Confirms email.
 6. On Welcome they stay on "I'm a parent".
 7. They enter the eight-character code once.
@@ -126,9 +126,9 @@ WhatsApp care: 0703 235 2158
 ------------------------------------------------
 TRY IT FIRST (NO ACCOUNT)
 ------------------------------------------------
-Live demo: https://daymark-eosin-five.vercel.app/demo
+Live demo: https://daymaark.com/demo
 Walk the opening sequence, then switch seats:
 proprietor → admin → teacher → parent (code ADAEZE01) → student.
 
 Printable copy of this brief:
-https://daymark-eosin-five.vercel.app/setup.html
+https://daymaark.com/setup.html

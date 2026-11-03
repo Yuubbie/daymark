@@ -1142,7 +1142,7 @@ function AdminEnquiries() {
       <Head eyebrow="Admin" title="Enquiries" sub="Public form, then the roster" />
       <Panel className="mt-4" title="Public form">
         <p className="text-[13px] text-ink-soft break-all">
-          daymark-eosin-five.vercel.app/apply/greenfield-academy
+          daymaark.com/apply/greenfield-academy
         </p>
         <p className="mt-2 text-[12px] text-ink-faint">
           Share this. A parent fills it. No login.

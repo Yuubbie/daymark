@@ -1,7 +1,7 @@
 DAYMAARK — HOW TO USE IT
 ========================
 
-App: https://daymark-eosin-five.vercel.app
+App: https://daymaark.com
 Press Ctrl+Shift+R once so you are not on an old page.
 
 This paper is for walking someone through Daymaark.

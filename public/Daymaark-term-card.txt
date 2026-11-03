@@ -1,6 +1,6 @@
 DAYMAARK — WHAT JUST LANDED
 ===========================
-App: https://daymark-eosin-five.vercel.app
+App: https://daymaark.com
 Hard-refresh once (Ctrl+Shift+R) so you are not on an old tab.
 
 The school already marks the register and sits CBT.
