@@ -1,7 +1,7 @@
 {
   "name": "Daymaark",
   "short_name": "Daymaark",
-  "description": "School management system in Nigeria. Attendance, CBT, report cards, household fees, HR and clinic.",
+  "description": "Daymaark is a full school management system in Nigeria. Fees, CBT, report cards, HR, clinic, admissions.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -1,10 +1,10 @@
-# Daymark
+# Daymaark
 
-**School management system in Nigeria. Every school day, marked.**
+**School management system in Nigeria.**
 
-Daymark is a school management system for Nigerian schools: attendance register, CBT
-exams, paper marks, Nursery/EYFS statements, term report cards, household fees, HR,
-clinic, admissions, ID cards and timetable. Parents see the same day it happens.
+Daymaark is a full school management system for Nigerian schools: attendance register,
+CBT exams, paper marks, Nursery/EYFS statements, term report cards, household fees,
+HR, clinic, admissions, ID cards and timetable. Spell it Daymaark, two a’s.
 
 Pricing: 30 days free, then N1,000 per student per term. That is the only plan.
 

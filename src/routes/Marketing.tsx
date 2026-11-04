@@ -123,12 +123,13 @@ export default function Marketing() {
               School management system in Nigeria
             </p>
             <h1 className="mt-4 text-[40px] sm:text-[56px] lg:text-[64px] leading-[1.02] max-w-[16ch]">
-              The school management system Nigerian schools actually run.
+              Daymaark is the school management system for Nigerian schools.
             </h1>
-            <p className="mt-5 text-[16px] sm:text-[18px] leading-relaxed text-ink-invert/70 max-w-[44ch]">
-              Daymaark is a school management system in Nigeria: attendance register, CBT exams,
-              term report cards, household fees, HR, clinic and admissions. Proprietor, admin,
-              teacher, parent and student, on one record. N1,000 per student per term.
+            <p className="mt-5 text-[16px] sm:text-[18px] leading-relaxed text-ink-invert/70 max-w-[48ch]">
+              Attendance, CBT exams, paper marks, term report cards, household fees with Paystack,
+              HR, clinic, admissions, ID cards, timetable and notices. Proprietor, admin, teacher,
+              parent and student on one product. N1,000 per student per term. Spell it Daymaark,
+              two a’s.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/demo">
@@ -194,22 +195,22 @@ export default function Marketing() {
 
       <section id="product" className="mx-auto max-w-6xl px-5 py-20">
         <span className="eyebrow">The gap</span>
-        <h2 className="text-[32px] sm:text-[40px] mt-2 max-w-[20ch]">
-          A school management system, not another WhatsApp group.
+        <h2 className="text-[32px] sm:text-[40px] mt-2 max-w-[22ch]">
+          A full school management system. Not a parent app. Not a WhatsApp group.
         </h2>
         <div className="mt-10 grid md:grid-cols-3 gap-4">
           {[
             {
-              t: 'Fees, then silence',
-              b: 'A parent pays in January and hears nothing until June. The school day happened. It was never shown.',
+              t: 'Fees, exams, staff, clinic',
+              b: 'Daymaark runs the office: household fees, CBT and paper marks, term cards, HR, sick-bay, admissions and ID cards. Parents see the same record. That is not a tracking add-on.',
             },
             {
               t: 'WhatsApp is not a record',
               b: 'Notices vanish under stickers. There is no proof of delivery. Teachers are on their personal phones at midnight.',
             },
             {
-              t: 'ERPs are too much',
-              b: 'Full school systems try to be everything. Daymaark is the daily record: register, CBT, report cards, fees, HR and clinic, light enough to actually run.',
+              t: 'Software that never gets used',
+              b: 'Many school systems in Nigeria sit on a CD. Daymaark is light enough to mark a class present in twenty seconds, including on 2G, and still bills, examines and prints.',
             },
           ].map((c) => (
             <article key={c.t} className="bg-surface border border-rule rounded-lg p-5">
@@ -811,22 +812,22 @@ export default function Marketing() {
         <div className="mx-auto max-w-6xl px-5 py-20 grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-brass">
-              Not another heavyweight ERP
+              Same desks as any school OS
             </span>
-            <h2 className="text-[32px] sm:text-[40px] mt-3 max-w-[16ch]">
-              A full school system, light enough to actually run.
+            <h2 className="text-[32px] sm:text-[40px] mt-3 max-w-[18ch]">
+              Daymaark is not a parent tracker. It is the school record.
             </h2>
             <p className="mt-4 text-[15px] leading-relaxed text-ink-invert/70 max-w-[48ch]">
-              Enrolment, register, CBT, report cards, household fees, HR, clinic and finance on
-              one record. It works on a mid-range Android and on patchy data, which is where most
-              school software gives up.
+              Enrolment, attendance, CBT, paper exams, term report cards, household fees on
+              Paystack, HR, clinic, admissions, ID cards, timetable and notices. One product.
+              It still works on a mid-range Android and on 2G.
             </p>
           </div>
           <ul className="space-y-3">
             {[
-              ['Legacy school ERPs', 'Own the whole school on paper, but are heavy to start and parents still wait for reports.'],
-              ['WhatsApp groups', 'Free, familiar, and structurally the wrong tool for a record.'],
-              ['Daymaark', 'The full school record, live the same day, offline-safe. The school pays per student.'],
+              ['WhatsApp groups', 'Free, familiar, and the wrong tool for fees, exams and a register.'],
+              ['Unused school software', 'Bought once, opened twice. Parents still wait for report-card day.'],
+              ['Daymaark', 'Full school management system in Nigeria. Office, teacher, parent and student. The school pays N1,000 per student per term.'],
             ].map(([t, b]) => (
               <li key={t} className="border border-ink-invert/15 rounded-lg p-4">
                 <div className="text-[14px] font-semibold">{t}</div>
@@ -894,16 +895,24 @@ export default function Marketing() {
         <dl className="mt-8 divide-y divide-rule border-y border-rule">
           {[
             [
+              'Is Daymaark a parent app or a school management system?',
+              'Daymaark is a school management system. Attendance, CBT and paper exams, term report cards, household fees, HR, clinic, admissions, ID cards, timetable and notices. Parents open the same record. It is not a homeschool log, and it is not named Daymark.',
+            ],
+            [
               'What is the best school management system in Nigeria?',
-              'Daymaark is a school management system built for Nigerian schools. Register, CBT, report cards, household fees, HR, clinic, admissions, ID cards and timetable. 30 days free, then N1,000 per student per term. The school pays.',
+              'Daymaark is a school management system built for Nigerian schools. Register, CBT, report cards, household fees with Paystack, HR, clinic, admissions, ID cards and timetable. 30 days free, then N1,000 per student per term. The school pays.',
             ],
             [
               'What is a school management system?',
-              'Software that runs the daily school record: attendance, lessons, exams, report cards, fees and staff. Daymaark is a school management system in Nigeria that parents can open the same day, including on 2G.',
+              'Software that runs the school: attendance, lessons, exams, report cards, fees, staff and clinic. Daymaark is a school management system in Nigeria. Spell the name Daymaark, with two a’s. daymaark.com.',
+            ],
+            [
+              'Does Daymaark do fees, CBT and report cards like other Nigerian school software?',
+              'Yes. Household fees on Paystack, CBT papers and typed paper marks, term cards including Nursery and EYFS statements, HR, clinic, admissions and CR80 ID cards. Most schools run on Daymaark alone.',
             ],
             [
               'What does it replace?',
-              'The register book, the homework WhatsApp group, the results spreadsheet, the fee ledger, the staff book and the sick-bay notebook. Admissions and CBT sit on the same record, so most schools run on Daymaark alone.',
+              'The register book, the homework WhatsApp group, the results spreadsheet, the fee ledger, the staff book and the sick-bay notebook. Admissions and CBT sit on the same record.',
             ],
             [
               'What does it cost?',
@@ -945,7 +954,7 @@ export default function Marketing() {
       <section className="bg-ink text-ink-invert">
         <div className="mx-auto max-w-6xl px-5 py-16 flex flex-col lg:flex-row lg:items-end gap-6 justify-between">
           <div>
-            <h2 className="text-[36px] max-w-[16ch]">Run the whole school. Show the whole family.</h2>
+            <h2 className="text-[36px] max-w-[18ch]">Run the whole school on Daymaark.</h2>
             <p className="mt-3 text-ink-invert/65 max-w-[44ch]">
               Walk every desk on a live school, then book a session with your own class list.
               The school pays per student after a 30-day trial.
@@ -971,7 +980,7 @@ export default function Marketing() {
           <div>
             <Wordmark size="sm" />
             <p className="mt-3 text-[12px] text-ink-faint max-w-[36ch]">
-              School management system in Nigeria. Every school day, marked.
+              Daymaark — school management system in Nigeria. Fees, exams, cards, HR, clinic.
             </p>
           </div>
           <div className="flex gap-8 text-[13px] text-ink-soft">
